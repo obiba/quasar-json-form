@@ -2,8 +2,8 @@
 
 > Add a short description of your App Extension. What does it do? How is it beneficial? Why would someone want to use it?
 
-[![npm](https://img.shields.io/npm/v/quasar-app-extension-json-form.svg?label=quasar-app-extension-json-form)](https://www.npmjs.com/package/quasar-app-extension-json-form)
-[![npm](https://img.shields.io/npm/dt/quasar-app-extension-json-form.svg)](https://www.npmjs.com/package/quasar-app-extension-json-form)
+[![npm](https://img.shields.io/npm/v/@obiba/quasar-app-extension-json-form.svg?label=@obiba/quasar-app-extension-json-form)](https://www.npmjs.com/package/@obiba/quasar-app-extension-json-form)
+[![npm](https://img.shields.io/npm/dt/@obiba/quasar-app-extension-json-form.svg)](https://www.npmjs.com/package/@obiba/quasar-app-extension-json-form)
 
 # Install
 ```bash

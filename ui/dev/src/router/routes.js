@@ -1,17 +1,17 @@
-import pages from './pages'
+const pages = [
+  { path: '', file: 'Index' }
+]
 
 const children = pages.map(page => ({
   path: page.path,
-  component: () => import('pages/' + page.file + '.vue')
+  component: () => import(`../pages/${page.file}.vue`)
 }))
 
 const routes = [
   {
     path: '/',
     component: () => import('layouts/MyLayout.vue'),
-    children: [
-      { path: '', component: () => import('pages/Index.vue') }
-    ].concat(children)
+    children
   },
 
   // Always leave this as last one,

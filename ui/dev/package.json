@@ -2,7 +2,7 @@
   "name": "dev",
   "version": "1.0.0",
   "description": "A Quasar Framework app",
-  "productName": "Quasar App",
+  "productName": "@obiba/Quasar JSON Form Dev",
   "private": true,
   "scripts": {
     "dev": "quasar dev",
@@ -11,20 +11,17 @@
     "dev:android": "quasar dev -m android",
     "dev:electron": "quasar dev -m electron"
   },
-  "browserslist": [
-    "last 10 Chrome versions",
-    "last 10 Firefox versions",
-    "last 4 Edge versions",
-    "last 7 Safari versions",
-    "last 8 Android versions",
-    "last 8 ChromeAndroid versions",
-    "last 8 FirefoxAndroid versions",
-    "last 10 iOS versions",
-    "last 5 Opera versions"
-  ],
+  "dependencies": {
+    "@quasar/extras": "^1.16.4",
+    "quasar": "^2.16.0",
+    "vue": "^3.4.0"
+  },
+  "devDependencies": {
+    "@quasar/app-vite": "^2.0.0",
+    "sass": "^1.69.5"
+  },
   "engines": {
-    "node": ">= 8.9.0",
-    "npm": ">= 5.6.0",
-    "yarn": ">= 1.6.0"
+    "node": ">= 18.0.0",
+    "npm": ">= 8.0.0"
   }
 }

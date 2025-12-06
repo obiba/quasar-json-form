@@ -7,7 +7,7 @@
 
 function extendConf (conf, api) {
   // register our boot file
-  conf.boot.push('~quasar-app-extension-json-form/src/boot/register.js')
+  conf.boot.push('~@obiba/quasar-app-extension-json-form/src/boot/register.js')
 
   if (api.hasWebpack) {
     // make sure app extension files & ui package gets transpiled
@@ -15,11 +15,11 @@ function extendConf (conf, api) {
       conf.build.webpackTranspileDependencies // q/app-webpack >= v4
       || conf.build.transpileDependencies // q/app-webpack v3
     )
-    transpileTarget.push(/quasar-app-extension-json-form[\\/]src/)
+    transpileTarget.push(/@obiba\/quasar-app-extension-json-form[\\/]src/)
   }
 
   // make sure the stylesheet goes through webpack to avoid SSR issues
-  conf.css.push('~quasar-ui-json-form/src/index.sass')
+  conf.css.push('~@obiba/quasar-ui-json-form/src/index.sass')
 }
 
 export default function (api) {
@@ -37,7 +37,7 @@ export default function (api) {
 
 
   // Uncomment the line below if you provide a JSON API for your component
-  // api.registerDescribeApi('QJsonForm', '~quasar-ui-json-form/src/components/QJsonForm.json')
+  // api.registerDescribeApi('QJsonForm', '~@obiba/quasar-ui-json-form/src/components/QJsonForm.json')
 
 
   // We extend /quasar.conf.js

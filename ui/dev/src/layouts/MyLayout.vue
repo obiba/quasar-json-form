@@ -11,7 +11,7 @@
         />
 
         <q-toolbar-title>
-          quasar-ui-json-form v{{ version }}
+          @obiba/quasar-ui-json-form v{{ version }}
         </q-toolbar-title>
 
         <div>Quasar v{{ $q.version }}</div>

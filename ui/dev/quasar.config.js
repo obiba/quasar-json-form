@@ -1,15 +1,13 @@
-// Configuration for your app
-// https://quasar.dev/quasar-cli/quasar-conf-js
+import { configure } from 'quasar/wrappers'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
-const path = require('path')
-const webpack = require('webpack')
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-module.exports = function (ctx) {
+export default configure((/* ctx */) => {
   return {
-    // app boot file (/src/boot)
-    // --> boot files are part of "main.js"
     boot: [
-      'register.js'
+      'register'
     ],
 
     css: [
@@ -17,57 +15,71 @@ module.exports = function (ctx) {
     ],
 
     extras: [
-      // 'ionicons-v4',
-      // 'mdi-v5',
-      // 'fontawesome-v5',
-      // 'eva-icons',
-      // 'themify',
-      // 'line-awesome',
-      // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
-
-      'roboto-font', // optional, you are not bound to it
-      'material-icons' // optional, you are not bound to it
+      'roboto-font',
+      'material-icons'
     ],
 
-    framework: {
-      // iconSet: 'material-icons', // Quasar icon set
-      // lang: 'en-US', // Quasar language pack
-
-      config: {},
-
-      // Quasar plugins
-      plugins: []
-    },
-
-    // animations: 'all', // --- includes all animations
-    animations: [],
-
-    // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
-      vueRouterMode: 'history',
+      vueRouterMode: 'hash',
 
-      chainWebpack (chain) {
-        chain.resolve.alias.merge({
-          ui: path.resolve(__dirname, `../src/index.esm.js`)
-        })
+      vitePlugins: [
+        ['vite-plugin-checker', { vueTsc: false }]
+      ],
 
-        chain.plugin('define-ui')
-          .use(webpack.DefinePlugin, [{
-            __UI_VERSION__: `'${require('../package.json').version}'`
-          }])
+      extendViteConf (viteConf) {
+        viteConf.resolve.alias.ui = path.resolve(__dirname, '../src/index.esm.js')
+        
+        // Add define to fix __UI_VERSION__ error
+        viteConf.define = {
+          ...viteConf.define,
+          __UI_VERSION__: JSON.stringify(process.env.npm_package_version || '1.0.0'),
+          __QUASAR_VERSION__: JSON.stringify(process.env.npm_package_version || '1.0.0')
+        }
       }
     },
 
     devServer: {
-      // port: 8080,
-      open: true // opens browser window automatically
+      open: true
     },
 
+    framework: {
+      config: {},
+      plugins: []
+    },
+
+    animations: [],
+
     ssr: {
+      pwa: false,
+      prodPort: 3000,
       middlewares: [
-        ctx.prod ? 'compression' : '',
-        'render' // keep this as last one
+        'render'
       ]
+    },
+
+    pwa: {
+      workboxMode: 'generateSW',
+      injectPwaMetaTags: true,
+      swFilename: 'sw.js',
+      manifestFilename: 'manifest.json',
+      useCredentialsForManifestTag: false
+    },
+
+    capacitor: {
+      hideSplashscreen: true
+    },
+
+    electron: {
+      inspectPort: 5858,
+
+      bundler: 'packager',
+
+      packager: {
+      },
+
+      builder: {
+        appId: 'dev'
+      }
     }
   }
-}
+})

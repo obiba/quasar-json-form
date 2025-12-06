@@ -1,5 +1,5 @@
-<img src="https://img.shields.io/npm/v/quasar-ui-json-form.svg?label=quasar-ui-json-form">
-<img src="https://img.shields.io/npm/v/quasar-app-extension-json-form.svg?label=quasar-app-extension-json-form">
+<img src="https://img.shields.io/npm/v/@obiba/quasar-ui-json-form.svg?label=@obiba/quasar-ui-json-form">
+<img src="https://img.shields.io/npm/v/@obiba/quasar-app-extension-json-form.svg?label=@obiba/quasar-app-extension-json-form">
 
 Compatible with Quasar UI v2 and Vue 3.
 

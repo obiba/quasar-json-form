@@ -16,9 +16,10 @@ function slugify (str) {
   return encodeURIComponent(String(str).trim().replace(/\s+/g, '-'))
 }
 
-export default require.context('../pages', true, /^\.\/.*\.vue$/)
-  .keys()
-  .map(page => page.slice(2).replace('.vue', ''))
+const pages = import.meta.glob('../pages/**/*.vue')
+
+export default Object.keys(pages)
+  .map(page => page.replace('../pages/', '').replace('.vue', ''))
   .filter(page => page !== 'Index' && page !== 'Error404')
   .map(page => ({
     file: page,
