@@ -6,7 +6,7 @@
   "license": "MIT",
   "type": "module",
   "dependencies": {
-    "@obiba/quasar-ui-json-form": "latest"
+    "@obiba/quasar-ui-json-form": "^0.0.1"
   },
   "engines": {
     "node": ">= 8.9.0",
