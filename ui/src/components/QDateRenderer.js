@@ -71,9 +71,7 @@ export default defineComponent({
                   label: t('close'),
                   color: 'primary',
                   flat: true,
-                  directives: [{
-                    name: 'close-popup',
-                  }],
+                  vClosePopup: true,
                 }),
               ]),
             }),

@@ -8,7 +8,8 @@ export default configure((/* ctx */) => {
   return {
     boot: [
       'register',
-      'i18n'
+      'i18n',
+      'prism'
     ],
 
     css: [
@@ -40,7 +41,7 @@ export default configure((/* ctx */) => {
     },
 
     devServer: {
-      open: true
+      open: false
     },
 
     framework: {
