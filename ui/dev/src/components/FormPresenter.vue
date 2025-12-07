@@ -56,6 +56,7 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import { QJsonForm } from 'ui';
 
 const props = defineProps({
   data: {
