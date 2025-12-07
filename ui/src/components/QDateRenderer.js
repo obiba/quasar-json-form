@@ -31,8 +31,12 @@ export default defineComponent({
     );
 
     const onChange = (value) => {
-      controlResult.handleChange(control.value.path, value);
+      // Convert empty string back to undefined
+      controlResult.handleChange(control.value.path, value || undefined);
     };
+
+    // Convert undefined to empty string for QDate/QInput compatibility
+    const dateValue = control.value.data || '';
 
     return () => {
       if (!isVisible.value) {
@@ -40,7 +44,7 @@ export default defineComponent({
       }
 
       return h(QInput, {
-        modelValue: control.value.data,
+        modelValue: dateValue,
         'onUpdate:modelValue': onChange,
         label: control.value.label,
         error: hasError.value,
@@ -60,7 +64,7 @@ export default defineComponent({
             transitionHide: 'scale',
           }, {
             default: () => h(QDate, {
-              modelValue: control.value.data,
+              modelValue: dateValue,
               mask: 'YYYY-MM-DD',
               'onUpdate:modelValue': onChange,
             }, {
