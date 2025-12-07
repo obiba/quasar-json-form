@@ -6,6 +6,7 @@ const uglify = require('uglify-js')
 const buble = require('@rollup/plugin-buble')
 const json = require('@rollup/plugin-json')
 const { nodeResolve } = require('@rollup/plugin-node-resolve')
+const commonjs = require('@rollup/plugin-commonjs')
 const replace = require('@rollup/plugin-replace')
 
 const { version } = require('../package.json')
@@ -24,9 +25,11 @@ const rollupPlugins = [
     extensions: ['.js'],
     preferBuiltins: false
   }),
+  commonjs(),
   json(),
   buble({
-    objectAssign: 'Object.assign'
+    objectAssign: 'Object.assign',
+    exclude: ['node_modules/**']
   })
 ]
 

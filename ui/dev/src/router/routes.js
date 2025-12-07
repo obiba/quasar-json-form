@@ -1,5 +1,6 @@
 const pages = [
-  { path: '', file: 'Index' }
+  { path: '', file: 'Index' },
+  { path: 'test1', file: 'Test1' }
 ]
 
 const children = pages.map(page => ({

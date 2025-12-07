@@ -7,7 +7,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 export default configure((/* ctx */) => {
   return {
     boot: [
-      'register'
+      'register',
+      'i18n'
     ],
 
     css: [
