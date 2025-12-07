@@ -7,6 +7,8 @@ const buble = require('@rollup/plugin-buble')
 const json = require('@rollup/plugin-json')
 const { nodeResolve } = require('@rollup/plugin-node-resolve')
 const replace = require('@rollup/plugin-replace')
+const typescript = require('@rollup/plugin-typescript')
+const vue = require('@vitejs/plugin-vue')
 
 const { version } = require('../package.json')
 
@@ -20,8 +22,26 @@ const rollupPlugins = [
       __UI_VERSION__: `'${ version }'`
     }
   }),
+  vue({
+    isProduction: true,
+    template: {
+      compilerOptions: {
+        whitespace: 'condense'
+      }
+    }
+  }),
+  typescript({
+    tsconfig: false,
+    compilerOptions: {
+      target: 'es2020',
+      module: 'esnext',
+      declaration: false,
+      skipLibCheck: true,
+      importsNotUsedAsValues: 'remove'
+    }
+  }),
   nodeResolve({
-    extensions: ['.js'],
+    extensions: ['.ts', '.js', '.mjs'],
     preferBuiltins: false
   }),
   json(),
@@ -30,11 +50,12 @@ const rollupPlugins = [
   })
 ]
 
+// Update input paths to support .ts
 const builds = [
   {
     rollup: {
       input: {
-        input: pathResolve('../src/index.esm.js')
+        input: pathResolve('../src/index.ts')
       },
       output: {
         file: pathResolve('../dist/index.esm.js'),

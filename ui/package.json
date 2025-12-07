@@ -18,6 +18,9 @@
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-replace": "^5.0.5",
+    "@rollup/plugin-typescript": "^12.3.0",
+    "@types/node": "^24.10.1",
+    "@vitejs/plugin-vue": "^6.0.2",
     "autoprefixer": "^10.4.16",
     "chalk": "^4.1.2",
     "cssnano": "^6.0.0",
@@ -28,7 +31,10 @@
     "rollup": "^4.9.0",
     "rtlcss": "^4.1.1",
     "sass": "^1.69.5",
-    "uglify-js": "^3.17.4"
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.3",
+    "uglify-js": "^3.17.4",
+    "vue-tsc": "^3.1.6"
   },
   "peerDependencies": {
     "quasar": "^2.0.0",
@@ -43,5 +49,12 @@
     "last 4 ChromeAndroid versions",
     "last 4 FirefoxAndroid versions",
     "last 4 iOS versions"
-  ]
+  ],
+  "dependencies": {
+    "@jsonforms/core": "^3.7.0",
+    "@jsonforms/vue": "^3.7.0",
+    "@jsonforms/vue-vanilla": "^3.7.0",
+    "filtrex": "^3.1.0",
+    "vue-i18n": "^11.2.2"
+  }
 }
