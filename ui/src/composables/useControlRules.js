@@ -10,13 +10,13 @@ export function useControlRules(control) {
 
   // Extract rule options from UI schema
   const ruleOptions = computed(() => {
-    const uischema = control.value.uischema;
-    return uischema.options || {};
+    const schema = control.value.schema;
+    return schema.rules || {};
   });
 
   // Visibility rule
   const isVisible = computed(() => {
-    const rule = ruleOptions.value.visibilityRule;
+    const rule = ruleOptions.value.visible;
     if (!rule) return true;
     try {
       return evaluateRule(rule);
@@ -29,7 +29,7 @@ export function useControlRules(control) {
   // Enable rule
   const isEnabled = computed(() => {
     if (!control.value.enabled) return false;
-    const rule = ruleOptions.value.enableRule;
+    const rule = ruleOptions.value.enabled;
     if (!rule) return true;
     try {
       const rval = evaluateRule(rule);
@@ -42,16 +42,17 @@ export function useControlRules(control) {
 
   // Custom validation
   const customValidationErrors = computed(() => {
-    const rules = ruleOptions.value.validationRules || [];
+    const rules = ruleOptions.value.validation || [];
     const errors = [];
 
     rules.forEach((rule) => {
       try {
-        if (!evaluateRule(rule.expression)) {
+        const expression = rule.expr || rule.expression;
+        if (expression && !evaluateRule(expression)) {
           errors.push(rule.message);
         }
       } catch (error) {
-        console.error('Error evaluating validation rule:', rule.expression, error);
+        console.error('Error evaluating validation rule:', expression, error);
       }
     });
 
@@ -69,7 +70,7 @@ export function useControlRules(control) {
       : [control.value.errors];
     const customErrors = customValidationErrors.value;
     // Combine both error arrays
-    const allErrors = [...jsonFormsErrors, ...customErrors];
+    const allErrors = [...jsonFormsErrors, ...customErrors].filter((e) => e && e.length > 0);
     return allErrors.join(', ');
   });
 

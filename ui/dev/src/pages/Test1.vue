@@ -19,17 +19,32 @@ const schema = {
   properties: {
     string: {
       type: 'string',
+      rules: {
+        visible: 'integer >= 1 and integer < 10',
+      },
     },
     boolean: {
       type: 'boolean',
       description: 'This toggle is enabled only if "enum" is "One"',
+      rules: {
+        enabled: `enum == "One"`,
+      },
     },
     number: {
       type: 'number',
+      description: 'A simple number input',
     },
     integer: {
       type: 'integer',
       description: 'This integer must be between 1 and 10 to show string input',
+      rules: {
+        validation: [
+          {
+            expr: 'integer % 2 == 0',
+            message: 'Number must be even',
+          }
+        ],
+      },
     },
     date: {
       type: 'string',
@@ -75,10 +90,7 @@ const uischema = {
           elements: [
             {
               type: 'Control',
-              scope: '#/properties/string',
-              options: {
-                visibilityRule: 'integer >= 1 and integer < 10',
-              },
+              scope: '#/properties/string'
             },
             {
               type: 'Control',
@@ -104,9 +116,6 @@ const uischema = {
             {
               type: 'Control',
               scope: '#/properties/boolean',
-              options: {
-                enableRule: `enum == "One"`,
-              },
             },
           ],
         },
