@@ -3,6 +3,9 @@ export default {
   failed: 'Action failed',
   success: 'Action was successful',
   close: 'Close',
+  schema: 'Schema',
+  layout: 'Layout',
+  form: 'Form',
   renderers: {
     string: {
       label: 'String Input',

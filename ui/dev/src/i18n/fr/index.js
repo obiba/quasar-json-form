@@ -3,6 +3,9 @@ export default {
   failed: 'Action échouée',
   success: 'Action réussie',
   close: 'Fermer',
+  schema: 'Schéma',
+  layout: 'Disposition',
+  form: 'Formulaire',
   renderers: {
     string: {
       label: 'Entrée de Texte',

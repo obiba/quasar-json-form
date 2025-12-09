@@ -2,8 +2,8 @@
   <div class="row q-col-gutter-md">
     <div class="col">
       <q-tabs v-model="tabDesign" align="left">
-        <q-tab name="schema" label="Schema" />
-        <q-tab name="layout" label="Layout" />
+        <q-tab name="schema" :label="t('schema')" />
+        <q-tab name="layout" :label="t('layout')" />
       </q-tabs>
       <q-separator />
       <q-tab-panels v-model="tabDesign" animated>
@@ -41,7 +41,7 @@
     </div>
     <div class="col">
       <q-tabs v-model="tabPreview" align="left">
-        <q-tab name="form" label="Form" />
+        <q-tab name="form" :label="t('form')" />
       </q-tabs>
       <q-separator />
       <q-tab-panels v-model="tabPreview" animated>
@@ -57,6 +57,9 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { QJsonForm } from 'ui';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps({
   data: {
