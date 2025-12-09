@@ -1,7 +1,7 @@
 import { h, watch, defineComponent } from 'vue';
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue';
 import { QToggle } from 'quasar';
-import { useControlRules } from '../composables/useControlRules';
+import { useControlProperties } from '../composables/useControlProperties';
 import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
@@ -18,8 +18,8 @@ export default defineComponent({
     const control = controlResult.control;
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, hasError, errorMessage, hint, componentProps } =
-      useControlRules(control);
+    const { isVisible, isEnabled, hasError, errorMessage, uiOptions } =
+      useControlProperties(control);
 
     watch(
       () => isVisible.value,
@@ -49,7 +49,7 @@ export default defineComponent({
         errorMessage: errorMessage.value,
         required: control.value.required,
         disable: !isEnabled.value,
-        ...componentProps.value,
+        ...uiOptions.value,
       }));
 
       if (control.value.description) {
@@ -58,10 +58,10 @@ export default defineComponent({
         }, t(control.value.description)));
       }
 
-      if (hint.value) {
+      if (uiOptions.value.hint) {
         children.push(h('div', {
           class: 'text-caption text-grey-7',
-        }, t(hint.value)));
+        }, t(uiOptions.value.hint)));
       }
 
       return h('div', children);

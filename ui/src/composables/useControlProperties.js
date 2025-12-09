@@ -2,7 +2,7 @@
 import { computed, inject, ref } from 'vue';
 import { useFiltrexRules } from './useFiltrexRules';
 
-export function useControlRules(control) {
+export function useControlProperties(control) {
   // Inject form data from provider
   const injectedFormData = inject('jsonforms-data', ref({}));
 
@@ -74,18 +74,18 @@ export function useControlRules(control) {
     return allErrors.join(', ');
   });
 
-  // TODO make dynamic hint based on an expression
-  const hint = computed(() => ruleOptions.value.hint);
-
-  const componentProps = computed(() => ruleOptions.value.componentProps || {});
+  // Extract options from schema
+  const uiOptions = computed(() => {
+    const uiSchema = control.value.uiSchema;
+    return (uiSchema && uiSchema.options) || {};
+  });
 
   return {
     isVisible,
     isEnabled,
     hasError,
     errorMessage,
-    hint,
-    componentProps,
+    uiOptions,
     ruleOptions,
   };
 }

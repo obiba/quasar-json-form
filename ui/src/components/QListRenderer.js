@@ -2,7 +2,7 @@ import { h, computed, watch, defineComponent } from 'vue';
 import { createDefaultValue } from '@jsonforms/core';
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue';
 import { QList, QItem, QItemSection, QItemLabel, QIcon, QBtn } from 'quasar';
-import { useControlRules } from '../composables/useControlRules';
+import { useControlProperties } from '../composables/useControlProperties';
 
 export default defineComponent({
   name: 'QListRenderer',
@@ -16,8 +16,8 @@ export default defineComponent({
     const control = controlResult.control;
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, hasError, errorMessage, hint, componentProps } =
-      useControlRules(control);
+    const { isVisible, isEnabled, hasError, errorMessage, uiOptions } =
+      useControlProperties(control);
 
     const items = computed(() => {
       return Array.isArray(control.value.data) ? control.value.data : [];
@@ -54,7 +54,7 @@ export default defineComponent({
       }, [
         h(QList, {
           bordered: true,
-          ...componentProps.value,
+          ...uiOptions.value,
         }, items.value.map((item, index) =>
           h(QItem, { key: index }, [
             h(QItemSection, { class: 'q-pa-sm' }, [

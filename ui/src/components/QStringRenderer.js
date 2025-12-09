@@ -1,7 +1,7 @@
 import { h, watch, computed, defineComponent } from 'vue';
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue';
 import { QInput } from 'quasar';
-import { useControlRules } from '../composables/useControlRules';
+import { useControlProperties } from '../composables/useControlProperties';
 import { useI18n } from 'vue-i18n';
 
 
@@ -19,8 +19,8 @@ export default defineComponent({
     const control = controlResult.control;
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, hasError, errorMessage, hint, componentProps } =
-      useControlRules(control);
+    const { isVisible, isEnabled, hasError, errorMessage, uiOptions } =
+      useControlProperties(control);
 
     const inputType = computed(() => {
       const schema = control.value.schema;
@@ -53,9 +53,9 @@ export default defineComponent({
         errorMessage: errorMessage.value,
         required: control.value.required,
         disable: !isEnabled.value,
-        hint: control.value.description ? t(control.value.description) : hint.value ? t(hint.value) : undefined,
+        hint: control.value.description ? t(control.value.description) : undefined,
         type: inputType.value,
-        ...componentProps.value,
+        ...uiOptions.value,
       });
     };
   },
