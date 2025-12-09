@@ -54,26 +54,6 @@ const schema = {
       type: 'string',
       enum: ['One', 'Two', 'Three'],
     },
-    comments: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          date: {
-            type: 'string',
-            format: 'date',
-          },
-          message: {
-            type: 'string',
-            maxLength: 5,
-          },
-          enum: {
-            type: 'string',
-            enum: ['foo', 'bar'],
-          },
-        },
-      },
-    },
   },
 };
 
@@ -120,10 +100,6 @@ const uischema = {
           ],
         },
       ],
-    },
-    {
-      type: 'Control',
-      scope: '#/properties/comments',
     },
   ],
 };
