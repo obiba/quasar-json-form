@@ -1,6 +1,7 @@
 const pages = [
   { path: '', file: 'Index' },
-  { path: 'test1', file: 'Test1' },
+  { path: 'test-renderers', file: 'TestRenderers' },
+  { path: 'test-rules', file: 'TestRules' },
   { path: 'test-list', file: 'TestList' },
 ]
 

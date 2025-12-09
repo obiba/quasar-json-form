@@ -2,11 +2,15 @@ import { h, watch, computed, defineComponent } from 'vue';
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue';
 import { QInput } from 'quasar';
 import { useControlRules } from '../composables/useControlRules';
+import { useI18n } from 'vue-i18n';
+
 
 export default defineComponent({
   name: 'QStringRenderer',
   props: rendererProps(),
   setup(props) {
+    const { t } = useI18n();
+    
     const controlResult = useJsonFormsControl({
       ...props,
       uischema: props.uischema,
@@ -20,13 +24,7 @@ export default defineComponent({
 
     const inputType = computed(() => {
       const schema = control.value.schema;
-      if (schema.format === 'email') {
-        return 'email';
-      }
-      if (schema.format === 'password') {
-        return 'password';
-      }
-      return 'text';
+      return schema.format || 'text';
     });
 
     watch(
@@ -50,12 +48,12 @@ export default defineComponent({
       return h(QInput, {
         modelValue: control.value.data,
         'onUpdate:modelValue': onChange,
-        label: control.value.label,
+        label: control.value.label ? t(control.value.label) : undefined,
         error: hasError.value,
         errorMessage: errorMessage.value,
         required: control.value.required,
         disable: !isEnabled.value,
-        hint: control.value.description || hint.value,
+        hint: control.value.description ? t(control.value.description) : hint.value ? t(hint.value) : undefined,
         type: inputType.value,
         ...componentProps.value,
       });

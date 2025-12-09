@@ -3,4 +3,35 @@ export default {
   failed: 'Action failed',
   success: 'Action was successful',
   close: 'Close',
+  renderers: {
+    string: {
+      label: 'String Input',
+      description: 'Please enter a string value',
+    },
+    boolean: {
+      label: 'Boolean Toggle',
+      description: 'Please toggle the boolean value',
+    },
+    number: {
+      label: 'Number Input',
+      description: 'Please enter a numeric value',
+    },
+    integer: {
+      label: 'Integer Input',
+      description: 'Please enter an integer value',
+    },
+    date: {
+      label: 'Date Picker',
+      description: 'Please select a date',
+    },
+    enum: {
+      label: 'Enum Selector',
+      description: 'Please select a value from the list',
+      options: {
+        one: 'Option One',
+        two: 'Option Two',
+        three: 'Option Three',
+      }
+    },
+  }
 };

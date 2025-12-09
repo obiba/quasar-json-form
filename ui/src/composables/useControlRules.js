@@ -74,6 +74,7 @@ export function useControlRules(control) {
     return allErrors.join(', ');
   });
 
+  // TODO make dynamic hint based on an expression
   const hint = computed(() => ruleOptions.value.hint);
 
   const componentProps = computed(() => ruleOptions.value.componentProps || {});

@@ -1,14 +1,15 @@
 import { h, watch, defineComponent, ref, computed } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue';
 import { QInput, QIcon, QPopupProxy, QDate, QBtn } from 'quasar';
 import { useControlRules } from '../composables/useControlRules';
+import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
   name: 'QDateRenderer',
   props: rendererProps(),
   setup(props) {
     const { t } = useI18n();
+
     const popupRef = ref(null);
 
     const controlResult = useJsonFormsControl({
@@ -50,12 +51,12 @@ export default defineComponent({
       return h(QInput, {
         modelValue: dateValue.value,
         'onUpdate:modelValue': onChange,
-        label: control.value.label,
+        label: control.value.label ? t(control.value.label) : undefined,
         error: hasError.value,
         errorMessage: errorMessage.value,
         required: control.value.required,
         disable: !isEnabled.value,
-        hint: control.value.description || hint.value,
+        hint: control.value.description ? t(control.value.description) : hint.value ? t(hint.value) : undefined,
         ...componentProps.value,
       }, {
         append: () => h(QIcon, {

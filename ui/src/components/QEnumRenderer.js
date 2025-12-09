@@ -2,11 +2,14 @@ import { h, computed, watch, defineComponent } from 'vue';
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue';
 import { QSelect } from 'quasar';
 import { useControlRules } from '../composables/useControlRules';
+import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
   name: 'QEnumRenderer',
   props: rendererProps(),
   setup(props) {
+    const { t } = useI18n();
+
     const controlResult = useJsonFormsControl({
       ...props,
       uischema: props.uischema,
@@ -26,10 +29,23 @@ export default defineComponent({
         return [];
       }
 
+      if (schema.options && Array.isArray(schema.options)) {
+        // for each enum option, check if it's an object with label and same value
+        return schema.enum.map((val) => {
+          const foundOption = schema.options.find((option) => {
+            if (typeof option === 'object' && option !== null && 'value' in option) {
+              return option.value === val;
+            }
+            return option === val;
+          });
+          return foundOption ? { label: t(String(foundOption.label)), value: foundOption.value } : { label: t(String(val)), value: val };
+        });
+      }
+
       return schema.enum.map((value) => ({
-        label: String(value),
-        value: value,
-      }));
+          label: t(String(value)),
+          value: value,
+        }));
     });
 
     watch(
@@ -56,13 +72,13 @@ export default defineComponent({
         h(QSelect, {
           modelValue: control.value.data,
           'onUpdate:modelValue': onChange,
+          label: control.value.label ? t(control.value.label) : undefined,
           options: options.value,
-          label: control.value.label,
           error: hasError.value,
           errorMessage: errorMessage.value,
           required: control.value.required,
           disable: !isEnabled.value,
-          hint: control.value.description || hint.value,
+          hint: control.value.description ? t(control.value.description) : hint.value ? t(hint.value) : undefined,
           emitValue: true,
           mapOptions: true,
           ...componentProps.value,

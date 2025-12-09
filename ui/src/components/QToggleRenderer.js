@@ -2,11 +2,14 @@ import { h, watch, defineComponent } from 'vue';
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue';
 import { QToggle } from 'quasar';
 import { useControlRules } from '../composables/useControlRules';
+import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
   name: 'QToggleRenderer',
   props: rendererProps(),
   setup(props) {
+    const { t } = useI18n();
+
     const controlResult = useJsonFormsControl({
       ...props,
       uischema: props.uischema,
@@ -41,7 +44,7 @@ export default defineComponent({
       children.push(h(QToggle, {
         modelValue: control.value.data,
         'onUpdate:modelValue': onChange,
-        label: control.value.label,
+        label: control.value.label ? t(control.value.label) : undefined,
         error: hasError.value,
         errorMessage: errorMessage.value,
         required: control.value.required,
@@ -52,13 +55,13 @@ export default defineComponent({
       if (control.value.description) {
         children.push(h('div', {
           class: 'text-caption text-grey-7',
-        }, control.value.description));
+        }, t(control.value.description)));
       }
 
       if (hint.value) {
         children.push(h('div', {
           class: 'text-caption text-grey-7',
-        }, hint.value));
+        }, t(hint.value)));
       }
 
       return h('div', children);
