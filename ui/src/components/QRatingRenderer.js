@@ -1,11 +1,11 @@
 import { h, watch, defineComponent } from 'vue';
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue';
-import { QToggle } from 'quasar';
+import { QRating } from 'quasar';
 import { useControlProperties } from '../composables/useControlProperties';
 import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
-  name: 'QToggleRenderer',
+  name: 'QRatingRenderer',
   props: rendererProps(),
   setup(props) {
     const { t } = useI18n();
@@ -31,7 +31,7 @@ export default defineComponent({
     );
 
     const onChange = (value) => {
-      controlResult.handleChange(control.value.path, value);
+      controlResult.handleChange(control.value.path, Number(value));
     };
 
     return () => {
@@ -41,10 +41,16 @@ export default defineComponent({
 
       const children = [];
 
-      children.push(h(QToggle, {
+      if (control.value.label) {
+        children.push(h('div', {
+          class: 'text-grey-7 q-mb-xs',
+        }, t(control.value.label)));
+      }
+
+      children.push(h(QRating, {
         modelValue: control.value.data,
+        type: 'number',
         'onUpdate:modelValue': onChange,
-        label: control.value.label ? t(control.value.label) : undefined,
         error: hasError.value,
         errorMessage: errorMessage.value,
         required: control.value.required,
@@ -54,17 +60,11 @@ export default defineComponent({
 
       if (control.value.description) {
         children.push(h('div', {
-          class: 'text-caption text-grey-7',
+          class: 'text-caption text-grey-7 q-mt-sm',
         }, t(control.value.description)));
       }
 
-      if (uiOptions.value.hint) {
-        children.push(h('div', {
-          class: 'text-caption text-grey-7',
-        }, t(uiOptions.value.hint)));
-      }
-
-      return h('div', {class: 'q-mt-md'}, children);
+      return h('div',  {class: 'q-mt-md'}, children);
     };
   },
 });

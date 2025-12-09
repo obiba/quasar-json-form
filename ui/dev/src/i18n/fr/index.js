@@ -23,6 +23,10 @@ export default {
       label: 'Entrée Entière',
       description: 'Veuillez entrer une valeur entière',
     },
+    rating: {
+      label: 'Sélecteur de Note',
+      description: 'Veuillez sélectionner une note',
+    },
     date: {
       label: 'Sélecteur de Date',
       description: 'Veuillez sélectionner une date',

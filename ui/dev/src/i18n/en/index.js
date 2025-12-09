@@ -23,6 +23,10 @@ export default {
       label: 'Integer Input',
       description: 'Please enter an integer value',
     },
+    rating: {
+      label: 'Rating Selector',
+      description: 'Please select a rating',
+    },
     date: {
       label: 'Date Picker',
       description: 'Please select a date',

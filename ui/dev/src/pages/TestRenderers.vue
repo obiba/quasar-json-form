@@ -37,6 +37,11 @@ const schema = {
       title: 'renderers.integer.label',
       description: 'renderers.integer.description',
     },
+    rating: {
+      type: 'integer',
+      title: 'renderers.rating.label',
+      description: 'renderers.rating.description',
+    },
     date: {
       type: 'string',
       format: 'date',
@@ -98,6 +103,18 @@ const uischema = {
             {
               type: 'Control',
               scope: '#/properties/integer',
+            },
+            {
+              type: 'Control',
+              scope: '#/properties/rating',
+              options: {
+                format: 'rating',
+                icon: 'star_border',
+                iconSelected: 'star',
+                color: 'red',
+                size: 'md',
+                max: 6,
+              },
             },
             {
               type: 'Control',

@@ -76,7 +76,7 @@ export function useControlProperties(control) {
 
   // Extract options from schema
   const uiOptions = computed(() => {
-    const uiSchema = control.value.uiSchema;
+    const uiSchema = control.value.uischema;
     return (uiSchema && uiSchema.options) || {};
   });
 

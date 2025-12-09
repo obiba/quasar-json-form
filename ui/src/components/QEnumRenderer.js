@@ -66,24 +66,20 @@ export default defineComponent({
         return null;
       }
 
-      return h('div', {
-        class: 'q-mb-md',
-      }, [
-        h(QSelect, {
-          modelValue: control.value.data,
-          'onUpdate:modelValue': onChange,
-          label: control.value.label ? t(control.value.label) : undefined,
-          options: options.value,
-          error: hasError.value,
-          errorMessage: errorMessage.value,
-          required: control.value.required,
-          disable: !isEnabled.value,
-          hint: control.value.description ? t(control.value.description) : undefined,
-          emitValue: true,
-          mapOptions: true,
-          ...uiOptions.value,
-        }),
-      ]);
+      return h(QSelect, {
+        modelValue: control.value.data,
+        'onUpdate:modelValue': onChange,
+        label: control.value.label ? t(control.value.label) : undefined,
+        options: options.value,
+        error: hasError.value,
+        errorMessage: errorMessage.value,
+        required: control.value.required,
+        disable: !isEnabled.value,
+        hint: control.value.description ? t(control.value.description) : undefined,
+        emitValue: true,
+        mapOptions: true,
+        ...uiOptions.value,
+      });
     };
   },
 });

@@ -9,14 +9,17 @@ import {
   isBooleanControl,
   isEnumControl,
   isDateControl,
-  isArrayObjectControl,
+  optionIs,
+  and,
+  // isArrayObjectControl,
 } from '@jsonforms/core';
 import QStringRenderer from './QStringRenderer.js';
 import QNumRenderer from './QNumberRenderer.js';
+import QRatingRenderer from './QRatingRenderer.js';
 import QToggleRenderer from './QToggleRenderer.js';
 import QEnumRenderer from './QEnumRenderer.js';
 import QDateRenderer from './QDateRenderer.js';
-import QListRenderer from './QListRenderer.js';
+// import QListRenderer from './QListRenderer.js';
 
 // Define your custom renderers
 // Priority 3 - higher than default (usually 1-2)
@@ -24,6 +27,10 @@ const customRenderers = [
   {
     renderer: QStringRenderer,
     tester: rankWith(3, isStringControl),
+  },
+  {
+    renderer: QRatingRenderer,
+    tester: rankWith(3, and(isIntegerControl, optionIs('format', 'rating'))),
   },
   {
     renderer: QNumRenderer,
