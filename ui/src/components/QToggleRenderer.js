@@ -64,7 +64,7 @@ export default defineComponent({
         }, t(uiOptions.value.hint)));
       }
 
-      return h('div', {class: 'q-mt-md'}, children);
+      return h('div', children);
     };
   },
 });

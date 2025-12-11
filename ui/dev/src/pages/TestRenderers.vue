@@ -65,6 +65,13 @@ const schema = {
       title: 'renderers.enum.label',
       description: 'renderers.enum.description',
     },
+    enums: {
+      type: 'string',
+      format: 'array',
+      enum: ['one', 'two', 'three'],
+      title: 'renderers.enums.label',
+      description: 'renderers.enums.description',
+    },
   },
 };
 
@@ -90,6 +97,15 @@ const uischema = {
             {
               type: 'Control',
               scope: '#/properties/enum',
+            },
+            {
+              type: 'Control',
+              scope: '#/properties/enums',
+              options: {
+                maxValues: 2,
+                useChips: true,
+                clearable: true,
+              },
             },
           ],
         },

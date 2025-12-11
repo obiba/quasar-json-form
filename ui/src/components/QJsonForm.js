@@ -1,6 +1,7 @@
 import { h, provide, toRef, defineComponent } from 'vue';
 import { JsonForms } from '@jsonforms/vue';
 import { vanillaRenderers } from '@jsonforms/vue-vanilla';
+import '@jsonforms/vue-vanilla/vanilla.css';
 import {
   rankWith,
   isStringControl,
@@ -11,13 +12,14 @@ import {
   isDateControl,
   optionIs,
   and,
+  getValidationMode,
   // isArrayObjectControl,
 } from '@jsonforms/core';
 import QStringRenderer from './QStringRenderer.js';
 import QNumRenderer from './QNumberRenderer.js';
 import QRatingRenderer from './QRatingRenderer.js';
 import QToggleRenderer from './QToggleRenderer.js';
-import QEnumRenderer from './QEnumRenderer.js';
+import QSelectRenderer from './QSelectRenderer.js';
 import QDateRenderer from './QDateRenderer.js';
 // import QListRenderer from './QListRenderer.js';
 
@@ -45,7 +47,7 @@ const customRenderers = [
     tester: rankWith(3, isBooleanControl),
   },
   {
-    renderer: QEnumRenderer,
+    renderer: QSelectRenderer,
     tester: rankWith(4, isEnumControl), // Higher priority than String control
   },
   {
@@ -96,6 +98,7 @@ export default defineComponent({
         schema: props.schema,
         uischema: props.uischema,
         renderers,
+        validationMode: 'NoValidation', // do not use built-in validation
         onChange,
       }),
     ]);

@@ -40,5 +40,9 @@ export default {
         three: 'Option Three',
       }
     },
+    enums: {
+      label: 'Multiple Enum Selector',
+      description: 'Please select one or two values from the list',
+    },
   }
 };

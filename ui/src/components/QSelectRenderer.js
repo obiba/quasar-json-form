@@ -5,7 +5,7 @@ import { useControlProperties } from '../composables/useControlProperties';
 import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
-  name: 'QEnumRenderer',
+  name: 'QSelectRenderer',
   props: rendererProps(),
   setup(props) {
     const { t } = useI18n();
@@ -48,6 +48,11 @@ export default defineComponent({
         }));
     });
 
+    const isMultiple = computed(() => {
+      const schema = controlResult.control.value.schema;
+      return schema.format === 'array' || (uiOptions.value && uiOptions.value.multiple === true);
+    });
+
     watch(
       () => isVisible.value,
       (newValue) => {
@@ -78,6 +83,7 @@ export default defineComponent({
         hint: control.value.description ? t(control.value.description) : undefined,
         emitValue: true,
         mapOptions: true,
+        multiple: isMultiple.value,
         ...uiOptions.value,
       });
     };

@@ -64,7 +64,7 @@ export default defineComponent({
         }, t(control.value.description)));
       }
 
-      return h('div',  {class: 'q-mt-md'}, children);
+      return h('div', {class: 'q-mt-md'}, children);
     };
   },
 });

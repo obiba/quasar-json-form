@@ -40,5 +40,9 @@ export default {
         three: 'Option Trois',
       }
     },
+    enums: {
+      label: 'Sélecteur d\'Enumérations Multiples',
+      description: 'Veuillez sélectionner une ou deux valeurs dans la liste',
+    },
   }
 };
