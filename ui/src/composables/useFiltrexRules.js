@@ -22,6 +22,27 @@ export class FiltrexRuleEngine {
       return 0;
     });
 
+    this.addFunction('get', (value, idx) => {
+      if (typeof value === 'string' || Array.isArray(value)) {
+        return value[idx];
+      }
+      return undefined;
+    });
+
+    this.addFunction('startsWith', (value, prefix) => {
+      if (typeof value !== 'string' || typeof prefix !== 'string') {
+        return false;
+      }
+      return value.startsWith(prefix);
+    });
+
+    this.addFunction('endsWith', (value, suffix) => {
+      if (typeof value !== 'string' || typeof suffix !== 'string') {
+        return false;
+      }
+      return value.endsWith(suffix);
+    });
+
     this.addFunction('matches', (value, pattern) => {
       // Limit pattern length to mitigate ReDoS risk
       if (typeof pattern !== 'string' || pattern.length > 100) {

@@ -22,6 +22,7 @@ export default {
     integer: {
       label: 'Entrée Entière',
       description: 'Veuillez entrer une valeur entière',
+      number_must_be_even: 'Le nombre doit être pair',
     },
     rating: {
       label: 'Sélecteur de Note',

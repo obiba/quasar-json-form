@@ -22,6 +22,7 @@ export default {
     integer: {
       label: 'Integer Input',
       description: 'Please enter an integer value',
+      number_must_be_even: 'Number must be even',
     },
     rating: {
       label: 'Rating Selector',

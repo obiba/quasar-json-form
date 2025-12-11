@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { computed, inject, ref } from 'vue';
 import { useFiltrexRules } from './useFiltrexRules';
+import { useI18n } from 'vue-i18n';
 
 export function useControlProperties(control) {
+  const { t } = useI18n();
+
   // Inject form data from provider
   const injectedFormData = inject('jsonforms-data', ref({}));
 
@@ -49,7 +52,7 @@ export function useControlProperties(control) {
       try {
         const expression = rule.expr || rule.expression;
         if (expression && !evaluateRule(expression)) {
-          errors.push(rule.message);
+          errors.push(t(rule.message));
         }
       } catch (error) {
         console.error('Error evaluating validation rule:', expression, error);
@@ -71,7 +74,7 @@ export function useControlProperties(control) {
     const customErrors = customValidationErrors.value;
     // Combine both error arrays
     const allErrors = [...jsonFormsErrors, ...customErrors].filter((e) => e && e.length > 0);
-    return allErrors.join(', ');
+    return allErrors.join('; ');
   });
 
   // Extract options from schema

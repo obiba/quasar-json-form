@@ -41,7 +41,7 @@ const schema = {
         validation: [
           {
             expr: 'integer % 2 == 0',
-            message: 'Number must be even',
+            message: 'renderers.integer.number_must_be_even',
           }
         ],
       },
@@ -53,6 +53,33 @@ const schema = {
     enum: {
       type: 'string',
       enum: ['One', 'Two', 'Three'],
+    },
+    enums: {
+      type: 'string',
+      format: 'array',
+      enum: ['one', 'two', 'three'],
+      title: 'renderers.enums.label',
+      description: 'renderers.enums.description',
+      rules: {
+        validation: [
+          {
+            expr: 'length(enums) <= 2',
+            message: 'You can select up to two values only',
+          },
+          {
+            expr: 'length(enums) >= 1',
+            message: 'Please select at least one value',
+          },
+          {
+            expr: '"one" in enums',
+            message: '"one" must be selected',
+          },
+          {
+            expr: 'get(enums, 0) == "one"',
+            message: '"one" must be first selected',
+          },
+        ],
+      },
     },
   },
 };
@@ -79,6 +106,10 @@ const uischema = {
             {
               type: 'Control',
               scope: '#/properties/enum',
+            },
+            {
+              type: 'Control',
+              scope: '#/properties/enums',
             },
           ],
         },
