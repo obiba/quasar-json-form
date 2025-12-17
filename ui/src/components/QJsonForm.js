@@ -91,6 +91,7 @@ export default defineComponent({
     };
 
     const generateDefaultUISchema = (schema) => {
+      if (!schema || !schema.properties) return { type: 'VerticalLayout', elements: [] };
       return {
         type: 'VerticalLayout',
         elements: Object.keys(schema.properties || {}).map((key) => ({
