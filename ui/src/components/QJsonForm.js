@@ -11,8 +11,8 @@ import {
   isEnumControl,
   isDateControl,
   optionIs,
+  uiTypeIs,
   and,
-  getValidationMode,
   // isArrayObjectControl,
 } from '@jsonforms/core';
 import QStringRenderer from './QStringRenderer.js';
@@ -21,11 +21,21 @@ import QRatingRenderer from './QRatingRenderer.js';
 import QToggleRenderer from './QToggleRenderer.js';
 import QSelectRenderer from './QSelectRenderer.js';
 import QDateRenderer from './QDateRenderer.js';
+import QSectionRenderer from './QSectionRenderer.js';
+import QLabelRenderer from './QLabelRenderer.js';
 // import QListRenderer from './QListRenderer.js';
 
 // Define your custom renderers
 // Priority 3 - higher than default (usually 1-2)
 const customRenderers = [
+  {
+    renderer: QLabelRenderer,
+    tester: rankWith(3, uiTypeIs('Label')),
+  },
+  {
+    renderer: QSectionRenderer,
+    tester: rankWith(1, uiTypeIs('Section')),
+  },
   {
     renderer: QStringRenderer,
     tester: rankWith(3, isStringControl),

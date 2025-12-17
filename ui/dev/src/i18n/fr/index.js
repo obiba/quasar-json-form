@@ -7,6 +7,13 @@ export default {
   layout: 'Disposition',
   form: 'Formulaire',
   renderers: {
+    label: {
+      text: 'Ceci est une étiquette avec support **Markdown**',
+    },
+    section: {
+      label: 'Section',
+      description: 'Une **section** pour annoncer des champs',
+    },
     string: {
       label: 'Entrée de Texte',
       description: 'Veuillez entrer une valeur de type texte',

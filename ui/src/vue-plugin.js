@@ -5,6 +5,8 @@ import QNumberRenderer from './components/QNumberRenderer'
 import QRatingRenderer from './components/QRatingRenderer'
 import QStringRenderer from './components/QStringRenderer'
 import QToggleRenderer from './components/QToggleRenderer'
+import QSectionRenderer from './components/QSectionRenderer'
+import QLabelRenderer from './components/QLabelRenderer'
 import QListRenderer from './components/QListRenderer'
 import QJsonForm from './components/QJsonForm'
 
@@ -18,7 +20,9 @@ function install (app) {
   app.component(QRatingRenderer.name, QRatingRenderer)
   app.component(QStringRenderer.name, QStringRenderer)
   app.component(QToggleRenderer.name, QToggleRenderer)
+  app.component(QSectionRenderer.name, QSectionRenderer)
   app.component(QListRenderer.name, QListRenderer)
+  app.component(QLabelRenderer.name, QLabelRenderer)
   app.component(QJsonForm.name, QJsonForm)
 }
 
@@ -31,7 +35,9 @@ export {
   QRatingRenderer,
   QStringRenderer,
   QToggleRenderer,
+  QSectionRenderer,
   QListRenderer,
+  QLabelRenderer,
   QJsonForm,
   install
 }
