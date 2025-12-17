@@ -7,6 +7,13 @@ export default {
   layout: 'Layout',
   form: 'Form',
   renderers: {
+    label: {
+      text: 'This is a Label with **Markdown** support',
+    },
+    section: {
+      label: 'Section',
+      description: 'A **section** to announce fields',
+    },
     string: {
       label: 'String Input',
       description: 'Please enter a string value',

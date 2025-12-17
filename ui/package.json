@@ -17,7 +17,8 @@
     "@jsonforms/core": "^3.7.0",
     "@jsonforms/vue": "^3.7.0",
     "@jsonforms/vue-vanilla": "^3.7.0",
-    "filtrex": "^3.1.0"
+    "filtrex": "^3.1.0",
+    "markdown-it": "^14.1.0"
   },
   "devDependencies": {
     "@rollup/plugin-buble": "^1.0.3",

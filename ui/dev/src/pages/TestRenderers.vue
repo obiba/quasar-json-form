@@ -79,7 +79,18 @@ const schema = {
 const uischema = {
   type: 'VerticalLayout',
   elements: [
-    { type: 'Label', text: 'A simple form example' },
+    {
+      type: 'Label',
+      label: 'renderers.label.text',
+      labelClass: 'text-green-8',
+    },
+    {
+      type: 'Section',
+      label: 'renderers.section.label',
+      labelClass: 'text-h6',
+      description: 'renderers.section.description',
+      descriptionClass: 'text-blue-8',
+    },
     {
       type: 'HorizontalLayout',
       elements: [
