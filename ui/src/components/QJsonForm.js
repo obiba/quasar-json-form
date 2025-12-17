@@ -7,6 +7,9 @@ import {
   schemaMatches,
   schemaSubPathMatches,
   hasType,
+  formatIs,
+  optionIs,
+  uiTypeIs,
   isStringControl,
   isIntegerControl,
   isNumberControl,
@@ -14,9 +17,10 @@ import {
   isEnumControl,
   isOneOfEnumControl,
   isDateControl,
-  optionIs,
-  uiTypeIs,
+  isTimeControl,
+  isDateTimeControl,
   and,
+  or,
   // isArrayObjectControl,
 } from '@jsonforms/core';
 import QStringRenderer from './QStringRenderer.js';
@@ -25,6 +29,8 @@ import QRatingRenderer from './QRatingRenderer.js';
 import QToggleRenderer from './QToggleRenderer.js';
 import QSelectRenderer from './QSelectRenderer.js';
 import QDateRenderer from './QDateRenderer.js';
+import QTimeRenderer from './QTimeRenderer.js';
+import QDateTimeRenderer from './QDateTimeRenderer.js';
 import QSectionRenderer from './QSectionRenderer.js';
 import QLabelRenderer from './QLabelRenderer.js';
 // import QListRenderer from './QListRenderer.js';
@@ -38,6 +44,16 @@ const hasOneOfItems = (schema) =>
  
 const hasEnumItems = (schema) =>
   schema.type === 'string' && schema.enum !== undefined;
+
+const isFulltimeControl = and(
+  uiTypeIs('Control'),
+  or(formatIs('fulltime'), optionIs('format', 'fulltime'))
+);
+
+const isDateFulltimeControl = and(
+  uiTypeIs('Control'),
+  or(formatIs('date-fulltime'), optionIs('format', 'date-fulltime'))
+);
 
 // Define your custom renderers
 // Priority 3 - higher than default (usually 1-2)
@@ -98,6 +114,14 @@ const customRenderers = [
   {
     renderer: QDateRenderer,
     tester: rankWith(4, isDateControl),
+  },
+  {
+    renderer: QTimeRenderer,
+    tester: rankWith(4, or(isTimeControl, isFulltimeControl)),
+  },
+  {
+    renderer: QDateTimeRenderer,
+    tester: rankWith(4, or(isDateTimeControl, isDateFulltimeControl)),
   },
   // {
   //   renderer: QListRenderer,

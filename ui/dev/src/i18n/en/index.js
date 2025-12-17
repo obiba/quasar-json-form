@@ -47,6 +47,22 @@ export default {
       label: 'Date Picker',
       description: 'Please select a date',
     },
+    time: {
+      label: 'Time Picker',
+      description: 'Please select a time',
+    },
+    fulltime: {
+      label: 'Fulltime Picker',
+      description: 'Please select a fulltime value',
+    },
+    datetime: {
+      label: 'DateTime Picker',
+      description: 'Please select a date and time value',
+    },
+    datefulltime: {
+      label: 'Date Fulltime Picker',
+      description: 'Please select a date and fulltime value',
+    },
     enum: {
       label: 'Enum Selector',
       description: 'Please select a value from the list',

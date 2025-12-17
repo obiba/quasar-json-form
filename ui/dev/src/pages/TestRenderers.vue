@@ -59,6 +59,30 @@ const schema = {
       title: 'renderers.date.label',
       description: 'renderers.date.description',
     },
+    time: {
+      type: 'string',
+      format: 'time',
+      title: 'renderers.time.label',
+      description: 'renderers.time.description',
+    },
+    fulltime: {
+      type: 'string',
+      format: 'fulltime',
+      title: 'renderers.fulltime.label',
+      description: 'renderers.fulltime.description',
+    },
+    datetime: {
+      type: 'string',
+      format: 'date-time',
+      title: 'renderers.datetime.label',
+      description: 'renderers.datetime.description',
+    },
+    datefulltime: {
+      type: 'string',
+      format: 'date-fulltime',
+      title: 'renderers.datefulltime.label',
+      description: 'renderers.datefulltime.description',
+    },
     enum: {
       type: 'string',
       enum: ['one', 'two', 'three'],
@@ -218,11 +242,28 @@ const uischema = {
               type: 'Control',
               scope: '#/properties/date',
             },
+            {
+              type: 'Control',
+              scope: '#/properties/time',
+            },
+            {
+              type: 'Control',
+              scope: '#/properties/fulltime',
+            },
           ],
         },
         {
           type: 'VerticalLayout',
-          elements: [],
+          elements: [
+            {
+              type: 'Control',
+              scope: '#/properties/datetime',
+            },
+            {
+              type: 'Control',
+              scope: '#/properties/datefulltime',
+            },
+          ],
         },
       ]
     },
