@@ -22,6 +22,17 @@ const schema = {
       title: 'renderers.string.label',
       description: 'renderers.string.description',
     },
+    password: {
+      type: 'string',
+      format: 'password',
+      title: 'renderers.password.label',
+      description: 'renderers.password.description',
+    },
+    multiLineString: {
+      type: 'string',
+      title: 'renderers.multiLineString.label',
+      description: 'renderers.multiLineString.description',
+    },
     boolean: {
       type: 'boolean',
       title: 'renderers.boolean.label',
@@ -137,8 +148,90 @@ const uischema = {
             },
             {
               type: 'Control',
+              scope: '#/properties/password',
+              options: {
+                autocomplete: 'new-password',
+              },
+            },
+          ],
+        },
+        {
+          type: 'VerticalLayout',
+          elements: [
+            {
+              type: 'Control',
+              scope: '#/properties/multiLineString',
+              options: {
+                rows: 4,
+              },
+            },
+          ],
+        },
+      ],
+    },
+    {
+      type: 'HorizontalLayout',
+      elements: [
+        {
+          type: 'VerticalLayout',
+          elements: [
+            {
+              type: 'Control',
+              scope: '#/properties/number',
+            },
+            {
+              type: 'Control',
+              scope: '#/properties/integer',
+            }
+          ],
+        },
+        {
+          type: 'VerticalLayout',
+          elements: [
+            {
+              type: 'Control',
+              scope: '#/properties/rating',
+              options: {
+                format: 'rating',
+                icon: 'star_border',
+                iconSelected: 'star',
+                color: 'red',
+                size: 'md',
+                max: 6,
+              },
+            },
+            {
+              type: 'Control',
+              scope: '#/properties/boolean',
+            }
+          ],
+        },
+      ]
+    },
+    {
+      type: 'HorizontalLayout',
+      elements: [
+        {
+          type: 'VerticalLayout',
+          elements: [
+            {
+              type: 'Control',
               scope: '#/properties/date',
             },
+          ],
+        },
+        {
+          type: 'VerticalLayout',
+          elements: [],
+        },
+      ]
+    },
+    {
+      type: 'HorizontalLayout',
+      elements: [
+        {
+          type: 'VerticalLayout',
+          elements: [
             {
               type: 'Control',
               scope: '#/properties/enum',
@@ -146,7 +239,12 @@ const uischema = {
             {
               type: 'Control',
               scope: '#/properties/oneOfEnum',
-            },
+            }
+          ],
+        },
+        {
+          type: 'VerticalLayout',
+          elements: [
             {
               type: 'Control',
               scope: '#/properties/multiEnum',
@@ -164,39 +262,10 @@ const uischema = {
                 useChips: true,
                 clearable: true,
               },
-            },
+            }
           ],
         },
-        {
-          type: 'VerticalLayout',
-          elements: [
-            {
-              type: 'Control',
-              scope: '#/properties/number',
-            },
-            {
-              type: 'Control',
-              scope: '#/properties/integer',
-            },
-            {
-              type: 'Control',
-              scope: '#/properties/rating',
-              options: {
-                format: 'rating',
-                icon: 'star_border',
-                iconSelected: 'star',
-                color: 'red',
-                size: 'md',
-                max: 6,
-              },
-            },
-            {
-              type: 'Control',
-              scope: '#/properties/boolean',
-            },
-          ],
-        },
-      ],
+      ]
     },
   ],
 };

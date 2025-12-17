@@ -24,7 +24,7 @@ export default defineComponent({
 
     const inputType = computed(() => {
       const schema = control.value.schema;
-      return schema.format || 'text';
+      return schema.format || (uiOptions.value.rows ? 'textarea' : 'text');
     });
 
     watch(

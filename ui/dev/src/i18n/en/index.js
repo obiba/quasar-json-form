@@ -18,6 +18,14 @@ export default {
       label: 'String Input',
       description: 'Please enter a string value',
     },
+    password: {
+      label: 'Password Input',
+      description: 'Please enter a password value',
+    },
+    multiLineString: {
+      label: 'Multi-line String Input',
+      description: 'Please enter a multi-line string value',
+    },
     boolean: {
       label: 'Boolean Toggle',
       description: 'Please toggle the boolean value',

@@ -18,6 +18,14 @@ export default {
       label: 'Entrée de Texte',
       description: 'Veuillez entrer une valeur de type texte',
     },
+    password: {
+      label: 'Entrée de Mot de Passe',
+      description: 'Veuillez entrer une valeur de mot de passe',
+    },
+    multiLineString: {
+      label: 'Multi-line String Input',
+      description: 'Please enter a multi-line string value',
+    },
     boolean: {
       label: 'Bascule Booléenne',
       description: 'Veuillez basculer la valeur booléenne',
