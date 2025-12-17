@@ -35,7 +35,7 @@ const hasOneOfItems = (schema) =>
   (schema.oneOf).every((entry) => {
     return entry.const !== undefined;
   });
-  
+ 
 const hasEnumItems = (schema) =>
   schema.type === 'string' && schema.enum !== undefined;
 

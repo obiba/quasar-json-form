@@ -30,7 +30,7 @@ export default defineComponent({
         if (itemsSchema.oneOf && Array.isArray(itemsSchema.oneOf) && itemsSchema.oneOf.length > 0) {
           // for each enum option, check if it's an object with label and same value
           return itemsSchema.oneOf.map((val) => {
-            return { label: t(String(val.title)), value: val.const };
+            return { label: t(String(val.title || val.const)), value: val.const };
           });
         }
 
@@ -45,7 +45,7 @@ export default defineComponent({
       if (schema.oneOf && Array.isArray(schema.oneOf) && schema.oneOf.length > 0) {
         // for each enum option, check if it's an object with label and same value
         return schema.oneOf.map((val) => {
-          return { label: t(String(val.title)), value: val.const };
+          return { label: t(String(val.title || val.const)), value: val.const };
         });
       }
 
@@ -56,7 +56,7 @@ export default defineComponent({
         }));
       }
 
-      return []; 
+      return [];
     });
 
     const isMultiple = computed(() => {
