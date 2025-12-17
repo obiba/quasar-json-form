@@ -1,6 +1,6 @@
 import { h, watch, defineComponent, ref, computed } from 'vue';
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue';
-import { QInput, QIcon, QPopupProxy, QDate, QTime, QBtn, date } from 'quasar';
+import { QInput, QIcon, QPopupProxy, QDate, QTime, QBtn } from 'quasar';
 import { useControlProperties } from '../composables/useControlProperties';
 import { useI18n } from 'vue-i18n';
 

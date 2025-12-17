@@ -18,7 +18,7 @@ function install (app) {
   app.component(Component.name, Component)
   app.component(QDateRenderer.name, QDateRenderer)
   app.component(QTimeRenderer.name, QTimeRenderer)
-  app.Component(QDateTimeRenderer.name, QDateTimeRenderer)
+  app.component(QDateTimeRenderer.name, QDateTimeRenderer)
   app.component(QSelectRenderer.name, QSelectRenderer)
   app.component(QNumberRenderer.name, QNumberRenderer)
   app.component(QRatingRenderer.name, QRatingRenderer)
