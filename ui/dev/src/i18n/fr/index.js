@@ -48,9 +48,17 @@ export default {
         three: 'Option Trois',
       }
     },
-    enums: {
+    oneOfEnum: {
+      label: 'Sélecteur d\'Enumération avec Étiquette',
+      description: 'Veuillez sélectionner une valeur dans la liste avec des étiquettes personnalisées',
+    },
+    multiEnum: {
       label: 'Sélecteur d\'Enumérations Multiples',
       description: 'Veuillez sélectionner une ou deux valeurs dans la liste',
+    },
+    oneOfMultiEnum: {
+      label: 'Sélecteur d\'Enumérations Multiples avec Étiquette',
+      description: 'Veuillez sélectionner une ou deux valeurs dans la liste avec des étiquettes personnalisées',
     },
   }
 };

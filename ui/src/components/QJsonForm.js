@@ -4,11 +4,15 @@ import { vanillaRenderers } from '@jsonforms/vue-vanilla';
 import '@jsonforms/vue-vanilla/vanilla.css';
 import {
   rankWith,
+  schemaMatches,
+  schemaSubPathMatches,
+  hasType,
   isStringControl,
   isIntegerControl,
   isNumberControl,
   isBooleanControl,
   isEnumControl,
+  isOneOfEnumControl,
   isDateControl,
   optionIs,
   uiTypeIs,
@@ -24,6 +28,16 @@ import QDateRenderer from './QDateRenderer.js';
 import QSectionRenderer from './QSectionRenderer.js';
 import QLabelRenderer from './QLabelRenderer.js';
 // import QListRenderer from './QListRenderer.js';
+
+const hasOneOfItems = (schema) =>
+  schema.oneOf !== undefined &&
+  schema.oneOf.length > 0 &&
+  (schema.oneOf).every((entry) => {
+    return entry.const !== undefined;
+  });
+  
+const hasEnumItems = (schema) =>
+  schema.type === 'string' && schema.enum !== undefined;
 
 // Define your custom renderers
 // Priority 3 - higher than default (usually 1-2)
@@ -58,7 +72,28 @@ const customRenderers = [
   },
   {
     renderer: QSelectRenderer,
-    tester: rankWith(4, isEnumControl), // Higher priority than String control
+    tester: rankWith(4, isEnumControl),
+  },
+  {
+    renderer: QSelectRenderer,
+    tester: rankWith(6, isOneOfEnumControl),
+  },
+  {
+    renderer: QSelectRenderer,
+    tester: rankWith(6, and(
+      uiTypeIs('Control'),
+      and(
+        schemaMatches(
+          (schema) =>
+            hasType(schema, 'array') &&
+            !Array.isArray(schema.items) &&
+            schema.uniqueItems === true
+        ),
+        schemaSubPathMatches('items', (schema) => {
+          return hasOneOfItems(schema) || hasEnumItems(schema);
+        })
+      )
+    )),
   },
   {
     renderer: QDateRenderer,

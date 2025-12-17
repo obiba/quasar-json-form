@@ -54,28 +54,31 @@ const schema = {
       type: 'string',
       enum: ['One', 'Two', 'Three'],
     },
-    enums: {
-      type: 'string',
-      format: 'array',
-      enum: ['one', 'two', 'three'],
-      title: 'renderers.enums.label',
-      description: 'renderers.enums.description',
+    multiEnum: {
+      type: 'array',
+      uniqueItems: true,
+      items: {
+        type: 'string',
+        enum: ['one', 'two', 'three'],
+      },
+      title: 'renderers.multiEnum.label',
+      description: 'renderers.multiEnum.description',
       rules: {
         validation: [
           {
-            expr: 'length(enums) <= 2',
+            expr: 'length(multiEnum) <= 2',
             message: 'You can select up to two values only',
           },
           {
-            expr: 'length(enums) >= 1',
+            expr: 'length(multiEnum) >= 1',
             message: 'Please select at least one value',
           },
           {
-            expr: '"one" in enums',
+            expr: '"one" in multiEnum',
             message: 'The "one" value must be selected',
           },
           {
-            expr: 'get(enums, 0) == "one"',
+            expr: 'get(multiEnum, 0) == "one"',
             message: 'The "one" value must be selected first',
           },
         ],
@@ -109,7 +112,7 @@ const uischema = {
             },
             {
               type: 'Control',
-              scope: '#/properties/enums',
+              scope: '#/properties/multiEnum',
             },
           ],
         },

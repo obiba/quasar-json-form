@@ -48,9 +48,17 @@ export default {
         three: 'Option Three',
       }
     },
-    enums: {
+    oneOfEnum: {
+      label: 'Enum Selector with Label',
+      description: 'Please select a value from the list with custom labels',
+    },
+    multiEnum: {
       label: 'Multiple Enum Selector',
       description: 'Please select one or two values from the list',
+    },
+    oneOfMultiEnum: {
+      label: 'Multiple Enum Selector with Label',
+      description: 'Please select one or two values from the list with custom labels',
     },
   }
 };

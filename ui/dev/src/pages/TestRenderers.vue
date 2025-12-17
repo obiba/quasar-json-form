@@ -51,26 +51,60 @@ const schema = {
     enum: {
       type: 'string',
       enum: ['one', 'two', 'three'],
-      options: [
-        {
-          label: 'renderers.enum.options.one', value: 'one'
-        },
-        {
-          label: 'renderers.enum.options.two', value: 'two'
-        },
-        {
-          label: 'renderers.enum.options.three', value: 'three'
-        }
-      ],
       title: 'renderers.enum.label',
       description: 'renderers.enum.description',
     },
-    enums: {
+    oneOfEnum: {
       type: 'string',
-      format: 'array',
-      enum: ['one', 'two', 'three'],
-      title: 'renderers.enums.label',
-      description: 'renderers.enums.description',
+      oneOf: [
+        {
+          const: 'one',
+          title: 'renderers.enum.options.one',
+        },
+        {
+          const: 'two',
+          title: 'renderers.enum.options.two',
+        },
+        {
+          const: 'three',
+          title: 'renderers.enum.options.three',
+        },
+      ],
+      title: 'renderers.oneOfEnum.label',
+      description: 'renderers.oneOfEnum.description',
+    },
+    multiEnum: {
+      type: 'array',
+      uniqueItems: true,
+      items: {
+        type: 'string',
+        enum: ['one', 'two', 'three'],
+      },
+      title: 'renderers.multiEnum.label',
+      description: 'renderers.multiEnum.description',
+    },
+    oneOfMultiEnum: {
+      type: 'array',
+      uniqueItems: true,
+      items: {
+        type: 'string',
+        oneOf: [
+          {
+            const: 'one',
+            title: 'renderers.enum.options.one',
+          },
+          {
+            const: 'two',
+            title: 'renderers.enum.options.two',
+          },
+          {
+            const: 'three',
+            title: 'renderers.enum.options.three',
+          },
+        ],
+      },
+      title: 'renderers.oneOfMultiEnum.label',
+      description: 'renderers.oneOfMultiEnum.description',
     },
   },
 };
@@ -111,7 +145,20 @@ const uischema = {
             },
             {
               type: 'Control',
-              scope: '#/properties/enums',
+              scope: '#/properties/oneOfEnum',
+            },
+            {
+              type: 'Control',
+              scope: '#/properties/multiEnum',
+              options: {
+                maxValues: 2,
+                useChips: true,
+                clearable: true,
+              },
+            },
+            {
+              type: 'Control',
+              scope: '#/properties/oneOfMultiEnum',
               options: {
                 maxValues: 2,
                 useChips: true,
