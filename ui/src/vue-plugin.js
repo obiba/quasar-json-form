@@ -1,5 +1,7 @@
 import Component from './components/Component'
 import QDateRenderer from './components/QDateRenderer'
+import QTimeRenderer from './components/QTimeRenderer'
+import QDateTimeRenderer from './components/QDateTimeRenderer'
 import QSelectRenderer from './components/QSelectRenderer'
 import QNumberRenderer from './components/QNumberRenderer'
 import QRatingRenderer from './components/QRatingRenderer'
@@ -15,6 +17,8 @@ const version = __UI_VERSION__
 function install (app) {
   app.component(Component.name, Component)
   app.component(QDateRenderer.name, QDateRenderer)
+  app.component(QTimeRenderer.name, QTimeRenderer)
+  app.component(QDateTimeRenderer.name, QDateTimeRenderer)
   app.component(QSelectRenderer.name, QSelectRenderer)
   app.component(QNumberRenderer.name, QNumberRenderer)
   app.component(QRatingRenderer.name, QRatingRenderer)
@@ -30,6 +34,8 @@ export {
   version,
   Component,
   QDateRenderer,
+  QTimeRenderer,
+  QDateTimeRenderer,
   QSelectRenderer,
   QNumberRenderer,
   QRatingRenderer,

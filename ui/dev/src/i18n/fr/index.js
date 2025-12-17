@@ -47,6 +47,22 @@ export default {
       label: 'Sélecteur de Date',
       description: 'Veuillez sélectionner une date',
     },
+    time: {
+      label: 'Sélecteur d\'Heure',
+      description: 'Veuillez sélectionner une heure',
+    },
+    fulltime: {
+      label: 'Sélecteur de Temps Complet',
+      description: 'Veuillez sélectionner une valeur de temps complet',
+    },
+    datetime: {
+      label: 'Sélecteur DateHeure',
+      description: 'Veuillez sélectionner une date et une heure',
+    },
+    datefulltime: {
+      label: 'Sélecteur DateTemps Complet',
+      description: 'Veuillez sélectionner une date et une valeur de temps complet',
+    },
     enum: {
       label: 'Sélecteur d\'Enumération',
       description: 'Veuillez sélectionner une valeur dans la liste',
