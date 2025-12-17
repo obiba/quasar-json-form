@@ -1,8 +1,8 @@
-import { h, watch, computed, defineComponent } from 'vue';
+import { h, watch, defineComponent } from 'vue';
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue';
 import { useControlProperties } from '../composables/useControlProperties';
 import { useI18n } from 'vue-i18n';
-import MarkdownIt from 'markdown-it';
+import { renderMarkdown } from '../utils/mardown';
 
 
 export default defineComponent({
@@ -19,13 +19,8 @@ export default defineComponent({
     const control = controlResult.control;
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, hasError, errorMessage, uiOptions } =
+    const { isVisible } =
       useControlProperties(control);
-
-    const inputType = computed(() => {
-      const schema = control.value.schema;
-      return schema.format || 'text';
-    });
 
     watch(
       () => isVisible.value,
@@ -44,14 +39,12 @@ export default defineComponent({
       if (!isVisible.value) {
         return null;
       }
-      const md = new MarkdownIt();
 
       const children = [];
 
       if (control.value.label || control.value.uischema.label) {
         let label = t(control.value.label || control.value.uischema.label);
-        label = md.render(label);
-        
+        label = renderMarkdown(label);
         children.push(h('div', {
           class: control.value.uischema.labelClass || 'text-h6 q-mb-sm',
           innerHTML: label,
@@ -60,8 +53,7 @@ export default defineComponent({
 
       if (control.value.uischema.description) {
         let hint = t(control.value.uischema.description);
-        hint = md.render(hint);
-
+        hint = renderMarkdown(hint);
         children.push(h('div', {
           class: control.value.uischema.descriptionClass || 'text-grey-7',
           innerHTML: hint,

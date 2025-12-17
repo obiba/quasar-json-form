@@ -2,7 +2,7 @@ import { h, watch, defineComponent } from 'vue';
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue';
 import { useControlProperties } from '../composables/useControlProperties';
 import { useI18n } from 'vue-i18n';
-import MarkdownIt from 'markdown-it';
+import { renderMarkdown } from '../utils/mardown';
 
 
 export default defineComponent({
@@ -39,12 +39,11 @@ export default defineComponent({
       if (!isVisible.value) {
         return null;
       }
-      const md = new MarkdownIt();
 
       let label = '';
       if (control.value.label || control.value.uischema.label) {
         label = t(control.value.label || control.value.uischema.label);
-        label = md.render(label);
+        label = renderMarkdown(label);
       }
 
       return h('div', {
