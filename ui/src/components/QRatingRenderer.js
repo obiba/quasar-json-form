@@ -49,7 +49,7 @@ export default defineComponent({
 
       if (control.value.description) {
         children.push(h('div', {
-          class: ' text-description text-caption text-grey-7 q-mb-sm',
+          class: 'text-description text-caption text-grey-7 q-mb-sm',
         }, t(control.value.description)));
       }
 

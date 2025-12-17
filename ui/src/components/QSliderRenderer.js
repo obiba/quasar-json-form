@@ -43,27 +43,32 @@ export default defineComponent({
 
       if (control.value.label) {
         children.push(h('div', {
-          class: 'text-grey-7 q-mb-xs',
+          class: 'text-label text-grey-7 q-mb-xs',
         }, t(control.value.label)));
       }
 
       if (control.value.description) {
         children.push(h('div', {
-          class: 'text-caption text-grey-7 q-mt-sm',
+          class: 'text-description text-caption text-grey-7 q-mb-sm',
         }, t(control.value.description)));
       }
 
       children.push(h(QSlider, {
         modelValue: control.value.data,
-        type: 'number',
         'onUpdate:modelValue': onChange,
-        error: hasError.value,
-        errorMessage: errorMessage.value,
-        required: control.value.required,
         disable: !isEnabled.value,
         ...uiOptions.value,
       }));
 
+      if (hasError.value && errorMessage.value) {
+        children.push(h('div', {
+          class: 'text-error text-caption text-negative q-mb-sm',
+        }, errorMessage.value));
+      } else if (control.value.hint) {
+        children.push(h('div', {
+          class: 'text-hint text-caption text-grey-7 q-mb-sm',
+        }, t(control.value.hint)));
+      }
 
       return h('div', {class: 'q-mt-md'}, children);
     };
