@@ -3,6 +3,7 @@ import QDateRenderer from './components/QDateRenderer'
 import QTimeRenderer from './components/QTimeRenderer'
 import QDateTimeRenderer from './components/QDateTimeRenderer'
 import QSelectRenderer from './components/QSelectRenderer'
+import QOptionsRenderer from './components/QOptionsRenderer'
 import QNumberRenderer from './components/QNumberRenderer'
 import QRatingRenderer from './components/QRatingRenderer'
 import QStringRenderer from './components/QStringRenderer'
@@ -20,6 +21,7 @@ function install (app) {
   app.component(QTimeRenderer.name, QTimeRenderer)
   app.component(QDateTimeRenderer.name, QDateTimeRenderer)
   app.component(QSelectRenderer.name, QSelectRenderer)
+  app.component(QOptionsRenderer.name, QOptionsRenderer)
   app.component(QNumberRenderer.name, QNumberRenderer)
   app.component(QRatingRenderer.name, QRatingRenderer)
   app.component(QStringRenderer.name, QStringRenderer)
@@ -37,6 +39,7 @@ export {
   QTimeRenderer,
   QDateTimeRenderer,
   QSelectRenderer,
+  QOptionsRenderer,
   QNumberRenderer,
   QRatingRenderer,
   QStringRenderer,

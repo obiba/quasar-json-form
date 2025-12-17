@@ -76,6 +76,14 @@ export default {
       label: 'Enum Selector with Label',
       description: 'Please select a value from the list with custom labels',
     },
+    radios: {
+      label: 'Radio Selector',
+      description: 'Please select one value from the list',
+    },
+    oneOfRadios: {
+      label: 'Radio Selector with Label',
+      description: 'Please select one value from the list with custom labels',
+    },
     multiEnum: {
       label: 'Multiple Enum Selector',
       description: 'Please select one or two values from the list',
@@ -83,6 +91,14 @@ export default {
     oneOfMultiEnum: {
       label: 'Multiple Enum Selector with Label',
       description: 'Please select one or two values from the list with custom labels',
+    },
+    checkboxes: {
+      label: 'Checkboxes Selector',
+      description: 'Please select one or more values from the list',
+    },
+    toggles: {
+      label: 'Toggles Selector',
+      description: 'Please select one or more values from the list',
     },
   }
 };
