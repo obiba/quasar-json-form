@@ -1,4 +1,4 @@
-import { h, computed, watch, defineComponent } from 'vue';
+import { h, computed, watch, defineComponent, onMounted } from 'vue';
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue';
 import { QOptionGroup } from 'quasar';
 import { useControlProperties } from '../composables/useControlProperties';
@@ -18,7 +18,7 @@ export default defineComponent({
     const control = controlResult.control;
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, hasError, errorMessage, uiOptions } =
+    const { isVisible, isEnabled, uiOptions } =
       useControlProperties(control);
 
     // Transform enum values into q-select options
@@ -64,6 +64,13 @@ export default defineComponent({
       return schema.type === 'array';
     });
 
+    onMounted(() => {
+      // Ensure that for multiple selection, the value is always an array
+      if (isMultiple.value && isVisible.value && !Array.isArray(control.value.data)) {
+        onChange([]);
+      }
+    });
+
     watch(
       () => isVisible.value,
       (newValue) => {
@@ -71,6 +78,16 @@ export default defineComponent({
           onChange(undefined);
         }
       },
+    );
+
+    watch (
+      () => control.value.data,
+      (newValue) => {
+        // Ensure that for multiple selection, the value is always an array
+        if (isMultiple.value && isVisible.value && !Array.isArray(newValue)) {
+          onChange([]);
+        }
+      }
     );
 
     const onChange = (value) => {
@@ -95,25 +112,21 @@ export default defineComponent({
           class: 'text-caption text-grey-7',
         }, t(control.value.description)));
       }
-      
-      if (control.value.data === undefined && isMultiple.value) {
-        // ensure that multiple selection controls have an array as value
-        onChange([]);
-      }
 
       children.push(
         h(QOptionGroup, {
           modelValue: control.value.data,
           options: options.value,
-          type: isMultiple.value ? uiOptions.value.format : 'radio',
+          type: isMultiple.value
+            ? (uiOptions.value && uiOptions.value.format) || 'checkbox'
+            : 'radio',
           disable: !isEnabled.value,
           'onUpdate:modelValue': onChange,
           ...uiOptions.value,
         }),
       );
 
-
-      return h('div', { class: 'q-check-renderer' }, children);
+      return h('div', { class: 'q-options-renderer' }, children);
     };
   },
 });

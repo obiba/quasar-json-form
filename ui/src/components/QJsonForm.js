@@ -104,15 +104,15 @@ const customRenderers = [
   },
   {
     renderer: QOptionsRenderer,
-    tester: rankWith(4, and(isEnumControl, optionIs('format', 'radio'))),
+    tester: rankWith(5, and(isEnumControl, optionIs('format', 'radio'))),
   },
   {
     renderer: QOptionsRenderer,
-    tester: rankWith(6, and(isOneOfEnumControl, optionIs('format', 'radio'))),
+    tester: rankWith(7, and(isOneOfEnumControl, optionIs('format', 'radio'))),
   },
   {
     renderer: QOptionsRenderer,
-    tester: rankWith(6, and(isMultiEnumControl, or(optionIs('format', 'checkbox'), optionIs('format', 'toggle')))),
+    tester: rankWith(7, and(isMultiEnumControl, or(optionIs('format', 'checkbox'), optionIs('format', 'toggle')))),
   },
   {
     renderer: QSelectRenderer,
