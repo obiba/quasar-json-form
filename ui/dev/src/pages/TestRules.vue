@@ -72,11 +72,11 @@ const schema = {
           },
           {
             expr: '"one" in enums',
-            message: '"one" must be selected',
+            message: 'The "one" value must be selected',
           },
           {
             expr: 'get(enums, 0) == "one"',
-            message: '"one" must be first selected',
+            message: 'The "one" value must be selected first',
           },
         ],
       },
