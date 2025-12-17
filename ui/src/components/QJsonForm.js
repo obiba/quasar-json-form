@@ -28,6 +28,7 @@ import QNumRenderer from './QNumberRenderer.js';
 import QRatingRenderer from './QRatingRenderer.js';
 import QToggleRenderer from './QToggleRenderer.js';
 import QSelectRenderer from './QSelectRenderer.js';
+import QOptionsRenderer from './QOptionsRenderer.js';
 import QDateRenderer from './QDateRenderer.js';
 import QTimeRenderer from './QTimeRenderer.js';
 import QDateTimeRenderer from './QDateTimeRenderer.js';
@@ -53,6 +54,21 @@ const isFulltimeControl = and(
 const isDateFulltimeControl = and(
   uiTypeIs('Control'),
   or(formatIs('date-fulltime'), optionIs('format', 'date-fulltime'))
+);
+
+const isMultiEnumControl = and(
+  uiTypeIs('Control'),
+  and(
+    schemaMatches(
+      (schema) =>
+        hasType(schema, 'array') &&
+        !Array.isArray(schema.items) &&
+        schema.uniqueItems === true
+    ),
+    schemaSubPathMatches('items', (schema) => {
+      return hasOneOfItems(schema) || hasEnumItems(schema);
+    })
+  )
 );
 
 // Define your custom renderers
@@ -87,6 +103,18 @@ const customRenderers = [
     tester: rankWith(3, isBooleanControl),
   },
   {
+    renderer: QOptionsRenderer,
+    tester: rankWith(4, and(isEnumControl, optionIs('format', 'radio'))),
+  },
+  {
+    renderer: QOptionsRenderer,
+    tester: rankWith(6, and(isOneOfEnumControl, optionIs('format', 'radio'))),
+  },
+  {
+    renderer: QOptionsRenderer,
+    tester: rankWith(6, and(isMultiEnumControl, or(optionIs('format', 'checkbox'), optionIs('format', 'toggle')))),
+  },
+  {
     renderer: QSelectRenderer,
     tester: rankWith(4, isEnumControl),
   },
@@ -96,20 +124,7 @@ const customRenderers = [
   },
   {
     renderer: QSelectRenderer,
-    tester: rankWith(6, and(
-      uiTypeIs('Control'),
-      and(
-        schemaMatches(
-          (schema) =>
-            hasType(schema, 'array') &&
-            !Array.isArray(schema.items) &&
-            schema.uniqueItems === true
-        ),
-        schemaSubPathMatches('items', (schema) => {
-          return hasOneOfItems(schema) || hasEnumItems(schema);
-        })
-      )
-    )),
+    tester: rankWith(6, isMultiEnumControl),
   },
   {
     renderer: QDateRenderer,

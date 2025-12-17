@@ -108,6 +108,31 @@ const schema = {
       title: 'renderers.oneOfEnum.label',
       description: 'renderers.oneOfEnum.description',
     },
+    radios: {
+      type: 'string',
+      enum: ['one', 'two', 'three'],
+      title: 'renderers.radios.label',
+      description: 'renderers.radios.description',
+    },
+    oneOfRadios: {
+      type: 'string',
+      oneOf: [
+        {
+          const: 'one',
+          title: 'renderers.enum.options.one',
+        },
+        {
+          const: 'two',
+          title: 'renderers.enum.options.two',
+        },
+        {
+          const: 'three',
+          title: 'renderers.enum.options.three',
+        },
+      ],
+      title: 'renderers.oneOfRadios.label',
+      description: 'renderers.oneOfRadios.description',
+    },
     multiEnum: {
       type: 'array',
       uniqueItems: true,
@@ -140,6 +165,26 @@ const schema = {
       },
       title: 'renderers.oneOfMultiEnum.label',
       description: 'renderers.oneOfMultiEnum.description',
+    },
+    checkboxes: {
+      type: 'array',
+      uniqueItems: true,
+      items: {
+        type: 'string',
+        enum: ['one', 'two', 'three'],
+      },
+      title: 'renderers.checkboxes.label',
+      description: 'renderers.checkboxes.description',
+    },
+    toggles: {
+      type: 'array',
+      uniqueItems: true,
+      items: {
+        type: 'string',
+        enum: ['one', 'two', 'three'],
+      },
+      title: 'renderers.toggles.label',
+      description: 'renderers.toggles.description',
     },
   },
 };
@@ -280,6 +325,20 @@ const uischema = {
             {
               type: 'Control',
               scope: '#/properties/oneOfEnum',
+            },
+            {
+              type: 'Control',
+              scope: '#/properties/radios',
+              options: {
+                format: 'radio',
+              },
+            },
+            {
+              type: 'Control',
+              scope: '#/properties/oneOfRadios',
+              options: {
+                format: 'radio',
+              },
             }
           ],
         },
@@ -303,7 +362,22 @@ const uischema = {
                 useChips: true,
                 clearable: true,
               },
-            }
+            },
+            {
+              type: 'Control',
+              scope: '#/properties/checkboxes',
+              options: {
+                format: 'checkbox',
+              },
+            },
+            {
+              type: 'Control',
+              scope: '#/properties/toggles',
+              options: {
+                format: 'toggle',
+                size: 'xs',
+              },
+            },
           ],
         },
       ]
