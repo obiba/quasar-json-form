@@ -25,32 +25,43 @@ export default defineComponent({
     const options = computed(() => {
       const schema = controlResult.control.value.schema;
 
-      if (!schema.enum) {
-        return [];
+      if (schema.type === 'array' && schema.items) {
+        const itemsSchema = schema.items;
+        if (itemsSchema.oneOf && Array.isArray(itemsSchema.oneOf) && itemsSchema.oneOf.length > 0) {
+          // for each enum option, check if it's an object with label and same value
+          return itemsSchema.oneOf.map((val) => {
+            return { label: t(String(val.title || val.const)), value: val.const };
+          });
+        }
+
+        if (itemsSchema.enum) {
+          return itemsSchema.enum.map((value) => ({
+            label: t(String(value)),
+            value: value,
+          }));
+        }
       }
 
-      if (schema.options && Array.isArray(schema.options)) {
+      if (schema.oneOf && Array.isArray(schema.oneOf) && schema.oneOf.length > 0) {
         // for each enum option, check if it's an object with label and same value
-        return schema.enum.map((val) => {
-          const foundOption = schema.options.find((option) => {
-            if (typeof option === 'object' && option !== null && 'value' in option) {
-              return option.value === val;
-            }
-            return option === val;
-          });
-          return foundOption ? { label: t(String(foundOption.label)), value: foundOption.value } : { label: t(String(val)), value: val };
+        return schema.oneOf.map((val) => {
+          return { label: t(String(val.title || val.const)), value: val.const };
         });
       }
 
-      return schema.enum.map((value) => ({
+      if (schema.enum) {
+        return schema.enum.map((value) => ({
           label: t(String(value)),
           value: value,
         }));
+      }
+
+      return [];
     });
 
     const isMultiple = computed(() => {
       const schema = controlResult.control.value.schema;
-      return schema.format === 'array' || (uiOptions.value && uiOptions.value.multiple === true);
+      return schema.type === 'array';
     });
 
     watch(

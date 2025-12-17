@@ -41,17 +41,6 @@ const schema = {
     enum: {
       type: 'string',
       enum: ['one', 'two', 'three'],
-      options: [
-        {
-          label: 'renderers.enum.options.one', value: 'one'
-        },
-        {
-          label: 'renderers.enum.options.two', value: 'two'
-        },
-        {
-          label: 'renderers.enum.options.three', value: 'three'
-        }
-      ],
       title: 'renderers.enum.label',
       description: 'renderers.enum.description',
     },
