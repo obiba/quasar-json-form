@@ -26,6 +26,7 @@ import {
 import QStringRenderer from './QStringRenderer.js';
 import QNumRenderer from './QNumberRenderer.js';
 import QRatingRenderer from './QRatingRenderer.js';
+import QSliderRenderer from './QSliderRenderer.js';
 import QToggleRenderer from './QToggleRenderer.js';
 import QSelectRenderer from './QSelectRenderer.js';
 import QOptionsRenderer from './QOptionsRenderer.js';
@@ -89,6 +90,10 @@ const customRenderers = [
   {
     renderer: QRatingRenderer,
     tester: rankWith(3, and(isIntegerControl, optionIs('format', 'rating'))),
+  },
+  {
+    renderer: QSliderRenderer,
+    tester: rankWith(3, and(isIntegerControl, optionIs('format', 'slider'))),
   },
   {
     renderer: QNumRenderer,

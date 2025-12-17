@@ -1,11 +1,11 @@
 import { h, watch, defineComponent } from 'vue';
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue';
-import { QRating } from 'quasar';
+import { QSlider } from 'quasar';
 import { useControlProperties } from '../composables/useControlProperties';
 import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
-  name: 'QRatingRenderer',
+  name: 'QSliderRenderer',
   props: rendererProps(),
   setup(props) {
     const { t } = useI18n();
@@ -53,18 +53,18 @@ export default defineComponent({
         }, t(control.value.description)));
       }
 
-      children.push(h(QRating, {
+      children.push(h(QSlider, {
         modelValue: control.value.data,
-        type: 'number',
         'onUpdate:modelValue': onChange,
-        error: hasError.value,
-        errorMessage: errorMessage.value,
-        required: control.value.required,
         disable: !isEnabled.value,
         ...uiOptions.value,
       }));
 
-      if (control.value.hint) {
+      if (hasError.value && errorMessage.value) {
+        children.push(h('div', {
+          class: 'text-error text-caption text-negative q-mb-sm',
+        }, errorMessage.value));
+      } else if (control.value.hint) {
         children.push(h('div', {
           class: 'text-hint text-caption text-grey-7 q-mb-sm',
         }, t(control.value.hint)));

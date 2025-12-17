@@ -103,13 +103,13 @@ export default defineComponent({
 
       if (control.value.label) {
         children.push(h('div', {
-          class: 'text-grey-7 q-mb-xs',
+          class: 'text-label text-grey-7 q-mb-xs',
         }, t(control.value.label)));
       }
 
       if (control.value.description) {
         children.push(h('div', {
-          class: 'text-caption text-grey-7',
+          class: 'text-description text-caption text-grey-7',
         }, t(control.value.description)));
       }
 

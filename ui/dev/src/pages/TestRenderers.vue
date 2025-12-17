@@ -53,6 +53,11 @@ const schema = {
       title: 'renderers.rating.label',
       description: 'renderers.rating.description',
     },
+    slider: {
+      type: 'integer',
+      title: 'renderers.slider.label',
+      description: 'renderers.slider.description',
+    },
     date: {
       type: 'string',
       format: 'date',
@@ -267,6 +272,18 @@ const uischema = {
                 color: 'red',
                 size: 'md',
                 max: 6,
+              },
+            },
+            {
+              type: 'Control',
+              scope: '#/properties/slider',
+              options: {
+                format: 'slider',
+                min: 0,
+                max: 10,
+                step: 1,
+                color: 'blue',
+                size: 'md',
               },
             },
             {
