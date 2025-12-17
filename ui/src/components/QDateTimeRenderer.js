@@ -71,65 +71,71 @@ export default defineComponent({
         hint: control.value.description ? t(control.value.description) : undefined,
         ...uiOptions.value,
       }, {
-        prepend: () => h(QIcon, {
-          name: 'event',
-          class: 'cursor-pointer',
-        }, {
-          default: () => h(QPopupProxy, {
-            ref: datePopupRef,
-            cover: true,
-            transitionShow: 'scale',
-            transitionHide: 'scale',
-          }, {
-            default: () => h(QDate, {
-              modelValue: dateValue.value,
-              mask: mask.value,
-              'onUpdate:modelValue': onChange,
-            }, {
-              default: () => h('div', {
-                class: 'row items-center justify-end',
-              }, [
-                h(QBtn, {
-                  label: t('close'),
-                  color: 'primary',
-                  flat: true,
-                  onClick: closeDatePopup,
+        append: () => h('div', {}, [
+          h(QIcon,
+            {
+              name: 'event',
+              class: 'cursor-pointer',
+            },
+            {
+              default: () => h(QPopupProxy, {
+                ref: datePopupRef,
+                cover: true,
+                transitionShow: 'scale',
+                transitionHide: 'scale',
+              }, {
+                default: () => h(QDate, {
+                  modelValue: dateValue.value,
+                  mask: mask.value,
+                  'onUpdate:modelValue': onChange,
+                }, {
+                  default: () => h('div', {
+                    class: 'row items-center justify-end',
+                  }, [
+                    h(QBtn, {
+                      label: t('close'),
+                      color: 'primary',
+                      flat: true,
+                      onClick: closeDatePopup,
+                    }),
+                  ]),
                 }),
-              ]),
-            }),
+              }),
           }),
-        }),
-        append: () => h(QIcon, {
-          name: 'access_time',
-          class: 'cursor-pointer',
-        }, {
-          default: () => h(QPopupProxy, {
-            ref: timePopupRef,
-            cover: true,
-            transitionShow: 'scale',
-            transitionHide: 'scale',
-          }, {
-            default: () => h(QTime, {
-              modelValue: dateValue.value,
-              'onUpdate:modelValue': onChange,
-              mask: mask.value,
-              withSeconds: mask.value === 'YYYY-MM-DD HH:mm:ss',
-              format24h: true,
-            }, {
-              default: () => h('div', {
-                class: 'row items-center justify-end',
-              }, [
-                h(QBtn, {
-                  label: t('close'),
-                  color: 'primary',
-                  flat: true,
-                  onClick: closeTimePopup,
+          h(QIcon, 
+            {
+              name: 'access_time',
+              class: 'cursor-pointer',
+            },
+            {
+              default: () => h(QPopupProxy, {
+                ref: timePopupRef,
+                cover: true,
+                transitionShow: 'scale',
+                transitionHide: 'scale',
+              }, {
+                default: () => h(QTime, {
+                  modelValue: dateValue.value,
+                  'onUpdate:modelValue': onChange,
+                  mask: mask.value,
+                  withSeconds: mask.value === 'YYYY-MM-DD HH:mm:ss',
+                  format24h: true,
+                }, {
+                  default: () => h('div', {
+                    class: 'row items-center justify-end',
+                  }, [
+                    h(QBtn, {
+                      label: t('close'),
+                      color: 'primary',
+                      flat: true,
+                      onClick: closeTimePopup,
+                    }),
+                  ]),
                 }),
-              ]),
-            }),
-          }),
-        }),
-      });
-    };
-  },
-});
+              }),
+            },
+          )])
+        });
+      };
+    },
+  });
