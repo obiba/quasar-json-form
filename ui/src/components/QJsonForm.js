@@ -1,4 +1,4 @@
-import { h, provide, toRef, defineComponent } from 'vue';
+import { h, provide, toRef, defineComponent, computed } from 'vue';
 import { JsonForms } from '@jsonforms/vue';
 import { vanillaRenderers } from '@jsonforms/vue-vanilla';
 import '@jsonforms/vue-vanilla/vanilla.css';
@@ -90,13 +90,31 @@ export default defineComponent({
       emit('update:modelValue', event.data);
     };
 
+    const generateDefaultUISchema = (schema) => {
+      if (!schema || !schema.properties) return { type: 'VerticalLayout', elements: [] };
+      return {
+        type: 'VerticalLayout',
+        elements: Object.keys(schema.properties || {}).map((key) => ({
+          type: 'Control',
+          scope: `#/properties/${key}`,
+        })),
+      };
+    };
+
+    // if uiSchema is not provided, generate a default one
+    const generatedUischema = computed(() => {
+      return props.uischema && Object.keys(props.uischema).length > 0
+        ? props.uischema
+        : generateDefaultUISchema(props.schema);
+    });
+
     return () => h('div', {
       class: 'json-form-wrapper',
     }, [
       h(JsonForms, {
         data: props.modelValue,
         schema: props.schema,
-        uischema: props.uischema,
+        uischema: generatedUischema.value,
         renderers,
         validationMode: 'NoValidation', // do not use built-in validation
         onChange,

@@ -3,6 +3,7 @@ const pages = [
   { path: 'test-renderers', file: 'TestRenderers' },
   { path: 'test-rules', file: 'TestRules' },
   { path: 'test-list', file: 'TestList' },
+  { path: 'test-no-layout', file: 'TestNoLayout' },
 ]
 
 const children = pages.map(page => ({
