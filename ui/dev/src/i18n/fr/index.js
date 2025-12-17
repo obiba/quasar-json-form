@@ -43,6 +43,10 @@ export default {
       label: 'Sélecteur de Note',
       description: 'Veuillez sélectionner une note',
     },
+    slider: {
+      label: 'Sélecteur de Curseur',
+      description: 'Veuillez sélectionner une valeur à l\'aide du curseur',
+    },
     date: {
       label: 'Sélecteur de Date',
       description: 'Veuillez sélectionner une date',

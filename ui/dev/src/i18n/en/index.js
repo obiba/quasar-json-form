@@ -43,6 +43,10 @@ export default {
       label: 'Rating Selector',
       description: 'Please select a rating',
     },
+    slider: {
+      label: 'Slider Selector',
+      description: 'Please select a value using the slider',
+    },
     date: {
       label: 'Date Picker',
       description: 'Please select a date',

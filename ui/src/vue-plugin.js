@@ -6,6 +6,7 @@ import QSelectRenderer from './components/QSelectRenderer'
 import QOptionsRenderer from './components/QOptionsRenderer'
 import QNumberRenderer from './components/QNumberRenderer'
 import QRatingRenderer from './components/QRatingRenderer'
+import QSliderRenderer from './components/QSliderRenderer'
 import QStringRenderer from './components/QStringRenderer'
 import QToggleRenderer from './components/QToggleRenderer'
 import QSectionRenderer from './components/QSectionRenderer'
@@ -24,6 +25,7 @@ function install (app) {
   app.component(QOptionsRenderer.name, QOptionsRenderer)
   app.component(QNumberRenderer.name, QNumberRenderer)
   app.component(QRatingRenderer.name, QRatingRenderer)
+  app.component(QSliderRenderer.name, QSliderRenderer)
   app.component(QStringRenderer.name, QStringRenderer)
   app.component(QToggleRenderer.name, QToggleRenderer)
   app.component(QSectionRenderer.name, QSectionRenderer)
@@ -42,6 +44,7 @@ export {
   QOptionsRenderer,
   QNumberRenderer,
   QRatingRenderer,
+  QSliderRenderer,
   QStringRenderer,
   QToggleRenderer,
   QSectionRenderer,

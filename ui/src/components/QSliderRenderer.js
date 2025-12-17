@@ -1,11 +1,11 @@
 import { h, watch, defineComponent } from 'vue';
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue';
-import { QRating } from 'quasar';
+import { QSlider } from 'quasar';
 import { useControlProperties } from '../composables/useControlProperties';
 import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
-  name: 'QRatingRenderer',
+  name: 'QSliderRenderer',
   props: rendererProps(),
   setup(props) {
     const { t } = useI18n();
@@ -43,17 +43,17 @@ export default defineComponent({
 
       if (control.value.label) {
         children.push(h('div', {
-          class: 'text-label text-grey-7 q-mb-xs',
+          class: 'text-grey-7 q-mb-xs',
         }, t(control.value.label)));
       }
 
       if (control.value.description) {
         children.push(h('div', {
-          class: ' text-description text-caption text-grey-7 q-mb-sm',
+          class: 'text-caption text-grey-7 q-mt-sm',
         }, t(control.value.description)));
       }
 
-      children.push(h(QRating, {
+      children.push(h(QSlider, {
         modelValue: control.value.data,
         type: 'number',
         'onUpdate:modelValue': onChange,
@@ -64,11 +64,6 @@ export default defineComponent({
         ...uiOptions.value,
       }));
 
-      if (control.value.hint) {
-        children.push(h('div', {
-          class: 'text-hint text-caption text-grey-7 q-mb-sm',
-        }, t(control.value.hint)));
-      }
 
       return h('div', {class: 'q-mt-md'}, children);
     };
