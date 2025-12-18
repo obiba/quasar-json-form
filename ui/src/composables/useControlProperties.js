@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { computed, inject, ref } from 'vue';
+import { computed, inject, ref, watch } from 'vue';
 import { useFiltrexRules } from './useFiltrexRules';
 import { useI18n } from 'vue-i18n';
 
@@ -138,6 +138,52 @@ export function useControlProperties(control) {
     return [];
   });
 
+  // Check if current value is valid (exists in selectOptions)
+  const isValueValid = computed(() => {
+    const currentValue = control.value.data;
+    const options = selectOptions.value;
+    
+    // If no value is set, it's valid (empty state)
+    if (currentValue === undefined || currentValue === null) {
+      return true;
+    }
+    
+    // Create a Set of option values for O(1) lookup performance
+    const optionValues = new Set(options.map(opt => opt.value));
+    
+    // Handle array values (multiple selection)
+    if (Array.isArray(currentValue)) {
+      // All selected values must exist in the options
+      return currentValue.every(val => optionValues.has(val));
+    }
+    
+    // Handle single value
+    return optionValues.has(currentValue);
+  });
+
+  // Function to clear invalid selections
+  const clearInvalidSelection = (handleChange) => {
+    return watch(
+      [selectOptions, () => control.value.data],
+      () => {
+        const currentValue = control.value.data;
+        const options = selectOptions.value;
+        
+        // Only clear if we have options and the current value is invalid
+        // Don't clear if options are empty (might be temporary)
+        // isValueValid already returns true for undefined/null, so we only get here
+        // when there's an actual invalid selection that needs to be cleared
+        if (options.length > 0 && !isValueValid.value) {
+          // Clear the selection if it's no longer valid
+          const schema = control.value.schema;
+          const isMultiple = schema.type === 'array';
+          handleChange(control.value.path, isMultiple ? [] : undefined);
+        }
+      },
+      { immediate: false }
+    );
+  };
+
   return {
     isVisible,
     isEnabled,
@@ -145,5 +191,7 @@ export function useControlProperties(control) {
     errorMessage,
     uiOptions,
     selectOptions,
+    isValueValid,
+    clearInvalidSelection,
   };
 }
