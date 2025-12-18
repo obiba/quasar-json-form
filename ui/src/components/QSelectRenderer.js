@@ -1,4 +1,4 @@
-import { h, computed, watch, defineComponent } from 'vue';
+import { h, computed, watch, defineComponent, onUnmounted } from 'vue';
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue';
 import { QSelect } from 'quasar';
 import { useControlProperties } from '../composables/useControlProperties';
@@ -31,7 +31,7 @@ export default defineComponent({
     };
 
     // Set up watch to clear invalid selections when options change
-    clearInvalidSelection(controlResult.handleChange);
+    const stopClearInvalidSelection = clearInvalidSelection(controlResult.handleChange);
 
     watch(
       () => isVisible.value,
@@ -41,6 +41,13 @@ export default defineComponent({
         }
       },
     );
+
+    // Cleanup watchers on unmount
+    onUnmounted(() => {
+      if (stopClearInvalidSelection) {
+        stopClearInvalidSelection();
+      }
+    });
 
     return () => {
       if (!isVisible.value) {

@@ -1,4 +1,4 @@
-import { h, computed, watch, defineComponent, onMounted } from 'vue';
+import { h, computed, watch, defineComponent, onMounted, onUnmounted } from 'vue';
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue';
 import { QOptionGroup } from 'quasar';
 import { useControlProperties } from '../composables/useControlProperties';
@@ -31,7 +31,14 @@ export default defineComponent({
     };
 
     // Set up watch to clear invalid selections when options change
-    clearInvalidSelection(controlResult.handleChange);
+    const stopClearInvalidSelection = clearInvalidSelection(controlResult.handleChange);
+
+    // Cleanup watchers on unmount
+    onUnmounted(() => {
+      if (stopClearInvalidSelection) {
+        stopClearInvalidSelection();
+      }
+    });
 
     onMounted(() => {
       // Ensure that for multiple selection, the value is always an array
