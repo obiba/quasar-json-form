@@ -162,7 +162,7 @@ export function useControlProperties(control) {
 
   // Function to clear invalid selections
   const clearInvalidSelection = (handleChange) => {
-    watch(
+    return watch(
       [selectOptions, () => control.value.data],
       () => {
         const currentValue = control.value.data;
@@ -170,7 +170,9 @@ export function useControlProperties(control) {
         
         // Only clear if we have options and the current value is invalid
         // Don't clear if options are empty (might be temporary)
-        if (options.length > 0 && !isValueValid.value && currentValue !== undefined) {
+        // isValueValid already returns true for undefined/null, so we only get here
+        // when there's an actual invalid selection that needs to be cleared
+        if (options.length > 0 && !isValueValid.value) {
           // Clear the selection if it's no longer valid
           const schema = control.value.schema;
           const isMultiple = schema.type === 'array';
