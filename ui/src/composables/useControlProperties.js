@@ -83,12 +83,67 @@ export function useControlProperties(control) {
     return (uiSchema && uiSchema.options) || {};
   });
 
+  // Transform enum values into q-select options
+  const selectOptions = computed(() => {
+    const schema = control.value.schema;
+
+    const optionVisible = (val) => {
+      if (val.rules && val.rules.visible) {
+        try {
+          return evaluateRule(val.rules.visible);
+        }
+        catch (error) {
+          console.error('Error evaluating visibility rule for option:', val, error);
+          return true;
+        }
+      }
+      return true;
+    };
+
+    if (schema.type === 'array' && schema.items) {
+      const itemsSchema = schema.items;
+      if (itemsSchema.oneOf && Array.isArray(itemsSchema.oneOf) && itemsSchema.oneOf.length > 0) {
+        // for each enum option, check if it's an object with label and same value
+        return itemsSchema.oneOf
+          .filter(optionVisible)
+          .map((val) => {
+            return { label: t(String(val.title || val.const)), value: val.const };
+          });
+      }
+
+      if (itemsSchema.enum) {
+        return itemsSchema.enum.map((value) => ({
+          label: t(String(value)),
+          value: value,
+        }));
+      }
+    }
+
+    if (schema.oneOf && Array.isArray(schema.oneOf) && schema.oneOf.length > 0) {
+      // for each enum option, check if it's an object with label and same value
+      return schema.oneOf
+        .filter(optionVisible)
+        .map((val) => {
+          return { label: t(String(val.title || val.const)), value: val.const };
+        });
+    }
+
+    if (schema.enum) {
+      return schema.enum.map((value) => ({
+        label: t(String(value)),
+        value: value,
+      }));
+    }
+
+    return [];
+  });
+
   return {
     isVisible,
     isEnabled,
     hasError,
     errorMessage,
     uiOptions,
-    ruleOptions,
+    selectOptions,
   };
 }
