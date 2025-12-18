@@ -35,9 +35,7 @@ export default defineComponent({
 
     // Cleanup watchers on unmount
     onUnmounted(() => {
-      if (stopClearInvalidSelection) {
-        stopClearInvalidSelection();
-      }
+      stopClearInvalidSelection();
     });
 
     onMounted(() => {

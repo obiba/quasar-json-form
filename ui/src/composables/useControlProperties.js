@@ -148,16 +148,17 @@ export function useControlProperties(control) {
       return true;
     }
     
+    // Create a Set of option values for O(1) lookup performance
+    const optionValues = new Set(options.map(opt => opt.value));
+    
     // Handle array values (multiple selection)
     if (Array.isArray(currentValue)) {
       // All selected values must exist in the options
-      return currentValue.every(val => 
-        options.some(opt => opt.value === val)
-      );
+      return currentValue.every(val => optionValues.has(val));
     }
     
     // Handle single value
-    return options.some(opt => opt.value === currentValue);
+    return optionValues.has(currentValue);
   });
 
   // Function to clear invalid selections
