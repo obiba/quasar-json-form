@@ -4,6 +4,7 @@ const pages = [
   { path: 'test-rules', file: 'TestRules' },
   { path: 'test-list', file: 'TestList' },
   { path: 'test-no-layout', file: 'TestNoLayout' },
+  { path: 'test-dynamic-renderers', file: 'TestDynamicRenderers' },
 ]
 
 const children = pages.map(page => ({

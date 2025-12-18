@@ -11,7 +11,7 @@
           <pre
             v-if="readonly"
             class="q-ma-none q-pa-md"
-          ><code class="language-json" v-prism>{{ formSchemaStr }}</code></pre>
+          ><code class="language-json" v-prism :key="formSchemaStr">{{ formSchemaStr }}</code></pre>
           <q-input
             v-else
             filled
@@ -26,7 +26,7 @@
           <pre
             v-if="readonly"
             class="q-ma-none q-pa-md"
-          ><code class="language-json" v-prism>{{ formUischemaStr }}</code></pre>
+          ><code class="language-json" v-prism :key="formUischemaStr">{{ formUischemaStr }}</code></pre>
           <q-input
             v-else
             filled
@@ -46,7 +46,7 @@
       <q-separator />
       <q-tab-panels v-model="tabPreview" animated>
         <q-tab-panel name="form" class="q-pl-none q-pr-none">
-          <QJsonForm v-model="formData" :schema="formSchema" :uischema="formUischema" />
+          <QJsonForm v-model="formData" :schema="props.schema" :uischema="props.uischema" @update:modelValue="onDataUpdate" />
           <pre class="bg-grey-10 text-white q-pa-md"><code>{{ formData }}</code></pre>
         </q-tab-panel>
       </q-tab-panels>
@@ -55,7 +55,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, watch } from 'vue';
 import { QJsonForm } from 'ui';
 import { useI18n } from 'vue-i18n';
 
@@ -83,12 +83,18 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(['update:data']);
+
 const formData = ref(props.data);
 const formSchemaStr = ref(JSON.stringify(props.schema, null, 2));
 const formUischemaStr = ref(JSON.stringify(props.uischema, null, 2));
 const tabDesign = ref('schema');
 const tabPreview = ref('form');
 
-const formSchema = computed(() => JSON.parse(formSchemaStr.value));
-const formUischema = computed(() => JSON.parse(formUischemaStr.value));
+const onDataUpdate = (newData) => {
+  formData.value = newData;
+  emit('update:data', newData);
+  formSchemaStr.value = JSON.stringify(props.schema, null, 2);
+  formUischemaStr.value = JSON.stringify(props.uischema, null, 2);
+};
 </script>
