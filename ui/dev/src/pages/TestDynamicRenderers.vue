@@ -35,6 +35,122 @@ const schema = {
       title: 'City',
       description: '3. Select a city from the selected region.',
     },
+    oneOfCountry: {
+      type: 'string',
+      oneOf: [
+        {
+          const: 'CA',
+          title: 'Canada',
+        },
+        {
+          const: 'CH',
+          title: 'Switzerland',
+        },
+      ],
+      title: 'Country (oneOf)',
+    },
+    oneOfRegion: {
+      type: 'string',
+      oneOf: [
+        {
+          const: 'ON',
+          title: 'Ontario',
+          rules: {
+            visible: 'oneOfCountry == "CA"',
+          },
+        },
+        {
+          const: 'QC',
+          title: 'Quebec',
+          rules: {
+            visible: 'oneOfCountry == "CA"',
+          },
+        },
+        {
+          const: 'GE',
+          title: 'Geneva',
+          rules: {
+            visible: 'oneOfCountry == "CH"',
+          },
+        },
+        {
+          const: 'ZH',
+          title: 'Zurich',
+          rules: {
+            visible: 'oneOfCountry == "CH"',
+          },
+        },
+      ],
+      title: 'Region (oneOf)',
+      rules: {
+        visible: 'isNotEmpty(oneOfCountry)',
+      },
+    },
+    oneOfCity: {
+      type: 'string',
+      oneOf: [
+        {
+          const: 'Toronto',
+          title: 'Toronto',
+          rules: {
+            visible: 'oneOfRegion == "ON"',
+          },
+        },
+        {
+          const: 'Ottawa',
+          title: 'Ottawa',
+          rules: {
+            visible: 'oneOfRegion == "ON"',
+          },
+        },
+        {
+          const: 'Montreal',
+          title: 'Montreal',
+          rules: {
+            visible: 'oneOfRegion == "QC"',
+          },
+        },
+        {
+          const: 'Quebec City',
+          title: 'Quebec City',
+          rules: {
+            visible: 'oneOfRegion == "QC"',
+          },
+        },
+        {
+          const: 'Geneva',
+          title: 'Geneva',
+          rules: {
+            visible: 'oneOfRegion == "GE"',
+          },
+        },
+        {
+          const: 'Carouge',
+          title: 'Carouge',
+          rules: {
+            visible: 'oneOfRegion == "GE"',
+          },
+        },
+        {
+          const: 'Zurich',
+          title: 'Zurich',
+          rules: {
+            visible: 'oneOfRegion == "ZH"',
+          },
+        },
+        {
+          const: 'Winterthur',
+          title: 'Winterthur',
+          rules: {
+            visible: 'oneOfRegion == "ZH"',
+          },
+        },
+      ],
+      title: 'City (oneOf)',
+      rules: {
+        visible: 'isNotEmpty(oneOfRegion)',
+      },
+    },
   },
 };
 
@@ -42,6 +158,11 @@ const schema = {
 const uischema = {
   type: 'VerticalLayout',
   elements: [
+    {
+      type: 'Label',
+      label: 'Selection logic is outside of the JSON Schema using update:data event.',
+      labelClass: 'text-bold',
+    },
     {
       type: 'Control',
       scope: '#/properties/country',
@@ -53,6 +174,23 @@ const uischema = {
     {
       type: 'Control',
       scope: '#/properties/city',
+    },
+    {
+      type: 'Label',
+      label: 'Selection logic is inside the JSON Schema using rules and oneOf.',
+      labelClass: 'text-bold q-mt-lg',
+    },
+    {
+      type: 'Control',
+      scope: '#/properties/oneOfCountry',
+    },
+    {
+      type: 'Control',
+      scope: '#/properties/oneOfRegion',
+    },
+    {
+      type: 'Control',
+      scope: '#/properties/oneOfCity',
     },
   ],
 };

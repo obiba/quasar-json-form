@@ -15,6 +15,10 @@ export class FiltrexRuleEngine {
       return value !== null && value !== undefined && value !== '';
     });
 
+    this.addFunction('ifElse', (condition, trueVal, falseVal) => {
+      return condition ? trueVal : falseVal;
+    });
+
     this.addFunction('length', (value) => {
       if (typeof value === 'string' || Array.isArray(value)) {
         return value.length;

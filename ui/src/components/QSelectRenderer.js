@@ -1,4 +1,4 @@
-import { h, computed, watch, defineComponent } from 'vue';
+import { h, computed, watch, defineComponent, onUnmounted } from 'vue';
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue';
 import { QSelect } from 'quasar';
 import { useControlProperties } from '../composables/useControlProperties';
@@ -18,51 +18,20 @@ export default defineComponent({
     const control = controlResult.control;
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, hasError, errorMessage, uiOptions } =
+    const { isVisible, isEnabled, hasError, errorMessage, uiOptions, selectOptions, clearInvalidSelection } =
       useControlProperties(control);
-
-    // Transform enum values into q-select options
-    const options = computed(() => {
-      const schema = controlResult.control.value.schema;
-
-      if (schema.type === 'array' && schema.items) {
-        const itemsSchema = schema.items;
-        if (itemsSchema.oneOf && Array.isArray(itemsSchema.oneOf) && itemsSchema.oneOf.length > 0) {
-          // for each enum option, check if it's an object with label and same value
-          return itemsSchema.oneOf.map((val) => {
-            return { label: t(String(val.title || val.const)), value: val.const };
-          });
-        }
-
-        if (itemsSchema.enum) {
-          return itemsSchema.enum.map((value) => ({
-            label: t(String(value)),
-            value: value,
-          }));
-        }
-      }
-
-      if (schema.oneOf && Array.isArray(schema.oneOf) && schema.oneOf.length > 0) {
-        // for each enum option, check if it's an object with label and same value
-        return schema.oneOf.map((val) => {
-          return { label: t(String(val.title || val.const)), value: val.const };
-        });
-      }
-
-      if (schema.enum) {
-        return schema.enum.map((value) => ({
-          label: t(String(value)),
-          value: value,
-        }));
-      }
-
-      return [];
-    });
 
     const isMultiple = computed(() => {
       const schema = controlResult.control.value.schema;
       return schema.type === 'array';
     });
+
+    const onChange = (value) => {
+      controlResult.handleChange(controlResult.control.value.path, value);
+    };
+
+    // Set up watch to clear invalid selections when options change
+    const stopClearInvalidSelection = clearInvalidSelection(controlResult.handleChange);
 
     watch(
       () => isVisible.value,
@@ -73,9 +42,10 @@ export default defineComponent({
       },
     );
 
-    const onChange = (value) => {
-      controlResult.handleChange(controlResult.control.value.path, value);
-    };
+    // Cleanup watchers on unmount
+    onUnmounted(() => {
+      stopClearInvalidSelection();
+    });
 
     return () => {
       if (!isVisible.value) {
@@ -86,7 +56,7 @@ export default defineComponent({
         modelValue: control.value.data,
         'onUpdate:modelValue': onChange,
         label: control.value.label ? t(control.value.label) : undefined,
-        options: options.value,
+        options: selectOptions.value,
         error: hasError.value,
         errorMessage: errorMessage.value,
         required: control.value.required,
