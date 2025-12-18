@@ -18,13 +18,20 @@ export default defineComponent({
     const control = controlResult.control;
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, uiOptions, selectOptions } =
+    const { isVisible, isEnabled, uiOptions, selectOptions, clearInvalidSelection } =
       useControlProperties(control);
 
     const isMultiple = computed(() => {
       const schema = controlResult.control.value.schema;
       return schema.type === 'array';
     });
+
+    const onChange = (value) => {
+      controlResult.handleChange(controlResult.control.value.path, value);
+    };
+
+    // Set up watch to clear invalid selections when options change
+    clearInvalidSelection(controlResult.handleChange);
 
     onMounted(() => {
       // Ensure that for multiple selection, the value is always an array
@@ -51,10 +58,6 @@ export default defineComponent({
         }
       }
     );
-
-    const onChange = (value) => {
-      controlResult.handleChange(controlResult.control.value.path, value);
-    };
 
     return () => {
       if (!isVisible.value) {
