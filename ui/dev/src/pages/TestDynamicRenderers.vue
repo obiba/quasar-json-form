@@ -160,7 +160,7 @@ const uischema = {
   elements: [
     {
       type: 'Label',
-      label: 'Location selection logic is outside of the JSON Schema using update:data event.',
+      label: 'Selection logic is outside of the JSON Schema using update:data event.',
       labelClass: 'text-bold',
     },
     {
@@ -177,8 +177,8 @@ const uischema = {
     },
     {
       type: 'Label',
-      label: 'Location selection logic is inside the JSON Schema using rules and oneOf.',
-      labelClass: ' text-bold q-mt-lg',
+      label: 'Selection logic is inside the JSON Schema using rules and oneOf.',
+      labelClass: 'text-bold q-mt-lg',
     },
     {
       type: 'Control',

@@ -103,7 +103,7 @@ export function useControlProperties(control) {
     if (schema.type === 'array' && schema.items) {
       const itemsSchema = schema.items;
       if (itemsSchema.oneOf && Array.isArray(itemsSchema.oneOf) && itemsSchema.oneOf.length > 0) {
-        // for each enum option, check if it's an object with label and same value
+        // for each oneOf item, filter by visibility and map to label/value
         return itemsSchema.oneOf
           .filter(optionVisible)
           .map((val) => {
@@ -120,7 +120,7 @@ export function useControlProperties(control) {
     }
 
     if (schema.oneOf && Array.isArray(schema.oneOf) && schema.oneOf.length > 0) {
-      // for each enum option, check if it's an object with label and same value
+      // for each oneOf item, filter by visibility and map to label/value
       return schema.oneOf
         .filter(optionVisible)
         .map((val) => {
