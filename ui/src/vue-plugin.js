@@ -1,4 +1,3 @@
-import Component from './components/Component'
 import QDateRenderer from './components/QDateRenderer'
 import QTimeRenderer from './components/QTimeRenderer'
 import QDateTimeRenderer from './components/QDateTimeRenderer'
@@ -12,12 +11,12 @@ import QToggleRenderer from './components/QToggleRenderer'
 import QSectionRenderer from './components/QSectionRenderer'
 import QLabelRenderer from './components/QLabelRenderer'
 import QListRenderer from './components/QListRenderer'
+import QTabsLayout from './components/QTabsLayout'
 import QJsonForm from './components/QJsonForm'
 
 const version = __UI_VERSION__
 
 function install (app) {
-  app.component(Component.name, Component)
   app.component(QDateRenderer.name, QDateRenderer)
   app.component(QTimeRenderer.name, QTimeRenderer)
   app.component(QDateTimeRenderer.name, QDateTimeRenderer)
@@ -31,12 +30,12 @@ function install (app) {
   app.component(QSectionRenderer.name, QSectionRenderer)
   app.component(QListRenderer.name, QListRenderer)
   app.component(QLabelRenderer.name, QLabelRenderer)
+  app.component(QTabsLayout.name, QTabsLayout)
   app.component(QJsonForm.name, QJsonForm)
 }
 
 export {
   version,
-  Component,
   QDateRenderer,
   QTimeRenderer,
   QDateTimeRenderer,
@@ -50,6 +49,7 @@ export {
   QSectionRenderer,
   QListRenderer,
   QLabelRenderer,
+  QTabsLayout,
   QJsonForm,
   install
 }
