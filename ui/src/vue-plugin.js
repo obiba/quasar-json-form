@@ -12,6 +12,7 @@ import QSectionRenderer from './components/QSectionRenderer'
 import QLabelRenderer from './components/QLabelRenderer'
 import QListRenderer from './components/QListRenderer'
 import QTabsLayout from './components/QTabsLayout'
+import QStepperLayout from './components/QStepperLayout'
 import QJsonForm from './components/QJsonForm'
 
 const version = __UI_VERSION__
@@ -31,6 +32,7 @@ function install (app) {
   app.component(QListRenderer.name, QListRenderer)
   app.component(QLabelRenderer.name, QLabelRenderer)
   app.component(QTabsLayout.name, QTabsLayout)
+  app.component(QStepperLayout.name, QStepperLayout)
   app.component(QJsonForm.name, QJsonForm)
 }
 
@@ -50,6 +52,7 @@ export {
   QListRenderer,
   QLabelRenderer,
   QTabsLayout,
+  QStepperLayout,
   QJsonForm,
   install
 }

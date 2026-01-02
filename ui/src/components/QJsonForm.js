@@ -36,6 +36,7 @@ import QDateTimeRenderer from './QDateTimeRenderer.js';
 import QSectionRenderer from './QSectionRenderer.js';
 import QLabelRenderer from './QLabelRenderer.js';
 import QTabsLayout from './QTabsLayout.js';
+import QStepperLayout from './QStepperLayout.js';
 // import QListRenderer from './QListRenderer.js';
 
 const hasOneOfItems = (schema) =>
@@ -79,6 +80,10 @@ const customRenderers = [
   {
     renderer: QTabsLayout,
     tester: rankWith(2, uiTypeIs('TabsLayout')),
+  },
+  {
+    renderer: QStepperLayout,
+    tester: rankWith(2, uiTypeIs('StepperLayout')),
   },
   {
     renderer: QLabelRenderer,
