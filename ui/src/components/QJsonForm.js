@@ -35,6 +35,7 @@ import QTimeRenderer from './QTimeRenderer.js';
 import QDateTimeRenderer from './QDateTimeRenderer.js';
 import QSectionRenderer from './QSectionRenderer.js';
 import QLabelRenderer from './QLabelRenderer.js';
+import QTabsLayout from './QTabsLayout.js';
 // import QListRenderer from './QListRenderer.js';
 
 const hasOneOfItems = (schema) =>
@@ -75,6 +76,10 @@ const isMultiEnumControl = and(
 // Define your custom renderers
 // Priority 3 - higher than default (usually 1-2)
 const customRenderers = [
+  {
+    renderer: QTabsLayout,
+    tester: rankWith(2, uiTypeIs('TabsLayout')),
+  },
   {
     renderer: QLabelRenderer,
     tester: rankWith(3, uiTypeIs('Label')),
