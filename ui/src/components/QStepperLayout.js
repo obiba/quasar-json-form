@@ -29,7 +29,6 @@ export default defineComponent({
     const steps = () => labels.value.map((name, index) =>
       h(QStep, {
       name: index,
-      // done: currentStep.value > index,
       title: t(name),
       icon: icons.value ? icons.value[index] : undefined,
       }, () => [
@@ -52,16 +51,10 @@ export default defineComponent({
         children.push(
           h(QBtn, {
             label: t('continue'),
-            disable: currentStep.value === elements.value.length - 1,
-            color: currentStep.value === elements.value.length - 1 ? undefined : 'primary',
-            flat: currentStep.value === elements.value.length - 1,
+            color: 'primary',
             noCaps: true,
             class: 'text-capitalize on-left',
-            onClick: () => {
-              if (currentStep.value < elements.value.length - 1) {
-                currentStep.value += 1;
-              }
-            },
+            onClick: () => currentStep.value += 1,
           })
         );
       }
@@ -70,15 +63,10 @@ export default defineComponent({
         children.push(
           h(QBtn, {
             label: t('back'),
-            disable: currentStep.value === 0,
             flat: true,
             noCaps: true,
             class: 'text-capitalize',
-            onClick: () => {
-              if (currentStep.value > 0) {
-                currentStep.value -= 1;
-              }
-            },
+            onClick: () => currentStep.value -= 1,
           })
         );
       }
