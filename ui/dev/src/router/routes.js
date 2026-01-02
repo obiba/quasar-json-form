@@ -5,6 +5,7 @@ const pages = [
   { path: 'test-list', file: 'TestList' },
   { path: 'test-no-layout', file: 'TestNoLayout' },
   { path: 'test-tabs-layout', file: 'TestTabsLayout' },
+  { path: 'test-stepper-layout', file: 'TestStepperLayout' },
   { path: 'test-dynamic-renderers', file: 'TestDynamicRenderers' },
 ]
 
