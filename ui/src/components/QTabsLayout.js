@@ -34,7 +34,6 @@ export default defineComponent({
         h(QTab, {
         name: String(index),
         label: t(name),
-        noCaps: true,
         class: labelClass.value,
         })
       )),

@@ -52,7 +52,6 @@ export default defineComponent({
           h(QBtn, {
             label: t('continue'),
             color: 'primary',
-            noCaps: true,
             class: 'text-capitalize on-left',
             onClick: () => currentStep.value += 1,
           })
@@ -64,7 +63,6 @@ export default defineComponent({
           h(QBtn, {
             label: t('back'),
             flat: true,
-            noCaps: true,
             class: 'text-capitalize',
             onClick: () => currentStep.value -= 1,
           })
