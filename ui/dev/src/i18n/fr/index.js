@@ -104,5 +104,7 @@ export default {
       label: 'Sélecteur de Bascule',
       description: 'Veuillez sélectionner une ou plusieurs valeurs dans la liste',
     },
-  }
+  },
+  'add-item': 'Ajouter un élément',
+  'no-items': 'Aucun élément',
 };

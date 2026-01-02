@@ -43,6 +43,30 @@ export function useControlProperties(control) {
     }
   });
 
+  // Max rule
+  const maxValue = computed(() => {
+    const rule = ruleOptions.value.max;
+    if (!rule) return undefined;
+    try {
+      return evaluateRule(rule);
+    } catch (error) {
+      console.error('Error evaluating max rule:', rule, error);
+      return undefined;
+    }
+  });
+
+  // Min rule
+  const minValue = computed(() => {
+    const rule = ruleOptions.value.min;
+    if (!rule) return undefined;
+    try {
+      return evaluateRule(rule);
+    } catch (error) {
+      console.error('Error evaluating min rule:', rule, error);
+      return undefined;
+    }
+  });
+
   // Custom validation
   const customValidationErrors = computed(() => {
     const rules = ruleOptions.value.validation || [];
@@ -187,6 +211,8 @@ export function useControlProperties(control) {
   return {
     isVisible,
     isEnabled,
+    maxValue,
+    minValue,
     hasError,
     errorMessage,
     uiOptions,

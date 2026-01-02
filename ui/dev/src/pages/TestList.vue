@@ -9,6 +9,7 @@
 import { ref } from 'vue';
 import FormPresenter from '../components/FormPresenter.vue';
 import { useI18n } from 'vue-i18n';
+import { title } from 'process';
 
 const formData = ref({
   comments: [
@@ -25,9 +26,34 @@ const { t } = useI18n();
 const schema = {
   type: 'object',
   properties: {
-
     comments: {
       type: 'array',
+      title: 'Comments (default layout)',
+      items: {
+        type: 'object',
+        properties: {
+          date: {
+            type: 'string',
+            format: 'date',
+          },
+          message: {
+            type: 'string',
+            maxLength: 5,
+          },
+          enum: {
+            type: 'string',
+            enum: ['foo', 'bar'],
+          },
+        },
+      },
+      rules: {
+        min: '1',
+        max: '3',
+      },
+    },
+    hcomments: {
+      type: 'array',
+      title: 'Comments (horizontal layout)',
       items: {
         type: 'object',
         properties: {
@@ -56,6 +82,29 @@ const uischema = {
     {
       type: 'Control',
       scope: '#/properties/comments',
+    },
+    {
+      type: 'Control',
+      scope: '#/properties/hcomments',
+      options: {
+        items: {
+          type: 'HorizontalLayout',
+          elements: [
+            {
+              type: 'Control',
+              scope: '#/properties/date',
+            },
+            {
+              type: 'Control',
+              scope: '#/properties/message',
+            },
+            {
+              type: 'Control',
+              scope: '#/properties/enum',
+            },
+          ],
+        },
+      },
     },
   ],
 };

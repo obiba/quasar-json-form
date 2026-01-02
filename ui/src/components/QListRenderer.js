@@ -1,13 +1,16 @@
 import { h, computed, watch, defineComponent } from 'vue';
-import { createDefaultValue } from '@jsonforms/core';
-import { rendererProps, useJsonFormsControl } from '@jsonforms/vue';
+import { createDefaultValue, composePaths } from '@jsonforms/core';
+import { DispatchRenderer, rendererProps, useJsonFormsControl } from '@jsonforms/vue';
 import { QList, QItem, QItemSection, QItemLabel, QIcon, QBtn } from 'quasar';
 import { useControlProperties } from '../composables/useControlProperties';
+import { renderMarkdown } from '../utils/mardown';
+import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
   name: 'QListRenderer',
   props: rendererProps(),
   setup(props) {
+    const { t } = useI18n();
     const controlResult = useJsonFormsControl({
       ...props,
       uischema: props.uischema,
@@ -16,21 +19,37 @@ export default defineComponent({
     const control = controlResult.control;
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, hasError, errorMessage, uiOptions } =
+    const { isVisible, isEnabled, maxValue, minValue, hasError, errorMessage, uiOptions } =
       useControlProperties(control);
 
     const items = computed(() => {
       return Array.isArray(control.value.data) ? control.value.data : [];
     });
 
+    const canAddItem = computed(() => {
+      if (maxValue.value === undefined) return true;
+      return items.value.length < maxValue.value;
+    });
+
     const addItem = () => {
+      if (!canAddItem.value) {
+        return;
+      }
       const newItem = createDefaultValue(controlResult.control.value.schema.items, controlResult.control.value.rootSchema);
       //controlResult.control.value.addItem(controlResult.control.value.path, newItem);
       const updatedItems = [...items.value, newItem];
       controlResult.handleChange(controlResult.control.value.path, updatedItems);
     };
 
+    const canRemoveItem = computed(() => {
+      if (minValue.value === undefined) return true;
+      return items.value.length > minValue.value;
+    });
+
     const removeItem = (index) => {
+      if (!canRemoveItem.value) {
+        return;
+      }
       const updatedItems = items.value.filter((_, i) => i !== index);
       controlResult.handleChange(controlResult.control.value.path, updatedItems);
     };
@@ -49,41 +68,76 @@ export default defineComponent({
         return null;
       }
 
-      return h('div', {
-        class: 'q-mb-md',
-      }, [
-        h(QList, {
+      const label = (control.value.label || control.value.uischema.label) ? t(control.value.label || control.value.uischema.label) : undefined;
+      const hint = control.value.uischema.description ? renderMarkdown(t(control.value.uischema.description)) : undefined;
+
+      const itemsSchema = computed(() => control.value.schema.items);
+      const itemsUiSchema = computed(() => {
+        return control.value.uischema.options?.items || {
+          type: 'VerticalLayout',
+          elements: Object.keys(itemsSchema.value.properties || {}).map((key) => ({
+            type: 'Control',
+            scope: `#/properties/${key}`,
+          })
+      )};
+      });
+
+      let listItems = null;
+      if (items.value.length > 0) {
+        listItems = h(QList, {
           bordered: true,
+          separator: true,
           ...uiOptions.value,
-        }, items.value.map((item, index) =>
-          h(QItem, { key: index }, [
-            h(QItemSection, { class: 'q-pa-sm' }, [
-              h(QItemLabel, item ? JSON.stringify(item) : '<empty>'),
+        }, () => items.value.map((item, index) =>
+          h(QItem, { key: index }, () => [
+            h(QItemSection, { class: 'q-pa-sm' }, () => [
+              h(DispatchRenderer, {
+                schema: itemsSchema.value,
+                uischema: itemsUiSchema.value,
+                path: composePaths(control.value.path, `${index}`)
+              }),
             ]),
-            h(QItemSection, { side: true }, [
+            h(QItemSection, { side: true }, () => [
               h(QBtn, {
                 dense: true,
                 flat: true,
                 color: 'negative',
-                label: control.value.deleteLabel || '',
+                label: control.value.deleteLabel ? t(control.value.deleteLabel) : '',
                 icon: control.value.deleteIcon || 'delete',
                 onClick: () => removeItem(index),
-                disabled: !isEnabled.value,
+                disabled: !isEnabled.value || !canRemoveItem.value,
               }),
             ]),
           ]),
-        )),
+        ))
+      } else {
+        listItems = h('div', {
+          class: 'text-grey-6',
+        }, t(control.value.emptyLabel || 'no-items'));
+      }
+
+      return h('div', {
+        class: 'q-mb-md',
+      }, [
+        label ? h('div', {
+          class: control.value.uischema.labelClass || 'text-bold q-mb-sm',
+          innerHTML: label
+        }) : null,
+        hint ? h('div', {
+          class: control.value.uischema.descriptionClass || 'text-grey-7',
+          innerHTML: hint
+        }) : null,
+        listItems,
         h(QBtn, {
-          class: 'q-mt-sm',
-          label: control.value.addLabel || 'Add Item',
+          class: 'q-mt-md',
+          label: t(control.value.addLabel || 'add-item'),
           color: 'primary',
           icon: control.value.addIcon || 'add',
           size: control.value.addSize || 'sm',
+          disabled: !isEnabled.value || !canAddItem.value,
           onClick: addItem,
-          disabled: !isEnabled.value,
         }),
         hasError.value ? h('div', { class: 'text-negative q-mt-sm' }, errorMessage.value) : null,
-        hint.value ? h('div', { class: 'text-caption q-mt-sm' }, hint.value) : null,
       ]);
     };
   },
