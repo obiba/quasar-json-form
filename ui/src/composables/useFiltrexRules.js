@@ -19,6 +19,14 @@ export class FiltrexRuleEngine {
       return condition ? trueVal : falseVal;
     });
 
+    this.addFunction('isNumber', (value) => {
+      return typeof value === 'number' && !isNaN(value);
+    });
+
+    this.addFunction('isString', (value) => {
+      return typeof value === 'string';
+    });
+
     this.addFunction('length', (value) => {
       if (typeof value === 'string' || Array.isArray(value)) {
         return value.length;
