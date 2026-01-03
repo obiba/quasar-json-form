@@ -34,6 +34,7 @@ import QLabelRenderer from '../components/QLabelRenderer.js';
 import QTabsLayout from '../components/QTabsLayout.js';
 import QStepperLayout from '../components/QStepperLayout.js';
 import QListRenderer from '../components/QListRenderer.js';
+import QComputedRenderer from '../components/QComputedRenderer.js';
 
 const hasOneOfItems = (schema) =>
   schema.oneOf !== undefined &&
@@ -55,6 +56,11 @@ const isDateFulltimeControl = and(
   or(formatIs('date-fulltime'), optionIs('format', 'date-fulltime'))
 );
 
+const isHiddenControl = and(
+  uiTypeIs('Control'),
+  or(formatIs('hidden'), optionIs('format', 'hidden'))
+);
+
 const isMultiEnumControl = and(
   uiTypeIs('Control'),
   and(
@@ -73,6 +79,10 @@ const isMultiEnumControl = and(
 // Define your custom renderers
 // Priority 3 - higher than default (usually 1-2)
 const qRenderers = [
+  {
+    renderer: QComputedRenderer,
+    tester: rankWith(4, isHiddenControl),
+  },
   {
     renderer: QTabsLayout,
     tester: rankWith(2, uiTypeIs('TabsLayout')),

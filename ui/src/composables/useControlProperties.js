@@ -67,6 +67,18 @@ export function useControlProperties(control) {
     }
   });
 
+  // Compute rule
+  const computeValue = computed(() => {
+    const rule = ruleOptions.value.compute;
+    if (!rule) return undefined;
+    try {
+      return evaluateRule(rule);
+    } catch (error) {
+      console.error('Error evaluating compute rule:', rule, error);
+      return undefined;
+    }
+  });
+
   // Custom validation
   const customValidationErrors = computed(() => {
     const rules = ruleOptions.value.validation || [];
@@ -213,6 +225,7 @@ export function useControlProperties(control) {
     isEnabled,
     maxValue,
     minValue,
+    computeValue,
     hasError,
     errorMessage,
     uiOptions,

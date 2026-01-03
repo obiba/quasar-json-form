@@ -39,6 +39,10 @@ export default {
       description: 'Veuillez entrer une valeur entière',
       number_must_be_even: 'Le nombre doit être pair',
     },
+    computed: {
+      label: 'Valeur Calculée',
+      description: 'Cette valeur est calculée en fonction d\'autres champs',
+    },
     rating: {
       label: 'Sélecteur de Note',
       description: 'Veuillez sélectionner une note',
