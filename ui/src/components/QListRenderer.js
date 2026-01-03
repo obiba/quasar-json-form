@@ -1,7 +1,7 @@
 import { h, computed, watch, defineComponent, ref } from 'vue';
 import { createDefaultValue, composePaths } from '@jsonforms/core';
 import { DispatchRenderer, rendererProps, useJsonFormsControl } from '@jsonforms/vue';
-import { QList, QItem, QItemSection, QItemLabel, QIcon, QBtn, QDialog, QCard, QCardSection, QCardActions } from 'quasar';
+import { QList, QItem, QItemSection, QBtn, QDialog, QCard, QCardSection, QCardActions } from 'quasar';
 import { useControlProperties } from '../composables/useControlProperties';
 import { renderMarkdown } from '../utils/mardown';
 import { useI18n } from 'vue-i18n';
@@ -30,6 +30,14 @@ export default defineComponent({
       return Array.isArray(control.value.data) ? control.value.data : [];
     });
 
+    const withOrdering = computed(() => {
+      return control.value.uischema.options?.ordering ?? true;
+    });
+
+    const withConfirmation = computed(() => {
+      return control.value.uischema.options?.confirmation ?? false;
+    });
+
     const canAddItem = computed(() => {
       if (maxValue.value === undefined) return true;
       return items.value.length < maxValue.value;
@@ -40,7 +48,6 @@ export default defineComponent({
         return;
       }
       const newItem = createDefaultValue(controlResult.control.value.schema.items, controlResult.control.value.rootSchema);
-      //controlResult.control.value.addItem(controlResult.control.value.path, newItem);
       const updatedItems = [...items.value, newItem];
       controlResult.handleChange(controlResult.control.value.path, updatedItems);
     };
@@ -77,14 +84,6 @@ export default defineComponent({
       itemToRemove.value = null;
     };
 
-    const withOrdering = computed(() => {
-      return control.value.uischema.options?.ordering ?? true;
-    });
-
-    const withConfirmation = computed(() => {
-      return control.value.uischema.options?.confirmation ?? false;
-    });
-
     const moveUpItem = (index) => {
       if (index <= 0) {
         return;
@@ -107,6 +106,16 @@ export default defineComponent({
       controlResult.handleChange(controlResult.control.value.path, updatedItems);
     };
 
+    const itemsSchema = computed(() => control.value.schema.items);
+    const itemsUiSchema = computed(() => {
+      return control.value.uischema.options?.items || {
+        type: 'VerticalLayout',
+        elements: Object.keys(itemsSchema.value.properties || {}).map((key) => ({
+          type: 'Control',
+          scope: `#/properties/${key}`,
+        }))};
+    });
+
     watch(
       () => isVisible.value,
       (newValue) => {
@@ -123,17 +132,6 @@ export default defineComponent({
 
       const label = (control.value.label || control.value.uischema.label) ? t(control.value.label || control.value.uischema.label) : undefined;
       const hint = control.value.uischema.description ? renderMarkdown(t(control.value.uischema.description)) : undefined;
-
-      const itemsSchema = computed(() => control.value.schema.items);
-      const itemsUiSchema = computed(() => {
-        return control.value.uischema.options?.items || {
-          type: 'VerticalLayout',
-          elements: Object.keys(itemsSchema.value.properties || {}).map((key) => ({
-            type: 'Control',
-            scope: `#/properties/${key}`,
-          })
-      )};
-      });
 
       // Confirmation dialog
       const confirmDialog = withConfirmation.value ? h(QDialog, {
@@ -206,7 +204,7 @@ export default defineComponent({
               }),
             ]) : null,
           ]),
-        ))
+        ));
       } else {
         listItems = h('div', {
           class: 'text-grey-6',
