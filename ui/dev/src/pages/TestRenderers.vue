@@ -48,6 +48,14 @@ const schema = {
       title: 'renderers.integer.label',
       description: 'renderers.integer.description',
     },
+    computed: {
+      type: 'number',
+      rules: {
+        compute: 'integer * 2 + ifElse(isNumber(number), number, 0)',
+      },
+      title: 'renderers.computed.label',
+      description: 'renderers.computed.description',
+    },
     rating: {
       type: 'integer',
       title: 'renderers.rating.label',
@@ -256,7 +264,15 @@ const uischema = {
             {
               type: 'Control',
               scope: '#/properties/integer',
-            }
+            },
+            {
+              type: 'Control',
+              scope: '#/properties/computed',
+              options: {
+                format: 'computed',
+                show: true,
+              },
+            },
           ],
         },
         {

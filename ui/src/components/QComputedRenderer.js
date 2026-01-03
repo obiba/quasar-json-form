@@ -1,4 +1,4 @@
-import { h, watch, defineComponent } from 'vue';
+import { h, watch, defineComponent, onMounted } from 'vue';
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue';
 import { useControlProperties } from '../composables/useControlProperties';
 import { useI18n } from 'vue-i18n';
@@ -6,7 +6,7 @@ import { renderMarkdown } from '../utils/mardown';
 
 
 export default defineComponent({
-  name: 'QSectionRenderer',
+  name: 'QComputedRenderer',
   props: rendererProps(),
   setup(props) {
     const { t } = useI18n();
@@ -19,15 +19,31 @@ export default defineComponent({
     const control = controlResult.control;
 
     // Use the generic control rules composable
-    const { isVisible } =
-      useControlProperties(control);
+    const { isVisible, computeValue } = useControlProperties(control);
+
+    onMounted(() => {
+      // Initialize computed value on mount
+      const computedVal = computeValue.value;
+      onChange(isVisible.value ? computedVal : undefined);
+    });
 
     watch(
       () => isVisible.value,
       (newValue) => {
         if (newValue === false) {
           onChange(undefined);
+        } else {
+          // Recompute value when becoming visible
+          const computedVal = computeValue.value;
+          onChange(computedVal);
         }
+      },
+    );
+
+    watch(
+      () => computeValue.value,
+      (newValue) => {
+        onChange(isVisible.value ? newValue : undefined);
       },
     );
 
@@ -46,7 +62,7 @@ export default defineComponent({
         let label = t(control.value.label || control.value.uischema.label);
         label = renderMarkdown(label);
         children.push(h('div', {
-          class: control.value.uischema.labelClass || 'text-h6 q-mb-sm',
+          class: control.value.uischema.labelClass || 'text-bold q-mb-sm',
           innerHTML: label,
         }));
       }
@@ -60,8 +76,17 @@ export default defineComponent({
         }));
       }
 
+      // show computed value
+      if (control.value.uischema.options?.show === true) {
+        children.push(h('div', {
+          class: 'q-computed-value q-pa-md q-mt-sm bg-grey-2 border-radius',
+        }, computeValue.value !== undefined && computeValue.value !== null
+          ? String(computeValue.value)
+          : t('noValue')));
+      }
+
       return h('div', {
-        class: 'q-section-renderer',
+        class: 'q-computed-renderer',
       }, children);
     };
   },

@@ -39,6 +39,10 @@ export default {
       description: 'Please enter an integer value',
       number_must_be_even: 'Number must be even',
     },
+    computed: {
+      label: 'Computed Value',
+      description: 'This value is computed based on other fields',
+    },
     rating: {
       label: 'Rating Selector',
       description: 'Please select a rating',
