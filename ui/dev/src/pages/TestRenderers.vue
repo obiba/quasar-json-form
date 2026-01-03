@@ -269,7 +269,7 @@ const uischema = {
               type: 'Control',
               scope: '#/properties/computed',
               options: {
-                format: 'hidden',
+                format: 'computed',
                 show: true,
               },
             },

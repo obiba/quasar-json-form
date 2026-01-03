@@ -48,7 +48,6 @@ export default defineComponent({
     );
 
     const onChange = (value) => {
-      control.value.data = value;
       controlResult.handleChange(control.value.path, value);
     };
 

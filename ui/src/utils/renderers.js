@@ -56,9 +56,9 @@ const isDateFulltimeControl = and(
   or(formatIs('date-fulltime'), optionIs('format', 'date-fulltime'))
 );
 
-const isHiddenControl = and(
+const isComputedControl = and(
   uiTypeIs('Control'),
-  or(formatIs('hidden'), optionIs('format', 'hidden'))
+  or(formatIs('computed'), optionIs('format', 'computed'))
 );
 
 const isMultiEnumControl = and(
@@ -81,7 +81,7 @@ const isMultiEnumControl = and(
 const qRenderers = [
   {
     renderer: QComputedRenderer,
-    tester: rankWith(4, isHiddenControl),
+    tester: rankWith(4, isComputedControl),
   },
   {
     renderer: QTabsLayout,
