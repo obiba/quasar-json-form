@@ -84,6 +84,7 @@ const uischema = {
       scope: '#/properties/comments',
       options: {
         ordering: false,
+        confirmation: true,
       },
     },
     {

@@ -1,7 +1,7 @@
-import { h, computed, watch, defineComponent } from 'vue';
+import { h, computed, watch, defineComponent, ref } from 'vue';
 import { createDefaultValue, composePaths } from '@jsonforms/core';
 import { DispatchRenderer, rendererProps, useJsonFormsControl } from '@jsonforms/vue';
-import { QList, QItem, QItemSection, QItemLabel, QIcon, QBtn } from 'quasar';
+import { QList, QItem, QItemSection, QItemLabel, QIcon, QBtn, QDialog, QCard, QCardSection, QCardActions } from 'quasar';
 import { useControlProperties } from '../composables/useControlProperties';
 import { renderMarkdown } from '../utils/mardown';
 import { useI18n } from 'vue-i18n';
@@ -21,6 +21,10 @@ export default defineComponent({
     // Use the generic control rules composable
     const { isVisible, isEnabled, maxValue, minValue, hasError, errorMessage, uiOptions } =
       useControlProperties(control);
+
+    // Dialog state for confirming item removal
+    const showConfirmDialog = ref(false);
+    const itemToRemove = ref(null);
 
     const items = computed(() => {
       return Array.isArray(control.value.data) ? control.value.data : [];
@@ -46,7 +50,16 @@ export default defineComponent({
       return items.value.length > minValue.value;
     });
 
-    const removeItem = (index) => {
+    const confirmRemoveItem = (index) => {
+      if (withConfirmation.value) {
+        itemToRemove.value = index;
+        showConfirmDialog.value = true;
+      } else {
+        removeItemDirect(index);
+      }
+    };
+
+    const removeItemDirect = (index) => {
       if (!canRemoveItem.value) {
         return;
       }
@@ -54,8 +67,22 @@ export default defineComponent({
       controlResult.handleChange(controlResult.control.value.path, updatedItems);
     };
 
+    const removeItem = () => {
+      if (!canRemoveItem.value || itemToRemove.value === null) {
+        return;
+      }
+      const updatedItems = items.value.filter((_, i) => i !== itemToRemove.value);
+      controlResult.handleChange(controlResult.control.value.path, updatedItems);
+      showConfirmDialog.value = false;
+      itemToRemove.value = null;
+    };
+
     const withOrdering = computed(() => {
       return control.value.uischema.options?.ordering ?? true;
+    });
+
+    const withConfirmation = computed(() => {
+      return control.value.uischema.options?.confirmation ?? false;
     });
 
     const moveUpItem = (index) => {
@@ -108,6 +135,28 @@ export default defineComponent({
       )};
       });
 
+      // Confirmation dialog
+      const confirmDialog = withConfirmation.value ? h(QDialog, {
+        modelValue: showConfirmDialog.value,
+        'onUpdate:modelValue': (val) => { showConfirmDialog.value = val; },
+      }, () => h(QCard, { style: 'min-width: 300px' }, () => [
+        h(QCardSection, { class: 'row items-center q-pb-none' }, () => t('confirm-remove-item') || 'Remove this item?'),
+        h(QCardActions, { align: 'right' }, () => [
+          h(QBtn, {
+            flat: true,
+            label: t('cancel') || 'Cancel',
+            color: 'primary',
+            onClick: () => { showConfirmDialog.value = false; itemToRemove.value = null; },
+          }),
+          h(QBtn, {
+            flat: true,
+            label: t('remove') || 'Remove',
+            color: 'negative',
+            onClick: removeItem,
+          }),
+        ]),
+      ])) : null;
+
       let listItems = null;
       if (items.value.length > 0) {
         listItems = h(QList, {
@@ -130,7 +179,7 @@ export default defineComponent({
                 color: 'negative',
                 label: control.value.deleteLabel ? t(control.value.deleteLabel) : '',
                 icon: control.value.deleteIcon || 'delete',
-                onClick: () => removeItem(index),
+                onClick: () => confirmRemoveItem(index),
                 disabled: !isEnabled.value || !canRemoveItem.value,
               }),
             ]),
@@ -176,6 +225,7 @@ export default defineComponent({
           innerHTML: hint
         }) : null,
         listItems,
+        confirmDialog,
         h(QBtn, {
           class: 'q-mt-md',
           label: t(control.value.addLabel || 'add-item'),

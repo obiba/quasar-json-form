@@ -107,4 +107,7 @@ export default {
   },
   'add-item': 'Ajouter un élément',
   'no-items': 'Aucun élément',
+  'confirm-remove-item': 'Supprimer cet élément ?',
+  cancel: 'Annuler',
+  remove: 'Supprimer',
 };
