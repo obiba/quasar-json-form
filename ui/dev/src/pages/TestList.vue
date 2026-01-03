@@ -82,6 +82,9 @@ const uischema = {
     {
       type: 'Control',
       scope: '#/properties/comments',
+      options: {
+        ordering: false,
+      },
     },
     {
       type: 'Control',

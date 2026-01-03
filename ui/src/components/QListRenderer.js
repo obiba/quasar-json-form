@@ -54,6 +54,32 @@ export default defineComponent({
       controlResult.handleChange(controlResult.control.value.path, updatedItems);
     };
 
+    const withOrdering = computed(() => {
+      return control.value.uischema.options?.ordering ?? true;
+    });
+
+    const moveUpItem = (index) => {
+      if (index <= 0) {
+        return;
+      }
+      const updatedItems = [...items.value];
+      const temp = updatedItems[index - 1];
+      updatedItems[index - 1] = updatedItems[index];
+      updatedItems[index] = temp;
+      controlResult.handleChange(controlResult.control.value.path, updatedItems);
+    };
+
+    const moveDownItem = (index) => {
+      if (index >= items.value.length - 1) {
+        return;
+      }
+      const updatedItems = [...items.value];
+      const temp = updatedItems[index + 1];
+      updatedItems[index + 1] = updatedItems[index];
+      updatedItems[index] = temp;
+      controlResult.handleChange(controlResult.control.value.path, updatedItems);
+    };
+
     watch(
       () => isVisible.value,
       (newValue) => {
@@ -97,7 +123,7 @@ export default defineComponent({
                 path: composePaths(control.value.path, `${index}`)
               }),
             ]),
-            h(QItemSection, { side: true }, () => [
+            h(QItemSection, { side: true, style: 'padding: 0' }, () => [
               h(QBtn, {
                 dense: true,
                 flat: true,
@@ -108,6 +134,28 @@ export default defineComponent({
                 disabled: !isEnabled.value || !canRemoveItem.value,
               }),
             ]),
+            withOrdering.value ? h(QItemSection, { side: true, style: 'padding: 0' }, () => [
+              h(QBtn, {
+                dense: true,
+                flat: true,
+                color: 'primary',
+                label: control.value.moveUpLabel ? t(control.value.moveUpLabel) : '',
+                icon: control.value.moveUpIcon || 'arrow_upward',
+                onClick: () => moveUpItem(index),
+                disabled: !isEnabled.value || index <= 0,
+              }),
+            ]) : null,
+            withOrdering.value ? h(QItemSection, { side: true, style: 'padding: 0' }, () => [
+              h(QBtn, {
+                dense: true,
+                flat: true,
+                color: 'primary',
+                label: control.value.moveDownLabel ? t(control.value.moveDownLabel) : '',
+                icon: control.value.moveDownIcon || 'arrow_downward',
+                onClick: () => moveDownItem(index),
+                disabled: !isEnabled.value || index >= items.value.length - 1,
+              }),
+            ]) : null,
           ]),
         ))
       } else {
