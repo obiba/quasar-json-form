@@ -21,7 +21,7 @@ import {
   isDateTimeControl,
   and,
   or,
-  // isArrayObjectControl,
+  isArrayObjectControl,
 } from '@jsonforms/core';
 import QStringRenderer from './QStringRenderer.js';
 import QNumRenderer from './QNumberRenderer.js';
@@ -37,7 +37,7 @@ import QSectionRenderer from './QSectionRenderer.js';
 import QLabelRenderer from './QLabelRenderer.js';
 import QTabsLayout from './QTabsLayout.js';
 import QStepperLayout from './QStepperLayout.js';
-// import QListRenderer from './QListRenderer.js';
+import QListRenderer from './QListRenderer.js';
 
 const hasOneOfItems = (schema) =>
   schema.oneOf !== undefined &&
@@ -153,10 +153,10 @@ const customRenderers = [
     renderer: QDateTimeRenderer,
     tester: rankWith(4, or(isDateTimeControl, isDateFulltimeControl)),
   },
-  // {
-  //   renderer: QListRenderer,
-  //   tester: rankWith(3, isArrayObjectControl),
-  // },
+  {
+    renderer: QListRenderer,
+    tester: rankWith(3, isArrayObjectControl),
+  },
 ];
 
 // Combine custom renderers with default vanilla renderers

@@ -104,5 +104,10 @@ export default {
       label: 'Toggles Selector',
       description: 'Please select one or more values from the list',
     },
-  }
+  },
+  'add-item': 'Add Item',
+  'no-items': 'No Items',
+  'confirm-remove-item': 'Remove this item?',
+  cancel: 'Cancel',
+  remove: 'Remove',
 };

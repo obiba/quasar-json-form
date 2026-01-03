@@ -65,6 +65,7 @@ export default defineComponent({
         emitValue: true,
         mapOptions: true,
         multiple: isMultiple.value,
+        clearable: !control.value.required,
         ...uiOptions.value,
       });
     };

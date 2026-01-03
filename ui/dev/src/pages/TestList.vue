@@ -25,9 +25,34 @@ const { t } = useI18n();
 const schema = {
   type: 'object',
   properties: {
-
     comments: {
       type: 'array',
+      title: 'Comments (default layout)',
+      items: {
+        type: 'object',
+        properties: {
+          date: {
+            type: 'string',
+            format: 'date',
+          },
+          message: {
+            type: 'string',
+            maxLength: 5,
+          },
+          enum: {
+            type: 'string',
+            enum: ['foo', 'bar'],
+          },
+        },
+      },
+      rules: {
+        min: '1',
+        max: '3',
+      },
+    },
+    hcomments: {
+      type: 'array',
+      title: 'Comments (horizontal layout)',
       items: {
         type: 'object',
         properties: {
@@ -56,6 +81,33 @@ const uischema = {
     {
       type: 'Control',
       scope: '#/properties/comments',
+      options: {
+        ordering: false,
+        confirmation: true,
+      },
+    },
+    {
+      type: 'Control',
+      scope: '#/properties/hcomments',
+      options: {
+        items: {
+          type: 'HorizontalLayout',
+          elements: [
+            {
+              type: 'Control',
+              scope: '#/properties/date',
+            },
+            {
+              type: 'Control',
+              scope: '#/properties/message',
+            },
+            {
+              type: 'Control',
+              scope: '#/properties/enum',
+            },
+          ],
+        },
+      },
     },
   ],
 };
