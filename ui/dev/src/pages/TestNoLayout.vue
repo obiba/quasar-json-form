@@ -44,6 +44,27 @@ const schema = {
       title: 'renderers.enum.label',
       description: 'renderers.enum.description',
     },
+    address: {
+      type: 'object',
+      properties: {
+        street: {
+          type: 'string'
+        },
+        streetNumber: {
+          type: 'string'
+        },
+        city: {
+          type: 'string'
+        },
+        postalCode: {
+          type: 'string',
+          maxLength: 5
+        }
+      },
+      rules: {
+        visible: 'boolean',
+      },
+    },
   },
 };
 </script>

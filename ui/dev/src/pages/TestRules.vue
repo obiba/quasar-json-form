@@ -84,6 +84,27 @@ const schema = {
         ],
       },
     },
+    address: {
+      type: 'object',
+      properties: {
+        street: {
+          type: 'string'
+        },
+        streetNumber: {
+          type: 'string'
+        },
+        city: {
+          type: 'string'
+        },
+        postalCode: {
+          type: 'string',
+          maxLength: 5
+        }
+      },
+      rules: {
+        visible: 'boolean',
+      },
+    },
   },
 };
 
@@ -135,6 +156,10 @@ const uischema = {
         },
       ],
     },
+    {
+      type: 'Control',
+      scope: '#/properties/address'
+    }
   ],
 };
 </script>

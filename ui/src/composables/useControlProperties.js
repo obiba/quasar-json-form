@@ -22,7 +22,8 @@ export function useControlProperties(control) {
     const rule = ruleOptions.value.visible;
     if (!rule) return true;
     try {
-      return evaluateRule(rule);
+      const rval = evaluateRule(rule);
+      return rval === true;
     } catch (error) {
       console.error('Error evaluating visibility rule:', rule, error);
       return true;

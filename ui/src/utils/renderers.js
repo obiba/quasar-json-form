@@ -15,6 +15,9 @@ import {
   isDateControl,
   isTimeControl,
   isDateTimeControl,
+  isCategorization,
+  isCategory,
+  isGroup,
   and,
   or,
   isArrayObjectControl,
@@ -34,6 +37,7 @@ import QLabelRenderer from '../components/QLabelRenderer.js';
 import QTabsLayout from '../components/QTabsLayout.js';
 import QStepperLayout from '../components/QStepperLayout.js';
 import QListRenderer from '../components/QListRenderer.js';
+import QGroupRenderer from '../components/QGroupRenderer.js';
 import QComputedRenderer from '../components/QComputedRenderer.js';
 
 const hasOneOfItems = (schema) =>
@@ -84,8 +88,12 @@ const qRenderers = [
     tester: rankWith(4, isComputedControl),
   },
   {
+    renderer: QGroupRenderer,
+    tester: rankWith(3, or(isGroup, isCategory)),
+  },
+  {
     renderer: QTabsLayout,
-    tester: rankWith(2, uiTypeIs('TabsLayout')),
+    tester: rankWith(4, or(uiTypeIs('TabsLayout'), isCategorization)),
   },
   {
     renderer: QStepperLayout,

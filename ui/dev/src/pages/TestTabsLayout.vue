@@ -39,7 +39,7 @@ const schema = {
 // Optional UI Schema for layout customization
 const uischema = {
   type: 'TabsLayout',
-  labels: ['date', 'message', 'enum'],
+  labels: ['date', 'message'],
   labelClass: 'text-capitalize',
   elements: [
     {
@@ -47,13 +47,18 @@ const uischema = {
       scope: '#/properties/date',
     },
     {
-      type: 'Control',
-      scope: '#/properties/message',
-    },
-    {
-      type: 'Control',
-      scope: '#/properties/enum',
-    },
+      type: 'VerticalLayout',
+      elements: [
+        {
+          type: 'Control',
+          scope: '#/properties/message',
+        },
+        {
+          type: 'Control',
+          scope: '#/properties/enum',
+        },
+      ],
+    }
   ],
 };
 </script>

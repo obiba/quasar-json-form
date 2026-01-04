@@ -9,11 +9,21 @@ export default defineComponent({
   props: rendererProps(),
   setup(props) {
     const { t } = useI18n();
-    const elements = computed(() => (props.uischema.elements && Array.isArray(props.uischema.elements) ? props.uischema.elements : []));
+
+    const withCategories = computed(() => props.uischema.type === 'Categorization');
+
+    const elements = computed(() => {
+      return (props.uischema.elements && Array.isArray(props.uischema.elements) ? props.uischema.elements : [])
+    });
     const labels = computed(() => {
-    return (props.uischema.labels && Array.isArray(props.uischema.labels) && props.uischema.labels.length > 0)
-      ? props.uischema.labels
-      : elements.value.map((_, index) => `${index + 1}`);
+      if (withCategories.value) {
+        return elements.value.map((category) => {
+          return (category.label) ? category.label : 'Category';
+        });
+      }
+      return (props.uischema.labels && Array.isArray(props.uischema.labels) && props.uischema.labels.length > 0)
+        ? props.uischema.labels
+        : elements.value.map((_, index) => `${index + 1}`);
     });
     const labelClass = computed(() => {
     return props.uischema.labelClass || '';
@@ -45,7 +55,7 @@ export default defineComponent({
         }, () => elements.value.map((_, index) =>
           h(QTabPanel, {
             name: String(index),
-          }, [
+          }, () => [
             h(DispatchRenderer, {
               schema: props.schema,
               uischema: elements.value[index],
