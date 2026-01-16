@@ -1,12 +1,12 @@
 import { h, watch, defineComponent } from 'vue';
-import { rendererProps, useJsonFormsControl } from '@jsonforms/vue';
+import { DispatchRenderer, rendererProps, useJsonFormsControl } from '@jsonforms/vue';
 import { useControlProperties } from '../composables/useControlProperties';
 import { useI18n } from 'vue-i18n';
-import { renderMarkdown } from '../utils/mardown';
+import { renderMarkdown } from '../utils/markdown';
 
 
 export default defineComponent({
-  name: 'QSectionRenderer',
+  name: 'QGroupRenderer',
   props: rendererProps(),
   setup(props) {
     const { t } = useI18n();
@@ -19,7 +19,7 @@ export default defineComponent({
     const control = controlResult.control;
 
     // Use the generic control rules composable
-    const { isVisible } = useControlProperties(control);
+    const { isVisible, isEnabled } = useControlProperties(control);
 
     watch(
       () => isVisible.value,
@@ -41,12 +41,11 @@ export default defineComponent({
 
       const children = [];
 
-      if (control.value.label || control.value.uischema.label) {
-        let label = t(control.value.label || control.value.uischema.label);
-        // label = renderMarkdown(label);
+      if (control.value.title || control.value.uischema.title) {
+        let title = t(control.value.title || control.value.uischema.title);
         children.push(h('div', {
-          class: 'q-form-label' + (control.value.uischema.labelClass ? ` ${control.value.uischema.labelClass}` : ''),
-          innerHTML: label,
+          class: 'q-form-title' + (control.value.uischema.titleClass ? ` ${control.value.uischema.titleClass}` : ''),
+          innerHTML: title,
         }));
       }
 
@@ -59,8 +58,30 @@ export default defineComponent({
         }));
       }
 
+      (control.value.uischema?.elements || []).forEach((element) => {
+        children.push(h(DispatchRenderer, {
+          schema: props.schema,
+          uischema: element,
+          path: control.value.path,
+          enabled: props.enabled && isEnabled.value,
+          visible: props.visible && isVisible.value,
+          cells: props.cells,
+          renderers: props.renderers,
+          config: props.config,
+        }));
+      });
+
+      if (control.value.hint || control.value.uischema.hint) {
+        let hint = t(control.value.hint || control.value.uischema.hint);
+        hint = renderMarkdown(hint);
+        children.push(h('div', {
+          class: 'q-form-hint' + (control.value.uischema.hintClass ? ` ${control.value.uischema.hintClass}` : ''),
+          innerHTML: hint,
+        }));
+      }
+      
       return h('div', {
-        class: 'q-section-renderer',
+        class: 'q-group-renderer',
       }, children);
     };
   },

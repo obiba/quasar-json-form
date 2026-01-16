@@ -108,6 +108,20 @@ export default {
       label: 'Toggles Selector',
       description: 'Please select one or more values from the list',
     },
+    categories: {
+      labels: {
+        identification: 'Identification',
+        address: 'Address',
+        additional: 'Additional',
+      },
+      titles: {
+        identification: 'Identification Information',
+        address: 'Address Information',
+      },
+      descriptions: {
+        identification: 'Please provide your identification details',
+      }
+    },
   },
   'add-item': 'Add Item',
   'no-items': 'No Items',

@@ -6,6 +6,7 @@ const pages = [
   { path: 'test-no-layout', file: 'TestNoLayout' },
   { path: 'test-tabs-layout', file: 'TestTabsLayout' },
   { path: 'test-stepper-layout', file: 'TestStepperLayout' },
+  { path: 'test-categorization-layout', file: 'TestCategorizationLayout' },
   { path: 'test-dynamic-renderers', file: 'TestDynamicRenderers' },
 ]
 

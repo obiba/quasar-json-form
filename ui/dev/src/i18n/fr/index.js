@@ -108,6 +108,20 @@ export default {
       label: 'Sélecteur de Bascule',
       description: 'Veuillez sélectionner une ou plusieurs valeurs dans la liste',
     },
+    categories: {
+      labels: {
+        identification: 'Identification',
+        address: 'Adresse',
+        additional: 'Supplémentaire',
+      },
+      titles: {
+        identification: 'Informations d\'Identification',
+        address: 'Informations sur l\'adresse',
+      },
+      descriptions: {
+        identification: 'Veuillez fournir vos informations d\'identification',
+      }
+    },
   },
   'add-item': 'Ajouter un élément',
   'no-items': 'Aucun élément',

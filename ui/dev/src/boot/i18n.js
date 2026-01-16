@@ -15,6 +15,8 @@ const i18n = createI18n({
   locale: detectedLocale,
   fallbackLocale: locales[0],
   warnHtmlInMessage: 'off',
+  missingWarn: false,
+  fallbackWarn: false,
   messages: messages
 })
 const t = i18n.global.t
