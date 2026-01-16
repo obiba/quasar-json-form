@@ -1,14 +1,25 @@
 import { h, computed, ref, defineComponent } from 'vue';
-import { rendererProps } from '@jsonforms/vue';
-import { DispatchRenderer } from '@jsonforms/vue';
+import { DispatchRenderer, rendererProps, useJsonFormsControl } from '@jsonforms/vue';
 import { QStepper, QStep, QStepperNavigation, QBtn } from 'quasar';
 import { useI18n } from 'vue-i18n';
+import { useControlProperties } from '../composables/useControlProperties';
 
 export default defineComponent({
   name: 'QStepperLayout',
   props: rendererProps(),
   setup(props) {
     const { t } = useI18n();
+
+    const controlResult = useJsonFormsControl({
+      ...props,
+      uischema: props.uischema,
+    });
+
+    const control = controlResult.control;
+
+    // Use the generic control rules composable
+    const { isVisible, isEnabled } = useControlProperties(control);
+
     const elements = computed(() => (props.uischema.elements && Array.isArray(props.uischema.elements) ? props.uischema.elements : []));
     const labels = computed(() => {
     return (props.uischema.labels && Array.isArray(props.uischema.labels) && props.uischema.labels.length > 0)
@@ -36,8 +47,8 @@ export default defineComponent({
             schema: props.schema,
             uischema: elements.value[index],
             path: props.path,
-            enabled: props.enabled,
-            visible: props.visible,
+            enabled: props.enabled && isEnabled.value,
+            visible: props.visible && isVisible.value,
             cells: props.cells,
             renderers: props.renderers,
             config: props.config,

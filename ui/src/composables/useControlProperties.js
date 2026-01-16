@@ -13,8 +13,14 @@ export function useControlProperties(control) {
 
   // Extract rule options from UI schema
   const ruleOptions = computed(() => {
-    const schema = control.value.schema;
-    return schema.rules || {};
+    const schemaRules = control.value.schema.rules || {};
+    const uischemaRules = control.value.uischema.rules || {};
+    // merge rules, override uischema rules over schema rules
+    const rules = {
+      ...schemaRules,
+      ...uischemaRules,
+    };
+    return rules;
   });
 
   // Visibility rule

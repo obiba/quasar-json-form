@@ -27,9 +27,6 @@ const schema = {
       minLength: 3,
       description: 'Please enter your second name'
     },
-    vegetarian: {
-      type: 'boolean'
-    },
     birthDate: {
       type: 'string',
       format: 'date',
@@ -131,14 +128,6 @@ const uischema = {
               scope: '#/properties/nationality'
             }
           ]
-        },
-        {
-          type: 'Control',
-          scope: '#/properties/provideAddress'
-        },
-        {
-          type: 'Control',
-          scope: '#/properties/vegetarian'
         }
       ]
     },
@@ -147,6 +136,10 @@ const uischema = {
       label: 'renderers.categories.labels.address',
       title: 'renderers.categories.titles.address',
       elements: [
+        {
+          type: 'Control',
+          scope: '#/properties/provideAddress'
+        },
         {
           type: 'Control',
           scope: '#/properties/address',
@@ -179,7 +172,7 @@ const uischema = {
             }
           ]
         },
-      ]
+      ],
     },
     {
       type: 'Category',

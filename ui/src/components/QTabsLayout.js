@@ -1,14 +1,24 @@
 import { h, computed, ref, defineComponent } from 'vue';
-import { rendererProps } from '@jsonforms/vue';
-import { DispatchRenderer } from '@jsonforms/vue';
+import { DispatchRenderer, rendererProps, useJsonFormsControl } from '@jsonforms/vue';
 import { QTabs, QTab, QTabPanels, QTabPanel, QSeparator } from 'quasar';
 import { useI18n } from 'vue-i18n';
+import { useControlProperties } from '../composables/useControlProperties';
 
 export default defineComponent({
   name: 'QTabsLayout',
   props: rendererProps(),
   setup(props) {
     const { t } = useI18n();
+
+    const controlResult = useJsonFormsControl({
+      ...props,
+      uischema: props.uischema,
+    });
+
+    const control = controlResult.control;
+
+    // Use the generic control rules composable
+    const { isVisible, isEnabled } = useControlProperties(control);
 
     const withCategories = computed(() => props.uischema.type === 'Categorization');
 
@@ -32,43 +42,47 @@ export default defineComponent({
     const currentTab = ref(labels.value.length > 0 ? '0' : null);
 
     return () => {
-    return h('div', [
-      h(QTabs, {
-        modelValue: currentTab.value,
-        'onUpdate:modelValue': (val) => currentTab.value = val,
-        align: 'left',
-        dense: true,
-        activeColor: 'primary',
-        indicatorColor: 'primary',
-      }, () => labels.value.map((name, index) =>
-        h(QTab, {
-        name: String(index),
-        label: t(name),
-        class: labelClass.value,
-        })
-      )),
-        h(QSeparator),
-        h(QTabPanels, {
+      if (!isVisible.value) {
+        return null;
+      }
+
+      return h('div', [
+        h(QTabs, {
           modelValue: currentTab.value,
           'onUpdate:modelValue': (val) => currentTab.value = val,
-          animated: false,
-        }, () => elements.value.map((_, index) =>
-          h(QTabPanel, {
-            name: String(index),
-          }, () => [
-            h(DispatchRenderer, {
-              schema: props.schema,
-              uischema: elements.value[index],
-              path: props.path,
-              enabled: props.enabled,
-              visible: props.visible,
-              cells: props.cells,
-              renderers: props.renderers,
-              config: props.config,
-            }),
-          ])
+          align: 'left',
+          dense: true,
+          activeColor: 'primary',
+          indicatorColor: 'primary',
+        }, () => labels.value.map((name, index) =>
+          h(QTab, {
+          name: String(index),
+          label: t(name),
+          class: labelClass.value,
+          })
         )),
-      ]);
+          h(QSeparator),
+          h(QTabPanels, {
+            modelValue: currentTab.value,
+            'onUpdate:modelValue': (val) => currentTab.value = val,
+            animated: false,
+          }, () => elements.value.map((_, index) =>
+            h(QTabPanel, {
+              name: String(index),
+            }, () => [
+              h(DispatchRenderer, {
+                schema: props.schema,
+                uischema: elements.value[index],
+                path: props.path,
+                enabled: props.enabled && isEnabled.value,
+                visible: props.visible && isVisible.value,
+                cells: props.cells,
+                renderers: props.renderers,
+                config: props.config,
+              }),
+            ])
+          )),
+        ]);
     };
   }
 });

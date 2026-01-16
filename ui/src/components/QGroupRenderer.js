@@ -19,7 +19,7 @@ export default defineComponent({
     const control = controlResult.control;
 
     // Use the generic control rules composable
-    const { isVisible } = useControlProperties(control);
+    const { isVisible, isEnabled } = useControlProperties(control);
 
     watch(
       () => isVisible.value,
@@ -63,8 +63,8 @@ export default defineComponent({
           schema: props.schema,
           uischema: element,
           path: control.value.path,
-          enabled: props.enabled,
-          visible: props.visible,
+          enabled: props.enabled && isEnabled.value,
+          visible: props.visible && isVisible.value,
           cells: props.cells,
           renderers: props.renderers,
           config: props.config,
