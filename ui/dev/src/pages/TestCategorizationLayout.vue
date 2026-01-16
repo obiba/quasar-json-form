@@ -159,7 +159,7 @@ const uischema = {
             },
             {
               type: 'HorizontalLayout',
-              'elements': [
+              elements: [
                 {
                   type: 'Control',
                   scope: '#/properties/address/properties/city'

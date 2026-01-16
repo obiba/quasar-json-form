@@ -2,7 +2,7 @@ import { h, watch, defineComponent } from 'vue';
 import { DispatchRenderer, rendererProps, useJsonFormsControl } from '@jsonforms/vue';
 import { useControlProperties } from '../composables/useControlProperties';
 import { useI18n } from 'vue-i18n';
-import { renderMarkdown } from '../utils/mardown';
+import { renderMarkdown } from '../utils/markdown';
 
 
 export default defineComponent({
@@ -58,7 +58,7 @@ export default defineComponent({
         }));
       }
 
-      control.value.uischema.elements.forEach((element) => {
+      (control.value.uischema?.elements || []).forEach((element) => {
         children.push(h(DispatchRenderer, {
           schema: props.schema,
           uischema: element,

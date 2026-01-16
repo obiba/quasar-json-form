@@ -114,6 +114,10 @@ export default {
         address: 'Adresse',
         additional: 'Supplémentaire',
       },
+      titles: {
+        identification: 'Informations d\'Identification',
+        address: 'Informations sur l\'adresse',
+      },
       descriptions: {
         identification: 'Veuillez fournir vos informations d\'identification',
       }
