@@ -19,7 +19,7 @@ export default defineComponent({
     const control = controlResult.control;
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, maxValue, minValue, hasError, errorMessage, uiOptions } =
+    const { isVisible, isEnabled, maxValue, minValue, hasError, errorMessage, options, title, description } =
       useControlProperties(control);
 
     // Dialog state for confirming item removal
@@ -130,9 +130,6 @@ export default defineComponent({
         return null;
       }
 
-      const label = (control.value.label || control.value.uischema.label) ? t(control.value.label || control.value.uischema.label) : undefined;
-      const hint = control.value.uischema.description ? renderMarkdown(t(control.value.uischema.description)) : undefined;
-
       // Confirmation dialog
       const confirmDialog = withConfirmation.value ? h(QDialog, {
         modelValue: showConfirmDialog.value,
@@ -158,9 +155,10 @@ export default defineComponent({
       let listItems = null;
       if (items.value.length > 0) {
         listItems = h(QList, {
+          class: 'q-mb-sm',
           bordered: true,
           separator: true,
-          ...uiOptions.value,
+          ...options.value,
         }, () => items.value.map((item, index) =>
           h(QItem, { key: index }, () => [
             h(QItemSection, { class: 'q-pa-sm' }, () => [
@@ -175,28 +173,31 @@ export default defineComponent({
                 dense: true,
                 flat: true,
                 color: 'negative',
+                size: 'sm',
                 label: control.value.deleteLabel ? t(control.value.deleteLabel) : '',
                 icon: control.value.deleteIcon || 'delete',
                 onClick: () => confirmRemoveItem(index),
                 disabled: !isEnabled.value || !canRemoveItem.value,
               }),
             ]),
-            withOrdering.value ? h(QItemSection, { side: true, style: 'padding: 0' }, () => [
+            withOrdering.value && items.value.length > 1 ? h(QItemSection, { side: true, style: 'padding: 0' }, () => [
               h(QBtn, {
                 dense: true,
                 flat: true,
                 color: 'primary',
+                size: 'sm',
                 label: control.value.moveUpLabel ? t(control.value.moveUpLabel) : '',
                 icon: control.value.moveUpIcon || 'arrow_upward',
                 onClick: () => moveUpItem(index),
                 disabled: !isEnabled.value || index <= 0,
               }),
             ]) : null,
-            withOrdering.value ? h(QItemSection, { side: true, style: 'padding: 0' }, () => [
+            withOrdering.value && items.value.length > 1 ? h(QItemSection, { side: true, style: 'padding: 0' }, () => [
               h(QBtn, {
                 dense: true,
                 flat: true,
                 color: 'primary',
+                size: 'sm',
                 label: control.value.moveDownLabel ? t(control.value.moveDownLabel) : '',
                 icon: control.value.moveDownIcon || 'arrow_downward',
                 onClick: () => moveDownItem(index),
@@ -205,27 +206,22 @@ export default defineComponent({
             ]) : null,
           ]),
         ));
-      } else {
-        listItems = h('div', {
-          class: 'text-grey-6',
-        }, t(control.value.emptyLabel || 'no-items'));
       }
 
       return h('div', {
-        class: 'q-mb-md',
+        class: 'q-list-renderer',
       }, [
-        label ? h('div', {
-          class: control.value.uischema.labelClass || 'text-bold q-mb-sm',
-          innerHTML: label
+        title.value ? h('div', {
+          class: control.value.uischema.titleClass || 'text-bold q-mb-sm',
+          innerHTML: t(title.value)
         }) : null,
-        hint ? h('div', {
-          class: control.value.uischema.descriptionClass || 'text-grey-7',
-          innerHTML: hint
+        description.value ? h('div', {
+          class: (control.value.uischema.descriptionClass || 'text-grey-7') + ' text-markdown q-mb-sm',
+          innerHTML: renderMarkdown(t(description.value))
         }) : null,
         listItems,
         confirmDialog,
         h(QBtn, {
-          class: 'q-mt-md',
           label: t(control.value.addLabel || 'add-item'),
           color: 'primary',
           icon: control.value.addIcon || 'add',

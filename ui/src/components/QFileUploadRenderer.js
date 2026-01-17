@@ -22,7 +22,7 @@ export default defineComponent({
 
     const control = controlResult.control;
 
-    const { isVisible, isEnabled, uiOptions, title, description, label, hint } =
+    const { isVisible, isEnabled, options, title, description, label, hint } =
       useControlProperties(control);
 
     const fileInputRef = ref();
@@ -62,13 +62,13 @@ export default defineComponent({
         return;
       }
 
-      const uploadUrl = uiOptions.value.uploadUrl;
-      const uploadMethod = uiOptions.value.uploadMethod || 'POST';
-      const uploadHeaders = uiOptions.value.uploadHeaders || {};
-      const pathKey = uiOptions.value.pathKey || 'path';
+      const uploadUrl = options.value.uploadUrl;
+      const uploadMethod = options.value.uploadMethod || 'POST';
+      const uploadHeaders = options.value.uploadHeaders || {};
+      const pathKey = options.value.pathKey || 'path';
 
       if (!uploadUrl) {
-        uploadError.value = t('errors.upload_url_missing') || 'Upload URL is not configured';
+        uploadError.value = t('errors.upload_url_missing');
         return;
       }
 
@@ -122,7 +122,7 @@ export default defineComponent({
       if (description.value) {
         const descriptionText = renderMarkdown(t(description.value));
         children.push(h('div', {
-          class: (control.value.uischema.descriptionClass || 'text-grey-7') + ' text-markdown',
+          class: (control.value.uischema.descriptionClass || 'text-grey-7') + ' text-markdown q-mb-sm',
           innerHTML: descriptionText,
         }));
       }
@@ -133,12 +133,7 @@ export default defineComponent({
         const maxLength = 50;
         const displayPath = path.length > maxLength ? path.substr(0, maxLength) + '...' : path;
         const qItem = h(QItem, {}, [
-          h(QItemSection, {
-            class: 'text-caption text-grey-7',
-            title: path.replaceAll('\n', ''),
-          }, displayPath),
-          h(QItemSection, {
-            class: 'q-ml-sm q-mb-xs',
+          isEnabled.value ? h(QItemSection, {
             avatar: true,
           }, [
             h(QBtn, {
@@ -151,42 +146,49 @@ export default defineComponent({
               onClick: onClear,
               disable: isLoading.value || !isEnabled.value,
             }),
-          ]),
+          ]) : null,
+          h(QItemSection, {
+            class: 'text-caption text-grey-7',
+            title: path.replaceAll('\n', ''),
+          }, displayPath),
         ]);
         children.push(h(QList, {
-          class: 'q-mt-sm',
-          bordered: true,
+          bordered: false,
+          dense: true,
         }, [qItem]));
       }
 
-      // Hidden file input
-      children.push(h('input', {
-        ref: fileInputRef,
-        type: 'file',
-        style: 'display: none',
-        onChange: handleFileSelected,
-        disabled: !isEnabled.value || isLoading.value,
-      }));
 
       // File picker button with loading progress
-      children.push(h('div', { class: 'q-mt-sm' }, [
-        h(QBtn, {
-          label: label.value ? t(label.value) : undefined,
-          color: 'primary',
-          icon: 'cloud_upload',
-          size: 'sm',
-          onClick: openFilePicker,
-          disable: !isEnabled.value || isLoading.value,
-          loading: isLoading.value,
-          unelevated: true,
-        }),
-      ]));
+      if (control.value.data === undefined) {
+        // Hidden file input
+        children.push(h('input', {
+          ref: fileInputRef,
+          type: 'file',
+          style: 'display: none',
+          onChange: handleFileSelected,
+          disabled: !isEnabled.value || isLoading.value,
+        }));
 
-      if (hint.value) {
-        const hintText = t(hint.value);
-        children.push(h('div', {
-          class: 'text-hint text-grey-7 q-mt-sm',
-        }, hintText));
+        children.push(h('div', { class: 'q-mt-sm' }, [
+          h(QBtn, {
+            label: label.value ? t(label.value) : undefined,
+            color: 'primary',
+            icon: 'cloud_upload',
+            size: 'sm',
+            onClick: openFilePicker,
+            disable: !isEnabled.value || isLoading.value,
+            loading: isLoading.value,
+            unelevated: true,
+          }),
+        ]));
+
+        if (hint.value) {
+          const hintText = t(hint.value);
+          children.push(h('div', {
+            class: 'text-hint text-grey-7 q-mt-sm',
+          }, hintText));
+        }
       }
 
       if (uploadError.value) {

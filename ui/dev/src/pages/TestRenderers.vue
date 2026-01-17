@@ -104,6 +104,26 @@ const schema = {
       label: 'renderers.file.label',
       hint: 'renderers.file.hint',
     },
+    files: {
+      type: 'array',
+      title: 'renderers.files.title',
+      description: 'renderers.files.description',
+      items: {
+        type: 'object',
+        properties: {
+          file: {
+            type: 'string',
+            format: 'file',
+            options: {
+              uploadUrl: 'https://httpbin.org/post',
+              uploadMethod: 'POST',
+              uploadHeaders: {},
+              pathKey: 'files.file',
+            },
+          },
+        },
+      },
+    },
     enum: {
       type: 'string',
       enum: ['one', 'two', 'three'],
@@ -194,7 +214,7 @@ const schema = {
         type: 'string',
         enum: ['one', 'two', 'three'],
       },
-      title: 'renderers.checkboxes.label',
+      title: 'renderers.checkboxes.title',
       description: 'renderers.checkboxes.description',
     },
     toggles: {
@@ -204,7 +224,7 @@ const schema = {
         type: 'string',
         enum: ['one', 'two', 'three'],
       },
-      title: 'renderers.toggles.label',
+      title: 'renderers.toggles.title',
       description: 'renderers.toggles.description',
     },
   },
@@ -264,6 +284,10 @@ const uischema = {
                 uploadHeaders: {},
                 pathKey: 'files.file',
               },
+            },
+            {
+              type: 'Control',
+              scope: '#/properties/files',
             },
           ],
         },

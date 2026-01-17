@@ -1,6 +1,7 @@
 import {
   rankWith,
   schemaMatches,
+  schemaTypeIs,
   schemaSubPathMatches,
   hasType,
   formatIs,
@@ -49,10 +50,11 @@ const hasOneOfItems = (schema) =>
   });
  
 const hasEnumItems = (schema) =>
-  schema.type === 'string' && schema.enum !== undefined;
+  hasType(schema, 'string') && schema.enum !== undefined;
 
 const isFileControl = and(
   uiTypeIs('Control'),
+  schemaTypeIs('string'),
   or(formatIs('file'), optionIs('format', 'file'))
 );
 

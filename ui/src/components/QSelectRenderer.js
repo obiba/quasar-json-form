@@ -18,7 +18,7 @@ export default defineComponent({
     const control = controlResult.control;
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, hasError, errorMessage, uiOptions, selectOptions, clearInvalidSelection } =
+    const { isVisible, isEnabled, hasError, errorMessage, options, selectOptions, clearInvalidSelection } =
       useControlProperties(control);
 
     const isMultiple = computed(() => {
@@ -66,7 +66,7 @@ export default defineComponent({
         mapOptions: true,
         multiple: isMultiple.value,
         clearable: !control.value.required,
-        ...uiOptions.value,
+        ...options.value,
       });
     };
   },

@@ -120,10 +120,9 @@ export function useControlProperties(control) {
     return allErrors.join('; ');
   });
 
-  // Extract options from schema
-  const uiOptions = computed(() => {
-    const uiSchema = control.value.uischema;
-    return (uiSchema && uiSchema.options) || {};
+  // Extract options from ui schema or schema
+  const options = computed(() => {
+    return control.value.uischema?.options || control.value.schema?.options || {};
   });
 
   // Transform enum values into q-select options
@@ -225,7 +224,6 @@ export function useControlProperties(control) {
     return watch(
       [selectOptions, () => control.value.data],
       () => {
-        const currentValue = control.value.data;
         const options = selectOptions.value;
         
         // Only clear if we have options and the current value is invalid
@@ -251,7 +249,7 @@ export function useControlProperties(control) {
     computeValue,
     hasError,
     errorMessage,
-    uiOptions,
+    options,
     selectOptions,
     isValueValid,
     title,
