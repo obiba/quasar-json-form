@@ -2,7 +2,7 @@ import { h, watch, defineComponent } from 'vue';
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue';
 import { useControlProperties } from '../composables/useControlProperties';
 import { useI18n } from 'vue-i18n';
-import { renderMarkdown } from '../utils/mardown';
+import { renderMarkdown } from '../utils/markdown';
 
 
 export default defineComponent({

@@ -3,7 +3,7 @@ import { createDefaultValue, composePaths } from '@jsonforms/core';
 import { DispatchRenderer, rendererProps, useJsonFormsControl } from '@jsonforms/vue';
 import { QList, QItem, QItemSection, QBtn, QDialog, QCard, QCardSection, QCardActions } from 'quasar';
 import { useControlProperties } from '../composables/useControlProperties';
-import { renderMarkdown } from '../utils/mardown';
+import { renderMarkdown } from '../utils/markdown';
 import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
