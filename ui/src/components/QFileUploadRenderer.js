@@ -1,4 +1,4 @@
-import { h, watch, defineComponent, ref, computed } from 'vue';
+import { h, watch, defineComponent, ref } from 'vue';
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue';
 import { QBtn, QList, QItem, QItemSection } from 'quasar';
 import { useControlProperties } from '../composables/useControlProperties';
@@ -89,7 +89,12 @@ export default defineComponent({
           throw new Error(`Upload failed with status ${response.status}`);
         }
 
-        const data = await response.json();
+        let data;
+        try {
+          data = await response.json();
+        } catch (parseError) {
+          throw new Error('Invalid JSON response from upload server');
+        }
         const remotePath = getNestedValue(data, pathKey);
 
         if (!remotePath) {
@@ -131,7 +136,7 @@ export default defineComponent({
         const path = control.value.data;
         // Max length for display
         const maxLength = 50;
-        const displayPath = path.length > maxLength ? path.substr(0, maxLength) + '...' : path;
+        const displayPath = path.length > maxLength ? path.slice(0, maxLength) + '...' : path;
         const qItem = h(QItem, {}, [
           isEnabled.value ? h(QItemSection, {
             avatar: true,
@@ -168,6 +173,19 @@ export default defineComponent({
           style: 'display: none',
           onChange: handleFileSelected,
           disabled: !isEnabled.value || isLoading.value,
+          accept: (() => {
+            if (options.value.accept) {
+              return options.value.accept;
+            }
+            if (options.value.acceptedFileTypes) {
+              const types = options.value.acceptedFileTypes;
+              if (Array.isArray(types)) {
+                return types.join(',');
+              }
+              return types;
+            }
+            return undefined;
+          })(),
         }));
 
         children.push(h('div', { class: 'q-mt-sm' }, [

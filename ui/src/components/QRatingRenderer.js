@@ -1,4 +1,4 @@
-import { h, watch, defineComponent, onMounted } from 'vue';
+import { h, watch, defineComponent } from 'vue';
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue';
 import { QRating } from 'quasar';
 import { useControlProperties } from '../composables/useControlProperties';
