@@ -204,6 +204,22 @@ export function useControlProperties(control) {
     return optionValues.has(currentValue);
   });
 
+  const title = computed(() => {
+    return control.value.uischema.title || control.value.schema.title || undefined;
+  });
+
+  const description = computed(() => {
+    return control.value.uischema.description || control.value.schema.description || undefined;
+  });
+
+  const label = computed(() => {
+    return control.value.uischema.label || control.value.schema.label || undefined;
+  });
+
+  const hint = computed(() => {
+    return control.value.uischema.hint || control.value.schema.hint || undefined;
+  });
+
   // Function to clear invalid selections
   const clearInvalidSelection = (handleChange) => {
     return watch(
@@ -238,6 +254,10 @@ export function useControlProperties(control) {
     uiOptions,
     selectOptions,
     isValueValid,
+    title,
+    description,
+    label,
+    hint,
     clearInvalidSelection,
   };
 }

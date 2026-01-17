@@ -22,7 +22,7 @@ export default defineComponent({
 
     const control = controlResult.control;
 
-    const { isVisible, isEnabled, uiOptions } =
+    const { isVisible, isEnabled, uiOptions, title, description, label, hint } =
       useControlProperties(control);
 
     const fileInputRef = ref();
@@ -111,20 +111,19 @@ export default defineComponent({
 
       const children = [];
 
-      if (control.value.schema.title || control.value.uischema.title) {
-        let title = t(control.value.schema.title || control.value.uischema.title);
+      if (title.value) {
+        const titleText = t(title.value);
         children.push(h('div', {
           class: control.value.uischema.titleClass || 'text-bold',
-          innerHTML: title,
+          innerHTML: titleText,
         }));
       }
 
-      if (control.value.description || control.value.uischema.description) {
-        let hint = t(control.value.description || control.value.uischema.description);
-        hint = renderMarkdown(hint);
+      if (description.value) {
+        const descriptionText = renderMarkdown(t(description.value));
         children.push(h('div', {
           class: (control.value.uischema.descriptionClass || 'text-grey-7') + ' text-markdown',
-          innerHTML: hint,
+          innerHTML: descriptionText,
         }));
       }
 
@@ -172,7 +171,7 @@ export default defineComponent({
       // File picker button with loading progress
       children.push(h('div', { class: 'q-mt-sm' }, [
         h(QBtn, {
-          label: control.value.schema.label ? t(control.value.schema.label): undefined,
+          label: label.value ? t(label.value) : undefined,
           color: 'primary',
           icon: 'cloud_upload',
           size: 'sm',
@@ -183,11 +182,11 @@ export default defineComponent({
         }),
       ]));
 
-      if (control.value.description || control.value.uischema.description) {
-        const hint = t(control.value.description || control.value.uischema.description);
+      if (hint.value) {
+        const hintText = t(hint.value);
         children.push(h('div', {
-          class: 'text-hint text-caption text-grey-7 q-mt-sm',
-        }, t(hint)));
+          class: 'text-hint text-grey-7 q-mt-sm',
+        }, hintText));
       }
 
       if (uploadError.value) {
