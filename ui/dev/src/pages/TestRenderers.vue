@@ -96,6 +96,14 @@ const schema = {
       title: 'renderers.datefulltime.label',
       description: 'renderers.datefulltime.description',
     },
+    file: {
+      type: 'string',
+      format: 'file',
+      title: 'renderers.file.title',
+      description: 'renderers.file.description',
+      label: 'renderers.file.label',
+      hint: 'renderers.file.hint',
+    },
     enum: {
       type: 'string',
       enum: ['one', 'two', 'three'],
@@ -245,6 +253,16 @@ const uischema = {
               scope: '#/properties/multiLineString',
               options: {
                 rows: 4,
+              },
+            },
+            {
+              type: 'Control',
+              scope: '#/properties/file',
+              options: {
+                uploadUrl: 'https://httpbin.org/post',
+                uploadMethod: 'POST',
+                uploadHeaders: {},
+                pathKey: 'files.file',
               },
             },
           ],

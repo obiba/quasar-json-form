@@ -71,6 +71,12 @@ export default {
       label: 'Date Fulltime Picker',
       description: 'Please select a date and fulltime value',
     },
+    file: {
+      title: 'File Upload',
+      description: 'Please upload a file',
+      label: 'File selector',
+      hint: 'Select a file to upload',
+    },
     enum: {
       label: 'Enum Selector',
       description: 'Please select a value from the list',
