@@ -71,6 +71,16 @@ export default {
       label: 'Sélecteur DateTemps Complet',
       description: 'Veuillez sélectionner une date et une valeur de temps complet',
     },
+    file: {
+      title: 'Téléversement de Fichier',
+      description: 'Veuillez téléverser un fichier',
+      label: 'Sélecteur de Fichier',
+      hint: 'Sélectionnez un fichier à téléverser',
+    },
+    files: {
+      title: 'Téléversement de Fichiers Multiples',
+      description: 'Veuillez téléverser un ou plusieurs fichiers',
+    },
     enum: {
       label: 'Sélecteur d\'Enumération',
       description: 'Veuillez sélectionner une valeur dans la liste',

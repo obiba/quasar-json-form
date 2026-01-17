@@ -71,6 +71,16 @@ export default {
       label: 'Date Fulltime Picker',
       description: 'Please select a date and fulltime value',
     },
+    file: {
+      title: 'File Upload',
+      description: 'Please upload a file',
+      label: 'File selector',
+      hint: 'Select a file to upload',
+    },
+    files: {
+      title: 'Multiple File Upload',
+      description: 'Please upload one or more files',
+    },
     enum: {
       label: 'Enum Selector',
       description: 'Please select a value from the list',
@@ -101,11 +111,11 @@ export default {
       description: 'Please select one or two values from the list with custom labels',
     },
     checkboxes: {
-      label: 'Checkboxes Selector',
+      title: 'Checkboxes Selector',
       description: 'Please select one or more values from the list',
     },
     toggles: {
-      label: 'Toggles Selector',
+      title: 'Toggles Selector',
       description: 'Please select one or more values from the list',
     },
     categories: {

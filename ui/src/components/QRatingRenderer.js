@@ -18,7 +18,7 @@ export default defineComponent({
     const control = controlResult.control;
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, hasError, errorMessage, uiOptions } =
+    const { isVisible, isEnabled, hasError, errorMessage, options } =
       useControlProperties(control);
 
     watch(
@@ -61,7 +61,7 @@ export default defineComponent({
         errorMessage: errorMessage.value,
         required: control.value.required,
         disable: !isEnabled.value,
-        ...uiOptions.value,
+        ...options.value,
       }));
 
       if (control.value.hint) {

@@ -19,13 +19,13 @@ export default defineComponent({
 
     const control = controlResult.control;
 
-    const { isVisible, isEnabled, hasError, errorMessage, uiOptions } =
+    const { isVisible, isEnabled, hasError, errorMessage, options } =
       useControlProperties(control);
 
     const timeValue = computed(() => control.value.data || '');
 
     const timeFormat = computed(() => {
-      return control.value.schema.format || uiOptions.value.format || 'time';
+      return control.value.schema.format || options.value.format || 'time';
     });
 
     watch(
@@ -63,7 +63,7 @@ export default defineComponent({
         required: control.value.required,
         disable: !isEnabled.value,
         hint: control.value.description ? t(control.value.description) : undefined,
-        ...uiOptions.value,
+        ...options.value,
       }, {
         append: () => h(QIcon, {
           name: 'access_time',

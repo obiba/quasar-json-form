@@ -19,7 +19,7 @@ export default defineComponent({
 
     const control = controlResult.control;
 
-    const { isVisible, isEnabled, hasError, errorMessage, uiOptions } =
+    const { isVisible, isEnabled, hasError, errorMessage, options } =
       useControlProperties(control);
 
     const dateValue = computed(() => control.value.data || '');
@@ -57,7 +57,7 @@ export default defineComponent({
         required: control.value.required,
         disable: !isEnabled.value,
         hint: control.value.description ? t(control.value.description) : undefined,
-        ...uiOptions.value,
+        ...options.value,
       }, {
         append: () => h(QIcon, {
           name: 'event',

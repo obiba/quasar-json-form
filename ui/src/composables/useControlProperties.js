@@ -120,10 +120,9 @@ export function useControlProperties(control) {
     return allErrors.join('; ');
   });
 
-  // Extract options from schema
-  const uiOptions = computed(() => {
-    const uiSchema = control.value.uischema;
-    return (uiSchema && uiSchema.options) || {};
+  // Extract options from ui schema or schema
+  const options = computed(() => {
+    return control.value.uischema?.options || control.value.schema?.options || {};
   });
 
   // Transform enum values into q-select options
@@ -204,12 +203,27 @@ export function useControlProperties(control) {
     return optionValues.has(currentValue);
   });
 
+  const title = computed(() => {
+    return control.value.uischema.title || control.value.schema.title || undefined;
+  });
+
+  const description = computed(() => {
+    return control.value.uischema.description || control.value.schema.description || undefined;
+  });
+
+  const label = computed(() => {
+    return control.value.uischema.label || control.value.schema.label || undefined;
+  });
+
+  const hint = computed(() => {
+    return control.value.uischema.hint || control.value.schema.hint || undefined;
+  });
+
   // Function to clear invalid selections
   const clearInvalidSelection = (handleChange) => {
     return watch(
       [selectOptions, () => control.value.data],
       () => {
-        const currentValue = control.value.data;
         const options = selectOptions.value;
         
         // Only clear if we have options and the current value is invalid
@@ -235,9 +249,13 @@ export function useControlProperties(control) {
     computeValue,
     hasError,
     errorMessage,
-    uiOptions,
+    options,
     selectOptions,
     isValueValid,
+    title,
+    description,
+    label,
+    hint,
     clearInvalidSelection,
   };
 }

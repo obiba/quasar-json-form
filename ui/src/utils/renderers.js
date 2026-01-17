@@ -1,6 +1,7 @@
 import {
   rankWith,
   schemaMatches,
+  schemaTypeIs,
   schemaSubPathMatches,
   hasType,
   formatIs,
@@ -23,6 +24,7 @@ import {
   isArrayObjectControl,
 } from '@jsonforms/core';
 import QStringRenderer from '../components/QStringRenderer.js';
+import QFileUploadRenderer from '../components/QFileUploadRenderer.js';
 import QNumRenderer from '../components/QNumberRenderer.js';
 import QRatingRenderer from '../components/QRatingRenderer.js';
 import QSliderRenderer from '../components/QSliderRenderer.js';
@@ -48,7 +50,13 @@ const hasOneOfItems = (schema) =>
   });
  
 const hasEnumItems = (schema) =>
-  schema.type === 'string' && schema.enum !== undefined;
+  hasType(schema, 'string') && schema.enum !== undefined;
+
+const isFileControl = and(
+  uiTypeIs('Control'),
+  schemaTypeIs('string'),
+  or(formatIs('file'), optionIs('format', 'file'))
+);
 
 const isFulltimeControl = and(
   uiTypeIs('Control'),
@@ -166,6 +174,10 @@ const qRenderers = [
   {
     renderer: QDateTimeRenderer,
     tester: rankWith(4, or(isDateTimeControl, isDateFulltimeControl)),
+  },
+  {
+    renderer: QFileUploadRenderer,
+    tester: rankWith(4, isFileControl),
   },
   {
     renderer: QListRenderer,

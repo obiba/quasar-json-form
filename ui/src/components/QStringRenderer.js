@@ -19,12 +19,12 @@ export default defineComponent({
     const control = controlResult.control;
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, hasError, errorMessage, uiOptions } =
+    const { isVisible, isEnabled, hasError, errorMessage, options } =
       useControlProperties(control);
 
     const inputType = computed(() => {
       const schema = control.value.schema;
-      return schema.format || (uiOptions.value.rows ? 'textarea' : 'text');
+      return schema.format || (options.value.rows ? 'textarea' : 'text');
     });
 
     watch(
@@ -55,7 +55,7 @@ export default defineComponent({
         disable: !isEnabled.value,
         hint: control.value.description ? t(control.value.description) : undefined,
         type: inputType.value,
-        ...uiOptions.value,
+        ...options.value,
       });
     };
   },

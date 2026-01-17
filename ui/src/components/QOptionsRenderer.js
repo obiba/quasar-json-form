@@ -18,7 +18,7 @@ export default defineComponent({
     const control = controlResult.control;
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, uiOptions, selectOptions, clearInvalidSelection } =
+    const { isVisible, isEnabled, options, selectOptions, clearInvalidSelection, title, description } =
       useControlProperties(control);
 
     const isMultiple = computed(() => {
@@ -71,28 +71,30 @@ export default defineComponent({
 
       const children = [];
 
-      if (control.value.label) {
+      if (title.value) {
         children.push(h('div', {
           class: 'text-label text-grey-7 q-mb-xs',
-        }, t(control.value.label)));
+        }, t(title.value)));
       }
 
-      if (control.value.description) {
+      if (description.value) {
         children.push(h('div', {
           class: 'text-description text-caption text-grey-7',
-        }, t(control.value.description)));
+        }, t(description.value)));
       }
+
+      const type = isMultiple.value
+            ? (options.value && options.value.format) || 'checkbox'
+            : 'radio';
 
       children.push(
         h(QOptionGroup, {
           modelValue: control.value.data,
           options: selectOptions.value,
-          type: isMultiple.value
-            ? (uiOptions.value && uiOptions.value.format) || 'checkbox'
-            : 'radio',
+          type: type,
           disable: !isEnabled.value,
           'onUpdate:modelValue': onChange,
-          ...uiOptions.value,
+          ...options.value,
         }),
       );
 
