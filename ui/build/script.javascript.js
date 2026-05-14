@@ -8,11 +8,21 @@ const json = require('@rollup/plugin-json')
 const { nodeResolve } = require('@rollup/plugin-node-resolve')
 const commonjs = require('@rollup/plugin-commonjs')
 const replace = require('@rollup/plugin-replace')
+const typescript = require('@rollup/plugin-typescript')
 
 const { version } = require('../package.json')
 
 const buildConf = require('./config')
 const buildUtils = require('./utils')
+
+const ignoreCssImports = {
+  name: 'ignore-css-imports',
+  load (id) {
+    if (id.endsWith('.css')) {
+      return 'export default undefined'
+    }
+  }
+}
 
 const rollupPlugins = [
   replace({
@@ -21,23 +31,32 @@ const rollupPlugins = [
       __UI_VERSION__: `'${ version }'`
     }
   }),
+  typescript({
+    tsconfig: false,
+    include: ['src/**/*.ts'],
+    exclude: ['dev/**', '**/*.d.ts'],
+    compilerOptions: {
+      allowSyntheticDefaultImports: true,
+      esModuleInterop: true,
+      target: 'ES2020',
+      module: 'ESNext'
+    }
+  }),
+  ignoreCssImports,
   nodeResolve({
-    extensions: ['.js'],
+    extensions: ['.ts', '.js'],
     preferBuiltins: false
   }),
   commonjs(),
   json(),
-  buble({
-    objectAssign: 'Object.assign',
-    exclude: ['node_modules/**']
-  })
+    // Skip buble - TypeScript plugin handles transpilation to ES2020
 ]
 
 const builds = [
   {
     rollup: {
       input: {
-        input: pathResolve('../src/index.esm.js')
+        input: pathResolve('../src/index.esm.ts')
       },
       output: {
         file: pathResolve('../dist/index.esm.js'),
@@ -52,7 +71,7 @@ const builds = [
   {
     rollup: {
       input: {
-        input: pathResolve('../src/index.common.js')
+        input: pathResolve('../src/index.common.ts')
       },
       output: {
         file: pathResolve('../dist/index.common.js'),
@@ -67,7 +86,7 @@ const builds = [
   {
     rollup: {
       input: {
-        input: pathResolve('../src/index.umd.js')
+        input: pathResolve('../src/index.umd.ts')
       },
       output: {
         name: 'qJsonForm',
@@ -107,9 +126,10 @@ function addAssets (builds, type, injectName) {
     fse.mkdirp(outputDir)
 
   files
-    .filter(file => file.endsWith('.js'))
+    .filter(file => file.endsWith('.ts') || file.endsWith('.js'))
     .forEach(file => {
-      const name = file.substr(0, file.length - 3).replace(/-([a-z])/g, g => g[1].toUpperCase())
+      const baseName = file.substring(0, file.lastIndexOf('.'))
+      const name = baseName.replace(/-([a-z])/g, g => g[1].toUpperCase())
       builds.push({
         rollup: {
           input: {

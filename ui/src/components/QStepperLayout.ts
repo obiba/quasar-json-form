@@ -1,0 +1,99 @@
+import { h, computed, ref, defineComponent } from 'vue'
+import { DispatchRenderer, rendererProps, useJsonFormsControl } from '@jsonforms/vue'
+import { QStepper, QStep, QStepperNavigation, QBtn } from 'quasar'
+import { useI18n } from 'vue-i18n'
+import { useControlProperties } from '../composables/useControlProperties'
+
+export default defineComponent({
+  name: 'QStepperLayout',
+  props: rendererProps(),
+  setup(props: any) {
+    const { t } = useI18n()
+
+    const controlResult = useJsonFormsControl({
+      ...props,
+      uischema: props.uischema,
+    })
+
+    const control = controlResult.control
+
+    // Use the generic control rules composable
+    const { isVisible, isEnabled } = useControlProperties(control)
+
+    const elements = computed(() => (props.uischema.elements && Array.isArray(props.uischema.elements) ? props.uischema.elements : []))
+    const labels = computed(() => {
+      return (props.uischema.labels && Array.isArray(props.uischema.labels) && props.uischema.labels.length > 0)
+        ? props.uischema.labels
+        : elements.value.map((_: any, index: number) => `${index + 1}`)
+    })
+    const labelClass = computed(() => {
+      return props.uischema.labelClass || ''
+    })
+    const icons = computed(() => {
+      return (props.uischema.icons && Array.isArray(props.uischema.icons) && props.uischema.icons.length === elements.value.length)
+        ? props.uischema.icons
+        : null
+    })
+
+    const currentStep = ref(0)
+
+    const steps = () => labels.value.map((name: string, index: number) =>
+      h(QStep, {
+        name: index,
+        title: t(name),
+        icon: icons.value ? icons.value[index] : undefined,
+      }, () => [
+        h(DispatchRenderer, {
+          schema: props.schema,
+          uischema: elements.value[index],
+          path: props.path,
+          enabled: props.enabled && isEnabled.value,
+          visible: props.visible && isVisible.value,
+          cells: props.cells,
+          renderers: props.renderers,
+          config: props.config,
+        }),
+      ])
+    )
+    const navigation = () => {
+      const children: any[] = []
+
+      if (currentStep.value < elements.value.length - 1) {
+        children.push(
+          h(QBtn, {
+            label: t('continue'),
+            color: 'primary',
+            class: 'text-capitalize on-left',
+            onClick: () => currentStep.value += 1,
+          })
+        )
+      }
+    
+      if (currentStep.value > 0) {
+        children.push(
+          h(QBtn, {
+            label: t('back'),
+            flat: true,
+            class: 'text-capitalize',
+            onClick: () => currentStep.value -= 1,
+          })
+        )
+      }
+      
+      return h(QStepperNavigation, {}, () => children)
+    }
+
+    return () => {
+      return h('div', [
+        h(QStepper, {
+          modelValue: currentStep.value,
+          'onUpdate:modelValue': (val: number) => { currentStep.value = val },
+          flat: true,
+          color: 'primary',
+          class: labelClass.value,
+        }, 
+        {default: steps, navigation})
+      ])
+    }
+  }
+})
