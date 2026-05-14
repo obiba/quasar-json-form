@@ -8,6 +8,8 @@ const autoprefixer = require('autoprefixer')
 const buildConf = require('./config')
 const buildUtils = require('./utils')
 
+const vanillaCss = buildUtils.readFile(resolve('node_modules/@jsonforms/vue-vanilla/vanilla.css'))
+
 const postCssCompiler = postcss([ autoprefixer ])
 const postCssRtlCompiler = postcss([ rtl({}) ])
 
@@ -45,6 +47,7 @@ function generate (src, dest) {
 
   return sass.compileAsync(src, { loadPaths: ['node_modules'] })
     .then(result => result.css)
+  .then(code => `${vanillaCss}\n${code}`)
   .then(code => buildConf.banner + code)
   .then(code => postCssCompiler.process(code, { from: void 0 }))
   .then(code => {

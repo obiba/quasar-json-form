@@ -2,7 +2,7 @@
  * Export files list for /pages folder
  */
 
-function kebabCase (str) {
+function kebabCase (str: string): string {
   const result = str.replace(
     /[A-Z\u00C0-\u00D6\u00D8-\u00DE]/g,
     match => '-' + match.toLowerCase()
@@ -12,7 +12,7 @@ function kebabCase (str) {
     : result
 }
 
-function slugify (str) {
+function slugify (str: string): string {
   return encodeURIComponent(String(str).trim().replace(/\s+/g, '-'))
 }
 
