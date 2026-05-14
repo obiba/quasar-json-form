@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-export default configure((/* ctx */) => {
+export default configure(() => {
   return {
     boot: [
       'register',
@@ -29,7 +29,10 @@ export default configure((/* ctx */) => {
       ],
 
       extendViteConf (viteConf) {
-        viteConf.resolve.alias.ui = path.resolve(__dirname, '../src/index.esm.js')
+        const alias = viteConf.resolve.alias as Record<string, string> | undefined
+        if (alias && typeof alias === 'object' && !Array.isArray(alias)) {
+          alias.ui = path.resolve(__dirname, '../src/index.esm.js')
+        }
         
         // Add define to fix __UI_VERSION__ error
         viteConf.define = {
@@ -60,7 +63,7 @@ export default configure((/* ctx */) => {
     },
 
     pwa: {
-      workboxMode: 'generateSW',
+      workboxMode: 'GenerateSW',
       injectPwaMetaTags: true,
       swFilename: 'sw.js',
       manifestFilename: 'manifest.json',

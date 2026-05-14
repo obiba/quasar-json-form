@@ -1,3 +1,5 @@
+import type { RouteRecordRaw } from 'vue-router'
+
 const pages = [
   { path: '', file: 'Index' },
   { path: 'test-renderers', file: 'TestRenderers' },
@@ -15,7 +17,7 @@ const children = pages.map(page => ({
   component: () => import(`../pages/${page.file}.vue`)
 }))
 
-const routes = [
+const routes: RouteRecordRaw[] = [
   {
     path: '/',
     component: () => import('layouts/MyLayout.vue'),

@@ -3,9 +3,10 @@ import { createI18n } from 'vue-i18n'
 import messages from 'src/i18n'
 import { Quasar } from 'quasar'
 
-const locales = ['en', 'fr']
+const locales = ['en', 'fr'] as const
+type Locale = typeof locales[number]
 
-let detectedLocale = Quasar.lang.getLocale().split('-')[0]
+let detectedLocale: Locale = Quasar.lang.getLocale().split('-')[0] as Locale
 if (!locales.includes(detectedLocale)) {
   detectedLocale = locales[0]
 }
@@ -14,15 +15,14 @@ const i18n = createI18n({
   legacy: false,
   locale: detectedLocale,
   fallbackLocale: locales[0],
-  warnHtmlInMessage: 'off',
+  warnHtmlMessage: false,
   missingWarn: false,
   fallbackWarn: false,
-  messages: messages
+  messages
 })
 const t = i18n.global.t
 
 export default boot(({ app }) => {
-  // Set instance on app
   app.use(i18n)
 })
 
