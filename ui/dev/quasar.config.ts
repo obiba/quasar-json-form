@@ -29,9 +29,15 @@ export default configure(() => {
       ],
 
       extendViteConf (viteConf) {
-        const alias = viteConf.resolve.alias as Record<string, string> | undefined
-        if (alias && typeof alias === 'object' && !Array.isArray(alias)) {
-          alias.ui = path.resolve(__dirname, '../src/index.esm.js')
+        viteConf.resolve ??= {}
+        const alias = viteConf.resolve.alias
+        if (Array.isArray(alias)) {
+          alias.push({ find: 'ui', replacement: path.resolve(__dirname, '../src/index.esm.js') })
+        } else {
+          viteConf.resolve.alias = {
+            ...(alias ?? {}),
+            ui: path.resolve(__dirname, '../src/index.esm.js')
+          }
         }
         
         // Add define to fix __UI_VERSION__ error

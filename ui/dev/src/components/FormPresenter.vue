@@ -9,7 +9,7 @@
       <q-tab-panels v-model="tabDesign" animated>
         <q-tab-panel name="schema" class="q-pl-none q-pr-none">
           <pre
-            v-if="readonly"
+            v-if="props.readonly"
             class="q-ma-none q-pa-md"
           ><code class="language-json" v-prism :key="formSchemaStr">{{ formSchemaStr }}</code></pre>
           <q-input
@@ -24,7 +24,7 @@
         </q-tab-panel>
         <q-tab-panel name="layout" class="q-pl-none q-pr-none">
           <pre
-            v-if="readonly"
+            v-if="props.readonly"
             class="q-ma-none q-pa-md"
           ><code class="language-json" v-prism :key="formUischemaStr">{{ formUischemaStr }}</code></pre>
           <q-input
@@ -54,44 +54,37 @@
   </div>
 </template>
 
-<script setup>
-import { ref, watch } from 'vue';
-import { QJsonForm } from 'ui';
+<script setup lang="ts">
+import { ref } from 'vue';
+import { QJsonForm } from '../../../src/vue-plugin';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
-const props = defineProps({
-  data: {
-    type: Object,
-    required: false,
-    default: () => ({}),
-  },
-  schema: {
-    type: Object,
-    required: true,
-  },
-  uischema: {
-    type: Object,
-    required: false,
-    default: () => ({}),
-  },
-  readonly: {
-    type: Boolean,
-    required: false,
-    default: false,
-  },
+interface FormPresenterProps {
+  data?: Record<string, unknown>;
+  schema: Record<string, unknown>;
+  uischema?: Record<string, unknown>;
+  readonly?: boolean;
+}
+
+const props = withDefaults(defineProps<FormPresenterProps>(), {
+  data: () => ({}),
+  uischema: () => ({}),
+  readonly: false,
 });
 
-const emit = defineEmits(['update:data']);
+const emit = defineEmits<{
+  (e: 'update:data', data: Record<string, unknown>): void;
+}>();
 
-const formData = ref(props.data);
+const formData = ref<Record<string, unknown>>(props.data);
 const formSchemaStr = ref(JSON.stringify(props.schema, null, 2));
 const formUischemaStr = ref(JSON.stringify(props.uischema, null, 2));
 const tabDesign = ref('schema');
 const tabPreview = ref('form');
 
-const onDataUpdate = (newData) => {
+const onDataUpdate = (newData: Record<string, unknown>) => {
   formData.value = newData;
   emit('update:data', newData);
   formSchemaStr.value = JSON.stringify(props.schema, null, 2);

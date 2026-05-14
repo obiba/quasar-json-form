@@ -5,7 +5,7 @@
   </q-page>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 import FormPresenter from '../components/FormPresenter.vue';
 import { useI18n } from 'vue-i18n';
@@ -25,13 +25,13 @@ const schema = {
     },
     region: {
       type: 'string',
-      enum: [],
+      enum: [] as string[],
       title: 'Region',
       description: '2. Select a region from the selected country.',
     },
     city: {
       type: 'string',
-      enum: [],
+      enum: [] as string[],
       title: 'City',
       description: '3. Select a city from the selected region.',
     },
@@ -195,13 +195,17 @@ const uischema = {
   ],
 };
 
-const onDataUpdate = (newData) => {
-  if (newData.country) {
-    if (newData.country === 'Canada') {
+const onDataUpdate = (newData: Record<string, unknown>) => {
+  const country = typeof newData.country === 'string' ? newData.country : '';
+  const region = typeof newData.region === 'string' ? newData.region : '';
+  const city = typeof newData.city === 'string' ? newData.city : '';
+
+  if (country) {
+    if (country === 'Canada') {
       schema.properties.region.enum = ['Ontario', 'Quebec', 'British Columbia'];
-    } else if (newData.country === 'France') {
+    } else if (country === 'France') {
       schema.properties.region.enum = ['Île-de-France', 'Provence-Alpes-Côte d\'Azur', 'Auvergne-Rhône-Alpes'];
-    } else if (newData.country === 'Switzerland') {
+    } else if (country === 'Switzerland') {
       schema.properties.region.enum = ['Zurich', 'Geneva', 'Bern'];
     } else {
       schema.properties.region.enum = [];
@@ -209,24 +213,24 @@ const onDataUpdate = (newData) => {
   } else {
     schema.properties.region.enum = [];
   }
-  if (newData.region) {
-    if (newData.region === 'Ontario') {
+  if (region) {
+    if (region === 'Ontario') {
       schema.properties.city.enum = ['Toronto', 'Ottawa', 'Hamilton'];
-    } else if (newData.region === 'Quebec') {
+    } else if (region === 'Quebec') {
       schema.properties.city.enum = ['Montreal', 'Quebec City', 'Laval'];
-    } else if (newData.region === 'British Columbia') {
+    } else if (region === 'British Columbia') {
       schema.properties.city.enum = ['Vancouver', 'Victoria', 'Richmond'];
-    } else if (newData.region === 'Île-de-France') {
+    } else if (region === 'Île-de-France') {
       schema.properties.city.enum = ['Paris', 'Boulogne-Billancourt', 'Saint-Denis'];
-    } else if (newData.region === 'Provence-Alpes-Côte d\'Azur') {
+    } else if (region === 'Provence-Alpes-Côte d\'Azur') {
       schema.properties.city.enum = ['Marseille', 'Nice', 'Toulon'];
-    } else if (newData.region === 'Auvergne-Rhône-Alpes') {
+    } else if (region === 'Auvergne-Rhône-Alpes') {
       schema.properties.city.enum = ['Lyon', 'Grenoble', 'Saint-Étienne'];
-    } else if (newData.region === 'Zurich') {
+    } else if (region === 'Zurich') {
       schema.properties.city.enum = ['Zurich', 'Winterthur', 'Uster'];
-    } else if (newData.region === 'Geneva') {
+    } else if (region === 'Geneva') {
       schema.properties.city.enum = ['Geneva', 'Carouge', 'Lancy'];
-    } else if (newData.region === 'Bern') {
+    } else if (region === 'Bern') {
       schema.properties.city.enum = ['Bern', 'Thun', 'Biel/Bienne'];
     } else {
       schema.properties.city.enum = [];
@@ -234,7 +238,7 @@ const onDataUpdate = (newData) => {
   } else {
     schema.properties.city.enum = [];
   }
-  formData.value = newData;
+  formData.value = { country, region, city };
   // reset dependent fields
   if (!schema.properties.region.enum.includes(formData.value.region)) {
     formData.value.region = '';
