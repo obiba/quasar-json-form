@@ -7,13 +7,13 @@ This app extension integrates the `QJsonForm` component into your Quasar CLI pro
 
 # Install
 ```bash
-quasar ext add json-form
+quasar ext add @obiba/json-form
 ```
 Quasar CLI will retrieve it from NPM and install the extension.
 
 # Uninstall
 ```bash
-quasar ext remove json-form
+quasar ext remove @obiba/json-form
 ```
 
 # Donate
