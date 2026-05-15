@@ -82,12 +82,12 @@ _release-ui:
 	@CURRENT_BRANCH=$$(git branch --show-current); \
 	if [ "$$CURRENT_BRANCH" != "master" ]; then \
 		echo "⚠️  Warning: You are on branch '$$CURRENT_BRANCH', not 'master'"; \
-		read -p "Continue? (y/N) " -n 1 -r; \
-		echo; \
-		if [[ ! $$REPLY =~ ^[Yy]$$ ]]; then \
-			echo "Release cancelled."; \
-			exit 1; \
-		fi; \
+		printf "Continue? (y/N) "; \
+		read -r REPLY; \
+		case "$$REPLY" in \
+			[Yy]|[Yy][Ee][Ss]) ;; \
+			*) echo "Release cancelled."; exit 1 ;; \
+		esac; \
 	fi
 	@# Bump version in UI package
 	@echo "Bumping UI package version ($(VERSION_TYPE))..."
@@ -131,28 +131,30 @@ _release-app-ext:
 	@CURRENT_BRANCH=$$(git branch --show-current); \
 	if [ "$$CURRENT_BRANCH" != "master" ]; then \
 		echo "⚠️  Warning: You are on branch '$$CURRENT_BRANCH', not 'master'"; \
-		read -p "Continue? (y/N) " -n 1 -r; \
-		echo; \
-		if [[ ! $$REPLY =~ ^[Yy]$$ ]]; then \
-			echo "Release cancelled."; \
-			exit 1; \
-		fi; \
+		printf "Continue? (y/N) "; \
+		read -r REPLY; \
+		case "$$REPLY" in \
+			[Yy]|[Yy][Ee][Ss]) ;; \
+			*) echo "Release cancelled."; exit 1 ;; \
+		esac; \
 	fi
 	@# Get current UI version
 	@UI_VERSION=$$(node -p "require('./ui/package.json').version"); \
 	echo "Current UI package version: $$UI_VERSION"; \
 	echo ""; \
-	read -p "Is this UI version published to npm? (y/N) " -n 1 -r; \
-	echo; \
-	if [[ ! $$REPLY =~ ^[Yy]$$ ]]; then \
-		echo "❌ Error: Please publish the UI package first."; \
-		echo "Run: make release-ui-$(VERSION_TYPE)"; \
-		exit 1; \
-	fi; \
+	printf "Is this UI version published to npm? (y/N) "; \
+	read -r REPLY; \
+	case "$$REPLY" in \
+		[Yy]|[Yy][Ee][Ss]) ;; \
+		*) \
+			echo "❌ Error: Please publish the UI package first."; \
+			echo "Run: make release-ui-$(VERSION_TYPE)"; \
+			exit 1 ;; \
+	esac; \
 	echo "Updating app-extension dependency to ^$$UI_VERSION..."; \
-	cd app-extension && npm pkg set dependencies.@obiba/quasar-ui-json-form="^$$UI_VERSION"; \
+	(cd app-extension && npm pkg set dependencies.@obiba/quasar-ui-json-form="^$$UI_VERSION"); \
 	echo "Bumping app-extension version ($(VERSION_TYPE))..."; \
-	cd app-extension && npm version $(VERSION_TYPE) --no-git-tag-version; \
+	(cd app-extension && npm version $(VERSION_TYPE) --no-git-tag-version); \
 	NEW_VERSION=$$(node -p "require('./app-extension/package.json').version"); \
 	echo "New app-extension version: $$NEW_VERSION"; \
 	echo ""; \
