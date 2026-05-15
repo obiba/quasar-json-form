@@ -4,6 +4,14 @@
   "description": "Quasar app extension for JSON Forms",
   "author": "Yannick Marcon <yannick.marcon@obiba.org>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/obiba/quasar-json-form"
+  },
+  "bugs": {
+    "url": "https://github.com/obiba/quasar-json-form/issues"
+  },
+  "homepage": "https://github.com/obiba/quasar-json-form",
   "type": "module",
   "dependencies": {
     "@obiba/quasar-ui-json-form": "^0.1.0"
