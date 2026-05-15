@@ -155,6 +155,8 @@ _release-app-ext:
 	(cd app-extension && npm pkg set dependencies.@obiba/quasar-ui-json-form="^$$UI_VERSION"); \
 	echo "Bumping app-extension version ($(VERSION_TYPE))..."; \
 	(cd app-extension && npm version $(VERSION_TYPE) --no-git-tag-version); \
+	echo "Updating app-extension lock file..."; \
+	(cd app-extension && npm install --package-lock-only); \
 	NEW_VERSION=$$(node -p "require('./app-extension/package.json').version"); \
 	echo "New app-extension version: $$NEW_VERSION"; \
 	echo ""; \
