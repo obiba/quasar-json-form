@@ -5,12 +5,7 @@
 
 **Compatible with Quasar UI v2 and Vue 3**.
 
-
-# Component QJsonForm
-> Short description of the component
-
-
-
+A Quasar UI component that renders dynamic, schema-driven forms based on a JSON Schema and an optional UI schema, using [JSON Forms](https://jsonforms.io/) renderers styled with Quasar components.
 
 # Usage
 
@@ -80,27 +75,6 @@ export default {
 </script>
 ```
 
-## UMD variant
-
-Exports `window.qJsonForm`.
-
-Add the following tag(s) after the Quasar ones:
-
-```html
-<head>
-  <!-- AFTER the Quasar stylesheet tags: -->
-  <link href="https://cdn.jsdelivr.net/npm/@obiba/quasar-ui-json-form/dist/index.min.css" rel="stylesheet" type="text/css">
-</head>
-<body>
-  <!-- at end of body, AFTER Quasar script(s): -->
-  <script src="https://cdn.jsdelivr.net/npm/@obiba/quasar-ui-json-form/dist/index.umd.min.js"></script>
-</body>
-```
-If you need the RTL variant of the CSS, then go for the following (instead of the above stylesheet link):
-```html
-<link href="https://cdn.jsdelivr.net/npm/@obiba/quasar-ui-json-form/dist/index.rtl.min.css" rel="stylesheet" type="text/css">
-```
-
 # Setup
 ```bash
 $ npm install
@@ -108,23 +82,7 @@ $ npm install
 
 # Developing
 ```bash
-# start dev in SPA mode
 $ npm run dev
-
-# start dev in UMD mode
-$ npm run dev:umd
-
-# start dev in SSR mode
-$ npm run dev:ssr
-
-# start dev in Cordova iOS mode
-$ npm run dev:ios
-
-# start dev in Cordova Android mode
-$ npm run dev:android
-
-# start dev in Electron mode
-$ npm run dev:electron
 ```
 
 # Building package

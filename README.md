@@ -3,6 +3,8 @@
 
 Compatible with Quasar UI v2 and Vue 3.
 
+A Quasar app extension that renders dynamic, schema-driven forms based on a JSON Schema and an optional UI schema, using [JSON Forms](https://jsonforms.io/) renderers styled with Quasar components.
+
 # Structure
 * [/ui](ui) - standalone npm package
 

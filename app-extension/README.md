@@ -1,9 +1,9 @@
 # Quasar App Extension json-form
 
-> Add a short description of your App Extension. What does it do? How is it beneficial? Why would someone want to use it?
-
 [![npm](https://img.shields.io/npm/v/@obiba/quasar-app-extension-json-form.svg?label=@obiba/quasar-app-extension-json-form)](https://www.npmjs.com/package/@obiba/quasar-app-extension-json-form)
 [![npm](https://img.shields.io/npm/dt/@obiba/quasar-app-extension-json-form.svg)](https://www.npmjs.com/package/@obiba/quasar-app-extension-json-form)
+
+This app extension integrates the `QJsonForm` component into your Quasar CLI project, enabling schema-driven form generation using JSON Schema. It automatically registers the component and its dependencies, so you can render complex, dynamic forms with Quasar-styled inputs without any manual setup. `QJsonForm` uses [JSON Forms](https://jsonforms.io/).
 
 # Install
 ```bash
