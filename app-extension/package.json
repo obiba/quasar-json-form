@@ -1,6 +1,6 @@
 {
   "name": "@obiba/quasar-app-extension-json-form",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Quasar app extension for JSON Forms",
   "author": "Yannick Marcon <yannick.marcon@obiba.org>",
   "license": "MIT",
