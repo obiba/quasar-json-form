@@ -13,8 +13,8 @@ A Quasar app extension that renders dynamic, schema-driven forms based on a JSON
 # Development
 
 ## Prerequisites
-- Node.js >= 8.9.0
-- npm >= 5.6.0 or yarn >= 1.6.0
+- Node.js >= 22.12 (required by `@quasar/app-vite` v3)
+- npm >= 10
 
 ## Setup
 

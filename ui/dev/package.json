@@ -4,29 +4,34 @@
   "description": "A Quasar Framework app",
   "productName": "@obiba/Quasar JSON Form Dev",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "quasar dev",
     "dev:ssr": "quasar dev -m ssr",
     "dev:ios": "quasar dev -m ios",
     "dev:android": "quasar dev -m android",
     "dev:electron": "quasar dev -m electron",
-    "typecheck": "vue-tsc --noEmit -p tsconfig.json"
+    "build": "quasar build",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
+    "postinstall": "quasar prepare --silent"
   },
   "dependencies": {
-    "@quasar/extras": "^1.16.4",
+    "@quasar/extras": "^2.0.4",
     "prismjs": "^1.30.0",
-    "quasar": "^2.16.0",
-    "vue": "^3.4.0",
-    "vue-i18n": "^11.2.2"
+    "quasar": "^2.27.0",
+    "vue": "^3.5.22",
+    "vue-i18n": "^11.3.0",
+    "vue-router": "^5.0.6"
   },
   "devDependencies": {
-    "@quasar/app-vite": "^2.0.0",
-    "sass": "^1.69.5",
+    "@quasar/app-vite": "^3.8.1",
+    "@types/node": "^22.19.11",
+    "autoprefixer": "^10.4.27",
+    "postcss": "^8.5.8",
     "typescript": "^5.8.3",
-    "vue-tsc": "^2.2.0"
+    "vue-tsc": "^3.3.3"
   },
   "engines": {
-    "node": ">= 18.0.0",
-    "npm": ">= 8.0.0"
+    "node": ">= 26 || ^24 || ^22.12"
   }
 }

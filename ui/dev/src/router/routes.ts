@@ -20,7 +20,7 @@ const children = pages.map(page => ({
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    component: () => import('layouts/MyLayout.vue'),
+    component: () => import('@/layouts/MyLayout.vue'),
     children
   },
 
@@ -28,7 +28,7 @@ const routes: RouteRecordRaw[] = [
   // but you can also remove it
   {
     path: '/:catchAll(.*)*',
-    component: () => import('pages/Error404.vue')
+    component: () => import('@/pages/Error404.vue')
   }
 ]
 

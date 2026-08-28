@@ -1,6 +1,6 @@
-import { boot } from 'quasar/wrappers'
+import { defineBoot } from '#q-app'
 import { createI18n } from 'vue-i18n'
-import messages from 'src/i18n'
+import messages from '@/i18n'
 import { Quasar } from 'quasar'
 
 const locales = ['en', 'fr'] as const
@@ -22,7 +22,7 @@ const i18n = createI18n({
 })
 const t = i18n.global.t
 
-export default boot(({ app }) => {
+export default defineBoot(({ app }) => {
   app.use(i18n)
 })
 

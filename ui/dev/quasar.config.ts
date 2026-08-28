@@ -1,10 +1,13 @@
-import { configure } from 'quasar/wrappers'
-import path from 'path'
-import { fileURLToPath } from 'url'
+// Configuration for your app
+// https://quasar.dev/quasar-cli-vite/quasar-config-file
+
+import { defineConfig } from '#q-app'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-export default configure(() => {
+export default defineConfig(() => {
   return {
     boot: [
       'register',
@@ -24,29 +27,21 @@ export default configure(() => {
     build: {
       vueRouterMode: 'hash',
 
+      // @jsonforms/vue renderers are authored with the Options API
+      vueOptionsAPI: true,
+
+      alias: {
+        ui: path.resolve(__dirname, '../src/index.esm.js')
+      },
+
+      define: {
+        __UI_VERSION__: JSON.stringify(process.env.npm_package_version || '1.0.0'),
+        __QUASAR_VERSION__: JSON.stringify(process.env.npm_package_version || '1.0.0')
+      },
+
       vitePlugins: [
         // ['vite-plugin-checker', { vueTsc: false }]
-      ],
-
-      extendViteConf (viteConf) {
-        viteConf.resolve ??= {}
-        const alias = viteConf.resolve.alias
-        if (Array.isArray(alias)) {
-          alias.push({ find: 'ui', replacement: path.resolve(__dirname, '../src/index.esm.js') })
-        } else {
-          viteConf.resolve.alias = {
-            ...(alias ?? {}),
-            ui: path.resolve(__dirname, '../src/index.esm.js')
-          }
-        }
-        
-        // Add define to fix __UI_VERSION__ error
-        viteConf.define = {
-          ...viteConf.define,
-          __UI_VERSION__: JSON.stringify(process.env.npm_package_version || '1.0.0'),
-          __QUASAR_VERSION__: JSON.stringify(process.env.npm_package_version || '1.0.0')
-        }
-      }
+      ]
     },
 
     devServer: {
@@ -70,7 +65,7 @@ export default configure(() => {
 
     pwa: {
       workboxMode: 'GenerateSW',
-      injectPwaMetaTags: true,
+      injectPWAMetaTags: true,
       swFilename: 'sw.js',
       manifestFilename: 'manifest.json',
       useCredentialsForManifestTag: false

@@ -1,10 +1,10 @@
-import { boot } from 'quasar/wrappers'
+import { defineBoot } from '#q-app'
 import Prism from 'prismjs'
 import 'prismjs/themes/prism-tomorrow.css'
 import 'prismjs/components/prism-json'
-import PrismDirective from 'src/directives/prism'
+import PrismDirective from '@/directives/prism'
 
-export default boot(({ app }) => {
+export default defineBoot(({ app }) => {
   app.directive('prism', PrismDirective)
   app.config.globalProperties.$prism = Prism
 })
