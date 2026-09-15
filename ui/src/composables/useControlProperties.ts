@@ -3,6 +3,8 @@ import { computed, inject, ref, watch } from 'vue'
 import type { Ref, ComputedRef } from 'vue'
 import { useFiltrexRules } from './useFiltrexRules'
 import { useFormI18n } from './useFormI18n'
+import { useReportedErrors } from './useFormErrors'
+import { DATA_KEY, READONLY_KEY, LANGUAGES_KEY } from './keys'
 
 export interface SelectOption {
   label: string
@@ -59,7 +61,27 @@ export interface Control {
     enabled: boolean
     errors: string[]
     path: string
+    config?: Record<string, any>
   }
+}
+
+/** A language a localized string can be entered in */
+export interface Language {
+  code: string
+  label: string
+}
+
+/** `['en', 'fr']` or `{ en: 'English', fr: 'Français' }` */
+export type LanguagesInput = string[] | Record<string, string> | undefined | null
+
+export function normalizeLanguages(input: LanguagesInput): Language[] {
+  if (Array.isArray(input)) {
+    return input.filter((code) => typeof code === 'string' && code.length > 0).map((code) => ({ code, label: code.toUpperCase() }))
+  }
+  if (input && typeof input === 'object') {
+    return Object.keys(input).map((code) => ({ code, label: String(input[code] || code.toUpperCase()) }))
+  }
+  return []
 }
 
 export interface ControlPropertiesReturn {
@@ -75,21 +97,29 @@ export interface ControlPropertiesReturn {
   inputLabel: ComputedRef<string | undefined>
   rootClass: ComputedRef<string | undefined>
   options: ComputedRef<Record<string, any>>
+  config: ComputedRef<Record<string, any>>
+  languages: ComputedRef<Language[]>
   selectOptions: ComputedRef<SelectOption[]>
   isValueValid: ComputedRef<boolean>
   title: ComputedRef<string | undefined>
   description: ComputedRef<string | undefined>
   label: ComputedRef<string | undefined>
   hint: ComputedRef<string | undefined>
+  /**
+   * Message of a renderer-level validator: the control `options.validationMessage[name]`
+   * (translated) when defined, else the built-in message `fallbackKey`.
+   */
+  validationMessage: (name: string, fallbackKey: string, named?: Record<string, unknown>) => string
   clearInvalidSelection: (handleChange: (path: string, value: any) => void) => () => void
 }
 
 export function useControlProperties(control: Ref<any>): ControlPropertiesReturn {
-  const { t } = useFormI18n()
+  const { t, translate } = useFormI18n()
 
   // Inject form data and readonly state from provider
-  const injectedFormData = inject('jsonforms-data', ref({}))
-  const injectedReadonly = inject('jsonforms-readonly', ref(false))
+  const injectedFormData = inject(DATA_KEY, ref({}))
+  const injectedReadonly = inject(READONLY_KEY, ref(false))
+  const injectedLanguages = inject<Ref<LanguagesInput>>(LANGUAGES_KEY, ref(undefined))
 
   const { evaluateRule } = useFiltrexRules(injectedFormData)
 
@@ -188,6 +218,13 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
     return errors
   })
 
+  // Report the filtrex validation errors of visible controls to the form
+  useReportedErrors(
+    () => control.value.path,
+    'validation',
+    computed(() => (isVisible.value ? customValidationErrors.value : [])),
+  )
+
   // Combined errors
   const hasError = computed(() => {
     return control.value.errors.length > 0 || customValidationErrors.value.length > 0
@@ -206,6 +243,22 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
   // Extract options from ui schema or schema
   const options = computed(() => {
     return control.value.uischema?.options || control.value.schema?.options || {}
+  })
+
+  // JSON Forms config (`config` prop of QJsonForm)
+  const config = computed(() => {
+    return control.value.config || {}
+  })
+
+  // Languages of localized strings: control options, then form config, then
+  // the `languages` prop of QJsonForm (or an application-level provide)
+  const languages = computed<Language[]>(() => {
+    const candidates: LanguagesInput[] = [options.value.languages, config.value.languages, injectedLanguages.value]
+    for (const candidate of candidates) {
+      const normalized = normalizeLanguages(candidate)
+      if (normalized.length > 0) return normalized
+    }
+    return [{ code: 'en', label: 'EN' }]
   })
 
   // Read-only: form-level (QJsonForm `readonly` prop), control-level (`options.readonly`)
@@ -290,21 +343,21 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
   const isValueValid = computed(() => {
     const currentValue = control.value.data
     const options = selectOptions.value
-    
+
     // If no value is set, it's valid (empty state)
     if (currentValue === undefined || currentValue === null) {
       return true
     }
-    
+
     // Create a Set of option values for O(1) lookup performance
     const optionValues = new Set(options.map((opt: any) => opt.value))
-    
+
     // Handle array values (multiple selection)
     if (Array.isArray(currentValue)) {
       // All selected values must exist in the options
       return currentValue.every(val => optionValues.has(val))
     }
-    
+
     // Handle single value
     return optionValues.has(currentValue)
   })
@@ -325,13 +378,21 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
     return control.value.uischema.hint || control.value.schema.hint || undefined
   })
 
+  const validationMessage = (name: string, fallbackKey: string, named?: Record<string, unknown>): string => {
+    const custom = options.value.validationMessage?.[name]
+    if (typeof custom === 'string' && custom.length > 0) {
+      return t(custom, named)
+    }
+    return translate(fallbackKey, named)
+  }
+
   // Function to clear invalid selections
   const clearInvalidSelection = (handleChange: (path: string, value: any) => void) => {
     return watch(
       [selectOptions, () => control.value.data],
       () => {
         const options = selectOptions.value
-        
+
         // Only clear if we have options and the current value is invalid
         // Don't clear if options are empty (might be temporary)
         // isValueValid already returns true for undefined/null, so we only get here
@@ -360,12 +421,15 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
     inputLabel,
     rootClass,
     options,
+    config,
+    languages,
     selectOptions,
     isValueValid,
     title,
     description,
     label,
     hint,
+    validationMessage,
     clearInvalidSelection,
   }
 }

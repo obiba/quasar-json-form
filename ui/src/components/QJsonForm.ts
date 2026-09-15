@@ -1,18 +1,43 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { h, provide, toRef, defineComponent, computed } from 'vue'
+import { h, provide, toRef, defineComponent, computed, ref, watch } from 'vue'
 import type { PropType } from 'vue'
 import { JsonForms } from '@jsonforms/vue'
+import { createAjv } from '@jsonforms/core'
 import type { ValidationMode } from '@jsonforms/core'
 import type Ajv from 'ajv'
 import type { ErrorObject } from 'ajv'
 import { vanillaRenderers } from '@jsonforms/vue-vanilla'
 import '@jsonforms/vue-vanilla/vanilla.css'
 import { useFormI18n } from '../composables/useFormI18n'
+import { provideFormErrorRegistry } from '../composables/useFormErrors'
+import { LANGUAGES_KEY, LOCALE_KEY } from '../composables/keys'
+import type { LanguagesInput } from '../composables/useControlProperties'
 import qRenderers from '../utils/renderers'
 import { createJsonFormsI18n } from '../utils/i18n'
 
 // Combine custom renderers with default vanilla renderers
 const renderers = Object.freeze([...vanillaRenderers, ...qRenderers])
+
+/**
+ * Custom `format` values understood by the renderers: registered on the
+ * default AJV instance as always valid, so that AJV does not warn about them.
+ */
+export const CUSTOM_FORMATS = [
+  'file', 'files', 'obibaFiles',
+  'localizedString', 'localizedstring', 'obibaSimpleMde', 'markdown',
+  'radioGroupCollection', 'radio-matrix',
+  'countries', 'obibaCountriesUiSelect', 'typeahead',
+  'datepicker', 'ymdatepicker', 'year-month', 'fulltime', 'date-fulltime',
+  'computed', 'textarea', 'password', 'search', 'tel',
+]
+
+export function createDefaultAjv(): Ajv {
+  const ajv = createAjv()
+  CUSTOM_FORMATS.forEach((format) => {
+    if (!ajv.formats[format]) ajv.addFormat(format, true)
+  })
+  return ajv
+}
 
 export default defineComponent({
   name: 'QJsonForm',
@@ -44,7 +69,8 @@ export default defineComponent({
      * data against the schema and shows the errors on the controls,
      * 'ValidateAndHide' validates but does not display errors (they are still
      * emitted with `update:errors`), 'NoValidation' disables schema
-     * validation. Filtrex `validation` rules are always evaluated.
+     * validation. Filtrex `validation` rules and the renderers' own checks
+     * (word limits, localized strings completed...) are always evaluated.
      */
     validationMode: {
       type: String as PropType<ValidationMode>,
@@ -69,10 +95,21 @@ export default defineComponent({
       default: () => [],
     },
     /**
-     * JSON Forms config object, passed to every renderer.
+     * JSON Forms config object, passed to every renderer (`countries`,
+     * `fileUpload`, `languages`...).
      */
     config: {
       type: Object,
+      required: false,
+      default: undefined,
+    },
+    /**
+     * Languages of the localized strings (`{ en: '...', fr: '...' }` values):
+     * an array of codes or a `{ code: label }` map. A control can override it
+     * with `options.languages`.
+     */
+    languages: {
+      type: [Array, Object] as PropType<LanguagesInput>,
       required: false,
       default: undefined,
     },
@@ -81,13 +118,29 @@ export default defineComponent({
   setup(props: any, { emit }: any) {
     const { t, te, locale, fallbackLocale } = useFormI18n()
 
+    // AJV instance: the given one, or a default knowing the custom formats
+    const defaultAjv = createDefaultAjv()
+    const ajv = computed<Ajv>(() => props.ajv ?? defaultAjv)
+
     // Provide form data and readonly state to all child renderers
     provide('jsonforms-data', toRef(props, 'modelValue'))
     provide('jsonforms-readonly', toRef(props, 'readonly'))
+    provide(LANGUAGES_KEY, toRef(props, 'languages'))
+
+    // Language currently displayed by the localized string controls (shared,
+    // so that switching it in one control switches every control)
+    const selectedLocale = ref<string | undefined>(undefined)
+    provide(LOCALE_KEY, selectedLocale)
+
+    // Errors found by the renderers themselves, merged with the AJV ones
+    const registry = provideFormErrorRegistry()
+    const ajvErrors = ref<ErrorObject[]>([])
+    const allErrors = computed<ErrorObject[]>(() => [...ajvErrors.value, ...registry.errors.value])
+    watch(allErrors, (errors) => emit('update:errors', errors))
 
     const onChange = (event: any) => {
       emit('update:modelValue', event.data)
-      emit('update:errors', event.errors || [])
+      ajvErrors.value = event.errors || []
     }
 
     const generateDefaultUISchema = (schema: any): any => {
@@ -127,7 +180,7 @@ export default defineComponent({
         renderers,
         readonly: props.readonly,
         validationMode: props.validationMode,
-        ajv: props.ajv,
+        ajv: ajv.value,
         additionalErrors: props.additionalErrors,
         config: props.config,
         i18n: i18n.value,

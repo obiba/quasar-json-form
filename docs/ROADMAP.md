@@ -125,23 +125,47 @@ shape: array → ASF definition, object → JSON Forms uischema.
 - [x] `Label` renderer accepts the JSON Forms `text` property; raw HTML (`<h3>`, alert `<div>`s)
   survives markdown-it + DOMPurify, scripts and event handlers are stripped (tested).
 
-### Phase 1 — Missing renderers (generic where possible, Mica shapes as options)
+### Phase 1 — Missing renderers (generic where possible, Mica shapes as options) — done (September 2026)
 
-1. **LocalizedString**: object `{lang: text}`; `languages` option (also injectable globally);
-   single-line or `rows` textarea; `marked` → markdown editor variant; all-languages-completed
-   validation; readonly display.
-2. **Markdown editor** (`obibaSimpleMde`): LocalizedString renderer in editor mode
-   (textarea + preview toggle; opal-ui already uses `qmarkdown`).
-3. **Multi-file upload**: generalize `QFileUploadRenderer` with `multiple`, `minItems`,
-   `emptyMessage`, configurable upload flow (Mica: `POST /ws/files/temp` → `Location` header →
-   `GET` temp-file metadata) and configurable model shape (`{obibaFiles: [...]}`);
-   delete/download; readonly list.
-4. **RadioGroupCollection** matrix (rows × radio columns).
-5. **Year-month date** (`ymdatepicker`) and a `dateFormat` option on the date renderer.
-6. **Word limit**: add `wordCount()` to the filtrex engine; map `wordLimit "0:500"` /
-   `wordMin` / `wordMax` to `validation` rules with the `wordLimitError` message.
-7. **Countries select** (ISO list injected via option/provide) and **typeahead** string.
-8. Defer `sf-obiba-selection-tree` until a customer config using it is found.
+See the `ui/README.md` sections for the options; `ui/dev` pages "test-localized-string",
+"test-file-upload" and "test-mica-widgets"; unit tests in `ui/test`.
+
+- [x] **LocalizedString** (`QLocalizedStringRenderer`, `format: localizedString`): `{lang: text}`;
+  languages from `options.languages`, `config.languages` or the `languages` prop of `QJsonForm`
+  (also an app-level `jsonforms-languages` provide); one input for the current language with a
+  language selector shared by every localized control; `rows` textarea; `marked` → markdown editor;
+  "completed in all languages" check (`localized.completed`, `validationMessage.completed`);
+  read-only display (rendered markdown for the `marked` variant).
+- [x] **Markdown editor** (`QMarkdownEditor`): textarea with a small toolbar and a preview toggle
+  (markdown-it + DOMPurify, no extra dependency); used by `obibaSimpleMde` and by plain strings with
+  `format: markdown` (`QMarkdownRenderer`).
+- [x] **Multi-file upload**: `QFileUploadRenderer` handles `string` (path), `array` (`format: files`)
+  and `object` (`format: files` / `obibaFiles`, `{obibaFiles: [...]}`) controls; `multiple`, `accept`,
+  `minItems` / `maxItems`, `emptyMessage`, `missingFiles` / `minItems` messages; declarative Mica
+  flow (`uploadUrl` → `Location` → `metadataUrl`, `deleteUrl` for just-uploaded files, `downloadUrl`
+  template, `justUploaded: true` on new items) or `config.fileUpload` hooks; upload progress;
+  read-only list with download links.
+- [x] **RadioGroupCollection** (`QRadioMatrixRenderer`, `format: radioGroupCollection` /
+  `radio-matrix`): rows × radio columns from `items` / `values` on the schema or the options,
+  `checkboxMode`, `allItemsSelected` check, read-only display.
+- [x] **Dates**: `dateFormat` option (angular-strap masks normalized), `min` / `max` bounds,
+  `format: year-month` picker. Note: the Mica `ymdatepicker` is not a year-month input but a *day*
+  picker bound to sibling year / month fields (`dateOptions.yearRef` / `monthRef`, `lastDay`): the
+  input is disabled until both are set, defaults to the first (or last) day of the month, follows
+  them, and validates the range (`invalidYMDate`). Implemented as such.
+- [x] **Word limit**: `wordCount()` (and `contains()`, for the Phase 2 `condition` transpiler) in
+  the filtrex engine; `wordLimit "0:500"` / `wordMin` / `wordMax` control options validated by the
+  string renderer with a word counter (`wordLimitError` / `wordMinError` / `wordMaxError` messages).
+- [x] **Countries select** (`QCountriesRenderer`, `format: countries` / `obibaCountriesUiSelect`,
+  single or multiple; list from `options.countries`, `config.countries` or a `jsonforms-countries`
+  provide; `countryCodes` export with the en/fr ISO 3166-1 alpha-3 names) and **typeahead**
+  (`QTypeaheadRenderer`, `format: typeahead`, suggestions from `options.values` / `examples` /
+  `enum`, `editable`).
+- [x] Renderer-level errors (filtrex rules, completed, word limits, file counts, matrix, dates) are
+  now reported to `QJsonForm` and emitted with `update:errors` next to the AJV errors, so a page can
+  block a save on them. The custom `format`s are registered on the default AJV instance (no more
+  "unknown format" warnings).
+- Deferred: `sf-obiba-selection-tree` until a customer config using it is found.
 
 ### Phase 2 — ASF compatibility converter
 
@@ -214,7 +238,7 @@ corresponding mica-ui page ships, then the AngularJS page is retired.
 | Phase | Size | Notes |
 |---|---|---|
 | 0 | small | |
-| 1 | large | LocalizedString and multi-file upload are the bulk |
+| 1 | large | done |
 | 2 | medium | |
 | 3 | medium | mostly build / CSS plumbing |
 | 4 | ongoing | tracks mica-ui page delivery; renderers land as pages need them |

@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   rankWith,
   schemaMatches,
   schemaTypeIs,
   schemaSubPathMatches,
   hasType,
-  formatIs,
   optionIs,
   uiTypeIs,
   isStringControl,
@@ -23,6 +23,7 @@ import {
   or,
   isArrayObjectControl,
 } from '@jsonforms/core'
+import type { Tester } from '@jsonforms/core'
 import QLayoutRenderer from '../components/QLayoutRenderer'
 import QStringRenderer from '../components/QStringRenderer'
 import QFileUploadRenderer from '../components/QFileUploadRenderer'
@@ -42,6 +43,11 @@ import QStepperLayout from '../components/QStepperLayout'
 import QListRenderer from '../components/QListRenderer'
 import QGroupRenderer from '../components/QGroupRenderer'
 import QComputedRenderer from '../components/QComputedRenderer'
+import QLocalizedStringRenderer from '../components/QLocalizedStringRenderer'
+import QMarkdownRenderer from '../components/QMarkdownRenderer'
+import QRadioMatrixRenderer from '../components/QRadioMatrixRenderer'
+import QCountriesRenderer from '../components/QCountriesRenderer'
+import QTypeaheadRenderer from '../components/QTypeaheadRenderer'
 
 const hasOneOfItems = (schema: any): boolean =>
   schema.oneOf !== undefined &&
@@ -49,29 +55,78 @@ const hasOneOfItems = (schema: any): boolean =>
   (schema.oneOf).every((entry: any) => {
     return entry.const !== undefined
   })
- 
+
 const hasEnumItems = (schema: any): boolean =>
   hasType(schema, 'string') && schema.enum !== undefined
+
+/**
+ * schema `format` or `options.format` is one of the given names (unlike the
+ * JSON Forms `formatIs`, which only matches string schemas)
+ */
+const hasFormat = (...names: string[]): Tester =>
+  or(
+    schemaMatches((schema: any) => names.includes(schema?.format)),
+    ...names.map((name) => optionIs('format', name)),
+  )
 
 const isFileControl = and(
   uiTypeIs('Control'),
   schemaTypeIs('string'),
-  or(formatIs('file'), optionIs('format', 'file'))
+  hasFormat('file')
+)
+
+const isFilesControl = and(
+  uiTypeIs('Control'),
+  or(schemaTypeIs('object'), schemaTypeIs('array')),
+  hasFormat('files', 'obibaFiles')
+)
+
+const isLocalizedStringControl = and(
+  uiTypeIs('Control'),
+  schemaTypeIs('object'),
+  hasFormat('localizedString', 'localizedstring', 'obibaSimpleMde')
+)
+
+const isMarkdownControl = and(
+  isStringControl,
+  hasFormat('markdown')
+)
+
+const isRadioMatrixControl = and(
+  uiTypeIs('Control'),
+  schemaTypeIs('object'),
+  hasFormat('radioGroupCollection', 'radio-matrix')
+)
+
+const isCountriesControl = and(
+  uiTypeIs('Control'),
+  or(schemaTypeIs('string'), schemaTypeIs('array')),
+  hasFormat('countries', 'obibaCountriesUiSelect')
+)
+
+const isTypeaheadControl = and(
+  isStringControl,
+  hasFormat('typeahead')
+)
+
+const isDatePickerControl = and(
+  uiTypeIs('Control'),
+  hasFormat('datepicker', 'ymdatepicker', 'year-month')
 )
 
 const isFulltimeControl = and(
   uiTypeIs('Control'),
-  or(formatIs('fulltime'), optionIs('format', 'fulltime'))
+  hasFormat('fulltime')
 )
 
 const isDateFulltimeControl = and(
   uiTypeIs('Control'),
-  or(formatIs('date-fulltime'), optionIs('format', 'date-fulltime'))
+  hasFormat('date-fulltime')
 )
 
 const isComputedControl = and(
   uiTypeIs('Control'),
-  or(formatIs('computed'), optionIs('format', 'computed'))
+  hasFormat('computed')
 )
 
 const isMultiEnumControl = and(
@@ -129,6 +184,26 @@ const qRenderers = [
     tester: rankWith(3, isStringControl),
   },
   {
+    renderer: QMarkdownRenderer,
+    tester: rankWith(4, isMarkdownControl),
+  },
+  {
+    renderer: QTypeaheadRenderer,
+    tester: rankWith(5, isTypeaheadControl),
+  },
+  {
+    renderer: QLocalizedStringRenderer,
+    tester: rankWith(6, isLocalizedStringControl),
+  },
+  {
+    renderer: QRadioMatrixRenderer,
+    tester: rankWith(6, isRadioMatrixControl),
+  },
+  {
+    renderer: QCountriesRenderer,
+    tester: rankWith(7, isCountriesControl),
+  },
+  {
     renderer: QRatingRenderer,
     tester: rankWith(3, and(isIntegerControl, optionIs('format', 'rating'))),
   },
@@ -174,7 +249,7 @@ const qRenderers = [
   },
   {
     renderer: QDateRenderer,
-    tester: rankWith(4, isDateControl),
+    tester: rankWith(4, or(isDateControl, isDatePickerControl)),
   },
   {
     renderer: QTimeRenderer,
@@ -187,6 +262,10 @@ const qRenderers = [
   {
     renderer: QFileUploadRenderer,
     tester: rankWith(4, isFileControl),
+  },
+  {
+    renderer: QFileUploadRenderer,
+    tester: rankWith(6, isFilesControl),
   },
   {
     renderer: QListRenderer,
