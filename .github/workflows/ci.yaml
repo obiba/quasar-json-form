@@ -31,5 +31,11 @@ jobs:
       - name: Install UI dependencies
         run: npm install
 
+      - name: Typecheck UI package
+        run: npm run typecheck
+
+      - name: Test UI package
+        run: npm test
+
       - name: Build UI package
         run: npm run build

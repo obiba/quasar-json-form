@@ -1,6 +1,7 @@
 import { h, watch, computed, defineComponent } from 'vue'
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
 import { QInput } from 'quasar'
+import type { QInputProps } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
 import { useI18n } from 'vue-i18n'
 
@@ -19,12 +20,25 @@ export default defineComponent({
     const control = controlResult.control
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, hasError, errorMessage, options } =
+    const { isVisible, isEnabled, isReadonly, inputLabel, hasError, errorMessage, options } =
       useControlProperties(control)
 
-    const inputType = computed(() => {
-      const schema = control.value.schema
-      return schema.format || (options.value.rows ? 'textarea' : 'text')
+    // schema `format` values that map to an HTML input type; anything else is plain text
+    const inputTypes: Record<string, QInputProps['type']> = {
+      text: 'text',
+      textarea: 'textarea',
+      password: 'password',
+      email: 'email',
+      search: 'search',
+      tel: 'tel',
+      url: 'url',
+      uri: 'url',
+    }
+
+    const inputType = computed<QInputProps['type']>(() => {
+      const format = control.value.schema.format
+      if (format && inputTypes[format]) return inputTypes[format]
+      return options.value.rows ? 'textarea' : 'text'
     })
 
     watch(
@@ -37,7 +51,8 @@ export default defineComponent({
     )
 
     const onChange = (value: any) => {
-      controlResult.handleChange(control.value.path, value)
+      // an emptied input means "no value", so that `required` applies
+      controlResult.handleChange(control.value.path, value === '' || value === null ? undefined : value)
     }
 
     return () => {
@@ -48,11 +63,12 @@ export default defineComponent({
       return h(QInput, {
         modelValue: control.value.data,
         'onUpdate:modelValue': onChange,
-        label: control.value.label ? t(control.value.label) : undefined,
+        label: inputLabel.value,
         error: hasError.value,
         errorMessage: errorMessage.value,
         required: control.value.required,
-        disable: !isEnabled.value,
+        disable: !isEnabled.value && !isReadonly.value,
+        readonly: isReadonly.value,
         hint: control.value.description ? t(control.value.description) : undefined,
         type: inputType.value,
         ...options.value,

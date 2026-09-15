@@ -19,7 +19,7 @@ export default defineComponent({
     const control = controlResult.control
 
     // Use the generic control rules composable
-    const { isVisible } =
+    const { isVisible, rootClass } =
       useControlProperties(control)
 
     watch(
@@ -40,14 +40,15 @@ export default defineComponent({
         return null
       }
 
-      let label = ''
-      if (control.value.label || control.value.uischema.label) {
-        label = t(String(control.value.label || control.value.uischema.label))
-        label = renderMarkdown(label)
-      }
+      // JSON Forms `Label` elements carry their content in `text`; `label` is also accepted.
+      // The content is a vue-i18n key or a literal, rendered as markdown with raw HTML
+      // allowed (headings, alert blocks...) and sanitized.
+      const uischema = control.value.uischema as any
+      const text = control.value.label || uischema.label || uischema.text
+      const label = text ? renderMarkdown(t(String(text))) : ''
 
       return h('div', {
-        class: 'q-label-renderer ' + ((control.value.uischema as any).labelClass || ''),
+        class: ['q-label-renderer', uischema.labelClass, rootClass.value],
         innerHTML: label,
       })
     }

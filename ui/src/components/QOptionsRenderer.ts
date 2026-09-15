@@ -18,7 +18,7 @@ export default defineComponent({
     const control = controlResult.control
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, options, selectOptions, clearInvalidSelection, title, description } =
+    const { isVisible, isEnabled, requiredMark, rootClass, options, selectOptions, clearInvalidSelection, title, description } =
       useControlProperties(control)
 
     const isMultiple = computed(() => {
@@ -74,7 +74,7 @@ export default defineComponent({
       if (title.value) {
         children.push(h('div', {
           class: 'text-label text-grey-7 q-mb-xs',
-        }, t(title.value)))
+        }, t(title.value) + requiredMark.value))
       }
 
       if (description.value) {
@@ -98,7 +98,7 @@ export default defineComponent({
         }),
       )
 
-      return h('div', { class: 'q-options-renderer' }, children)
+      return h('div', { class: ['q-options-renderer', rootClass.value] }, children)
     }
   },
 })

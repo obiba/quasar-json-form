@@ -14,3 +14,6 @@ yarn-error.log*
 *.ntvs*
 *.njsproj
 *.sln
+
+# compiled TypeScript output must not be committed
+ui/src/**/*.js

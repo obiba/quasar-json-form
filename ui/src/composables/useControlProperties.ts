@@ -70,6 +70,10 @@ export interface ControlPropertiesReturn {
   computeValue: ComputedRef<any>
   hasError: ComputedRef<boolean>
   errorMessage: ComputedRef<string>
+  isReadonly: ComputedRef<boolean>
+  requiredMark: ComputedRef<string>
+  inputLabel: ComputedRef<string | undefined>
+  rootClass: ComputedRef<string | undefined>
   options: ComputedRef<Record<string, any>>
   selectOptions: ComputedRef<SelectOption[]>
   isValueValid: ComputedRef<boolean>
@@ -83,8 +87,9 @@ export interface ControlPropertiesReturn {
 export function useControlProperties(control: Ref<any>): ControlPropertiesReturn {
   const { t } = useI18n()
 
-  // Inject form data from provider
+  // Inject form data and readonly state from provider
   const injectedFormData = inject('jsonforms-data', ref({}))
+  const injectedReadonly = inject('jsonforms-readonly', ref(false))
 
   const { evaluateRule } = useFiltrexRules(injectedFormData)
 
@@ -201,6 +206,29 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
   // Extract options from ui schema or schema
   const options = computed(() => {
     return control.value.uischema?.options || control.value.schema?.options || {}
+  })
+
+  // Read-only: form-level (QJsonForm `readonly` prop), control-level (`options.readonly`)
+  // or schema-level (`readOnly`). Distinct from being disabled by an `enabled` rule.
+  const isReadonly = computed(() => {
+    return injectedReadonly.value === true
+      || options.value.readonly === true
+      || options.value.readOnly === true
+      || control.value.schema?.readOnly === true
+  })
+
+  // Marker appended to the label of a required control
+  const requiredMark = computed(() => (control.value.required ? ' *' : ''))
+
+  // Translated label with the required marker, for input-like components
+  const inputLabel = computed(() => {
+    return control.value.label ? t(control.value.label) + requiredMark.value : undefined
+  })
+
+  // CSS classes applied to the root element of the renderer
+  const rootClass = computed(() => {
+    const cls = options.value.class
+    return typeof cls === 'string' && cls.length > 0 ? cls : undefined
   })
 
   // Transform enum values into q-select options
@@ -327,6 +355,10 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
     computeValue,
     hasError,
     errorMessage,
+    isReadonly,
+    requiredMark,
+    inputLabel,
+    rootClass,
     options,
     selectOptions,
     isValueValid,

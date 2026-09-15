@@ -1,9 +1,19 @@
 @use 'quasar/src/css/variables.sass' as *
 
-.horizontal-layout
-  gap: 20px
-.vertical-layout
+// VerticalLayout / HorizontalLayout (QLayoutRenderer). When the layout carries
+// an explicit Quasar flex class through `options.class` (row, column, flex),
+// that class drives the layout instead of the default stacking below.
+.q-vertical-layout:not(.row):not(.column):not(.flex)
+  display: flex
+  flex-direction: column
   gap: 10px
+.q-horizontal-layout:not(.row):not(.column):not(.flex)
+  display: flex
+  flex-direction: row
+  gap: 20px
+  > *
+    flex: 1 1 0
+    min-width: 0
 .q-form-title
   font-weight: bold
   font-size: larger

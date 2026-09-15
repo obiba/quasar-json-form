@@ -1,6 +1,7 @@
 import { h, watch, defineComponent, ref, computed } from 'vue'
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
 import { QInput, QIcon, QPopupProxy, QDate, QBtn } from 'quasar'
+import type { QPopupProxy as QPopupProxyInstance } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
 import { useI18n } from 'vue-i18n'
 
@@ -10,7 +11,7 @@ export default defineComponent({
   setup(props: any) {
     const { t } = useI18n()
 
-    const popupRef = ref(null)
+    const popupRef = ref<QPopupProxyInstance | null>(null)
 
     const controlResult = useJsonFormsControl({
       ...props,
@@ -19,7 +20,7 @@ export default defineComponent({
 
     const control = controlResult.control
 
-    const { isVisible, isEnabled, hasError, errorMessage, options } =
+    const { isVisible, isEnabled, isReadonly, inputLabel, hasError, errorMessage, options } =
       useControlProperties(control)
 
     const dateValue = computed(() => control.value.data || '')
@@ -38,9 +39,7 @@ export default defineComponent({
     }
 
     const closePopup = () => {
-      if (popupRef.value) {
-        (popupRef.value as any).hide()
-      }
+      popupRef.value?.hide()
     }
 
     return () => {
@@ -51,14 +50,15 @@ export default defineComponent({
       return h(QInput, {
         modelValue: dateValue.value,
         'onUpdate:modelValue': onChange,
-        label: control.value.label ? t(control.value.label) : undefined,
+        label: inputLabel.value,
         error: hasError.value,
         errorMessage: errorMessage.value,
         required: control.value.required,
-        disable: !isEnabled.value,
+        disable: !isEnabled.value && !isReadonly.value,
+        readonly: isReadonly.value,
         hint: control.value.description ? t(control.value.description) : undefined,
         ...options.value,
-      }, {
+      }, isReadonly.value ? {} : {
         append: () => h(QIcon, {
           name: 'event',
           class: 'cursor-pointer',

@@ -1,4 +1,7 @@
 export default {
+  errors: 'Erreurs',
+  readonly: 'Lecture seule',
+  validation_mode: 'Mode de validation',
   json_form: 'Formulaire JSON',
   failed: 'Action échouée',
   success: 'Action réussie',

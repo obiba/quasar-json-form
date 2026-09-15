@@ -109,16 +109,21 @@ shape: array → ASF definition, object → JSON Forms uischema.
 
 ## 4. Phases
 
-### Phase 0 — Harden the library (prerequisite)
+### Phase 0 — Harden the library (prerequisite) — done (September 2026)
 
-- Expose `readonly` and `validationMode` props on `QJsonForm`; enable AJV validation with
-  i18n'd messages (equivalents of Mica's `SfOptionsService`: `required`, `does-not-validate`,
-  `localized.completed`); show required markers.
-- Add vitest + `@vue/test-utils`; remove the tracked `ui/src/**/*.js` duplicates.
-- Layouts with classes: allow `options.class` on layouts/groups (or a `GridLayout`) so ASF
-  `row` / `col-6` map to Quasar `row` / `col-md-6`.
-- `Label` renderer: confirm raw HTML `helpvalue` blocks (`<h3>`, alert `<div>`s) survive
-  markdown-it (`html: true`) + DOMPurify.
+- [x] `readonly`, `validationMode` (default `ValidateAndShow`), `ajv`, `additionalErrors` and
+  `config` props on `QJsonForm`; `update:errors` event. AJV messages go through vue-i18n
+  (`error.<keyword>`, `error.default` as the `does-not-validate` equivalent) with built-in
+  en/fr defaults (`messages` export); required markers (`*`) on labels. Emptied text/number
+  inputs and cleared selects become `undefined` so that `required` applies.
+  `localized.completed` belongs to the LocalizedString renderer (Phase 1).
+- [x] vitest + `@vue/test-utils` (`ui/test`, `npm test`, run in CI); tracked `ui/src/**/*.js`
+  removed and ignored; dev app aliased to the `.ts` entry.
+- [x] `options.class` on layouts, groups, sections, labels and controls; new `QLayoutRenderer`
+  for `VerticalLayout` / `HorizontalLayout` renders elements as direct children so
+  `row q-col-gutter-md` / `col-md-6` work (see `ui/dev` "test-grid-layout").
+- [x] `Label` renderer accepts the JSON Forms `text` property; raw HTML (`<h3>`, alert `<div>`s)
+  survives markdown-it + DOMPurify, scripts and event handlers are stripped (tested).
 
 ### Phase 1 — Missing renderers (generic where possible, Mica shapes as options)
 

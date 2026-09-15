@@ -18,7 +18,7 @@ export default defineComponent({
     const control = controlResult.control
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, hasError, errorMessage, options } =
+    const { isVisible, isEnabled, isReadonly, requiredMark, rootClass, hasError, errorMessage, options } =
       useControlProperties(control)
 
     watch(
@@ -44,7 +44,7 @@ export default defineComponent({
       if (control.value.label) {
         children.push(h('div', {
           class: 'text-label text-grey-7 q-mb-xs',
-        }, t(control.value.label)))
+        }, t(control.value.label) + requiredMark.value))
       }
 
       if (control.value.description) {
@@ -60,7 +60,8 @@ export default defineComponent({
         error: hasError.value,
         errorMessage: errorMessage.value,
         required: control.value.required,
-        disable: !isEnabled.value,
+        disable: !isEnabled.value && !isReadonly.value,
+        readonly: isReadonly.value,
         ...options.value,
       }))
 
@@ -70,7 +71,7 @@ export default defineComponent({
         }, t((control.value.uischema as any).hint)))
       }
 
-      return h('div', {class: 'q-mt-md'}, children)
+      return h('div', { class: ['q-mt-md', rootClass.value] }, children)
     }
   },
 })
