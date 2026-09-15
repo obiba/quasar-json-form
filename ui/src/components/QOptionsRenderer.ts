@@ -2,13 +2,13 @@ import { h, computed, watch, defineComponent, onMounted, onUnmounted } from 'vue
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
 import { QOptionGroup } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
-import { useI18n } from 'vue-i18n'
+import { useFormI18n } from '../composables/useFormI18n'
 
 export default defineComponent({
   name: 'QOptionsRenderer',
   props: rendererProps(),
   setup(props: any) {
-    const { t } = useI18n()
+    const { t } = useFormI18n()
 
     const controlResult = useJsonFormsControl({
       ...props,

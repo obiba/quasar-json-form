@@ -8,6 +8,10 @@ This app extension integrates the `QJsonForm` component into your Quasar CLI pro
 # Requirements
 - `@quasar/app-vite` v3+ (Quasar CLI with Vite)
 - `quasar` v2
+- `vue-i18n` v11, registered in a boot file with `app.use(i18n)` (composition mode, `legacy: false`).
+  Every title, description, option label and message of a form is passed through `t()`, so they
+  can be i18n keys or literal strings. Without vue-i18n the forms still render untranslated, with
+  english validation messages, and a warning is logged.
 
 Quasar CLI with Webpack (`@quasar/app-webpack`) is no longer supported. Use version 0.1.1 of this
 extension if you are still on `@quasar/app-vite` v1/v2 or on `@quasar/app-webpack`.

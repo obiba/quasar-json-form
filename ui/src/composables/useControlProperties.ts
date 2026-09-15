@@ -2,7 +2,7 @@
 import { computed, inject, ref, watch } from 'vue'
 import type { Ref, ComputedRef } from 'vue'
 import { useFiltrexRules } from './useFiltrexRules'
-import { useI18n } from 'vue-i18n'
+import { useFormI18n } from './useFormI18n'
 
 export interface SelectOption {
   label: string
@@ -85,7 +85,7 @@ export interface ControlPropertiesReturn {
 }
 
 export function useControlProperties(control: Ref<any>): ControlPropertiesReturn {
-  const { t } = useI18n()
+  const { t } = useFormI18n()
 
   // Inject form data and readonly state from provider
   const injectedFormData = inject('jsonforms-data', ref({}))

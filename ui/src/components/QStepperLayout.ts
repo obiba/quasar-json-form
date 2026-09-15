@@ -1,14 +1,14 @@
 import { h, computed, ref, defineComponent } from 'vue'
 import { DispatchRenderer, rendererProps, useJsonFormsControl } from '@jsonforms/vue'
 import { QStepper, QStep, QStepperNavigation, QBtn } from 'quasar'
-import { useI18n } from 'vue-i18n'
+import { useFormI18n } from '../composables/useFormI18n'
 import { useControlProperties } from '../composables/useControlProperties'
 
 export default defineComponent({
   name: 'QStepperLayout',
   props: rendererProps(),
   setup(props: any) {
-    const { t } = useI18n()
+    const { t } = useFormI18n()
 
     const controlResult = useJsonFormsControl({
       ...props,

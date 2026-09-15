@@ -7,7 +7,7 @@ import type Ajv from 'ajv'
 import type { ErrorObject } from 'ajv'
 import { vanillaRenderers } from '@jsonforms/vue-vanilla'
 import '@jsonforms/vue-vanilla/vanilla.css'
-import { useI18n } from 'vue-i18n'
+import { useFormI18n } from '../composables/useFormI18n'
 import qRenderers from '../utils/renderers'
 import { createJsonFormsI18n } from '../utils/i18n'
 
@@ -79,7 +79,7 @@ export default defineComponent({
   },
   emits: ['update:modelValue', 'update:errors'],
   setup(props: any, { emit }: any) {
-    const { t, te, locale, fallbackLocale } = useI18n()
+    const { t, te, locale, fallbackLocale } = useFormI18n()
 
     // Provide form data and readonly state to all child renderers
     provide('jsonforms-data', toRef(props, 'modelValue'))
@@ -108,16 +108,14 @@ export default defineComponent({
         : generateDefaultUISchema(props.schema)
     })
 
-    // JSON Forms translation state backed by vue-i18n, refreshed on locale change
-    const i18n = computed(() => {
-      const fallback = fallbackLocale.value
-      return createJsonFormsI18n({
-        locale: String(locale.value),
-        fallbackLocale: typeof fallback === 'string' ? fallback : undefined,
-        te: (key: string, loc?: string) => te(key, loc as any),
-        t: (key: string, named?: Record<string, unknown>) => t(key, named || {}),
-      })
-    })
+    // JSON Forms translation state backed by vue-i18n (or the pass-through
+    // fallback when it is not installed), refreshed on locale change
+    const i18n = computed(() => createJsonFormsI18n({
+      locale: String(locale.value),
+      fallbackLocale: fallbackLocale.value,
+      te,
+      t,
+    }))
 
     return () => h('div', {
       class: 'json-form-wrapper',

@@ -4,13 +4,13 @@ import { DispatchRenderer, rendererProps, useJsonFormsControl } from '@jsonforms
 import { QList, QItem, QItemSection, QBtn, QDialog, QCard, QCardSection, QCardActions } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
 import { renderMarkdown } from '../utils/markdown'
-import { useI18n } from 'vue-i18n'
+import { useFormI18n } from '../composables/useFormI18n'
 
 export default defineComponent({
   name: 'QListRenderer',
   props: rendererProps(),
   setup(props: any) {
-    const { t } = useI18n()
+    const { t } = useFormI18n()
     const controlResult = useJsonFormsControl({
       ...props,
       uischema: props.uischema,

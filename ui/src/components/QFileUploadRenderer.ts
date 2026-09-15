@@ -2,7 +2,7 @@ import { h, watch, defineComponent, ref } from 'vue'
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
 import { QBtn, QList, QItem, QItemSection } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
-import { useI18n } from 'vue-i18n'
+import { useFormI18n } from '../composables/useFormI18n'
 import { renderMarkdown } from '../utils/markdown'
 
 const getNestedValue = (obj: any, path: string): any => {
@@ -13,7 +13,7 @@ export default defineComponent({
   name: 'QFileUploadRenderer',
   props: rendererProps(),
   setup(props: any) {
-    const { t } = useI18n()
+    const { t } = useFormI18n()
 
     const controlResult = useJsonFormsControl({
       ...props,
