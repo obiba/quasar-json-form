@@ -5,6 +5,16 @@
 
 **Compatible with Quasar UI v2 and Vue 3**.
 
+## Requirements
+
+- Quasar v2, Vue 3
+- [vue-i18n](https://vue-i18n.intlify.dev/) v11 (peer dependency), registered in the application
+  with `app.use(i18n)` (composition mode, `legacy: false`). Every title, description, option
+  label, hint and message is passed through `t()`, so they can be either i18n keys or literal
+  strings (an unknown key is displayed as-is; set `missingWarn: false` to silence vue-i18n).
+  Without vue-i18n installed, the forms still render: strings are displayed untranslated and
+  validation messages come from the built-in english defaults (a warning is logged once).
+
 A Quasar UI component that renders dynamic, schema-driven forms based on a JSON Schema and an optional UI schema, using [JSON Forms](https://jsonforms.io/) renderers styled with Quasar components.
 
 # Usage

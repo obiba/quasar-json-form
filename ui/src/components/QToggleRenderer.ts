@@ -2,13 +2,13 @@ import { h, watch, defineComponent } from 'vue'
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
 import { QToggle } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
-import { useI18n } from 'vue-i18n'
+import { useFormI18n } from '../composables/useFormI18n'
 
 export default defineComponent({
   name: 'QToggleRenderer',
   props: rendererProps(),
   setup(props: any) {
-    const { t } = useI18n()
+    const { t } = useFormI18n()
 
     const controlResult = useJsonFormsControl({
       ...props,

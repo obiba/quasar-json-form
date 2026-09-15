@@ -3,13 +3,13 @@ import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
 import { QInput, QIcon, QPopupProxy, QTime, QBtn } from 'quasar'
 import type { QPopupProxy as QPopupProxyInstance } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
-import { useI18n } from 'vue-i18n'
+import { useFormI18n } from '../composables/useFormI18n'
 
 export default defineComponent({
   name: 'QTimeRenderer',
   props: rendererProps(),
   setup(props: any) {
-    const { t } = useI18n()
+    const { t } = useFormI18n()
 
     const popupRef = ref<QPopupProxyInstance | null>(null)
 
