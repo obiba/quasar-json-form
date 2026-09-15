@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { h, provide, toRef, defineComponent, computed, ref, watch } from 'vue'
+import { h, provide, toRef, defineComponent, computed, ref, watch, inject, unref } from 'vue'
 import type { PropType } from 'vue'
 import { JsonForms } from '@jsonforms/vue'
 import { createAjv } from '@jsonforms/core'
@@ -134,7 +134,9 @@ export default defineComponent({
     // Provide form data and readonly state to all child renderers
     provide('jsonforms-data', toRef(props, 'modelValue'))
     provide('jsonforms-readonly', toRef(props, 'readonly'))
-    provide(LANGUAGES_KEY, toRef(props, 'languages'))
+    // the `languages` prop, else an application-level provide (raw value or ref)
+    const inheritedLanguages = inject<unknown>(LANGUAGES_KEY, undefined)
+    provide(LANGUAGES_KEY, computed<LanguagesInput>(() => props.languages ?? (unref(inheritedLanguages) as LanguagesInput)))
 
     // Language currently displayed by the localized string controls (shared,
     // so that switching it in one control switches every control)

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { h, computed, watch, defineComponent, inject, ref } from 'vue'
-import type { Ref } from 'vue'
+import { h, computed, watch, defineComponent, inject, ref, unref } from 'vue'
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
 import { QSelect } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
@@ -33,10 +32,11 @@ export default defineComponent({
     const { isVisible, isEnabled, isReadonly, inputLabel, hasError, errorMessage, options, config } =
       useControlProperties(control)
 
-    const injected = inject<Ref<any>>(COUNTRIES_KEY, ref(undefined))
+    // raw value or ref
+    const injected = inject<unknown>(COUNTRIES_KEY, undefined)
 
     const countries = computed<CountryCode[]>(() => {
-      const source = options.value.countries ?? config.value.countries ?? injected.value
+      const source = options.value.countries ?? config.value.countries ?? (unref(injected) as any)
       if (Array.isArray(source)) return source
       if (source && typeof source === 'object') {
         const current = String(locale.value || '')

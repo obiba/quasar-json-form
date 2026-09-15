@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { h, watch, defineComponent, ref, computed } from 'vue'
+import { h, watch, defineComponent, ref, computed, reactive } from 'vue'
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
 import { QBtn, QList, QItem, QItemSection, QIcon, QLinearProgress } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
@@ -261,7 +261,8 @@ export default defineComponent({
 
     const toItem = (result: FileItem | string, file: File): FileItem => {
       if (typeof result === 'string') {
-        return { path: result, fileName: file.name, size: file.size }
+        const item: FileItem = { path: result, fileName: file.name, size: file.size }
+        return mode.value === 'path' ? item : { ...item, justUploaded: true }
       }
       return { fileName: file.name, size: file.size, ...result, justUploaded: true }
     }
@@ -272,7 +273,7 @@ export default defineComponent({
       for (const file of (isMultiple.value ? selected : selected.slice(0, 1))) {
         if (!isMultiple.value && current.length > 0) break
         if (maxItems.value !== undefined && isMultiple.value && current.length >= maxItems.value) break
-        const entry: PendingUpload = { name: file.name, progress: 0 }
+        const entry: PendingUpload = reactive({ name: file.name, progress: 0 })
         pending.value = [...pending.value, entry]
         try {
           const result = hooks.value.upload

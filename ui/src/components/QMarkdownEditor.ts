@@ -104,7 +104,9 @@ export default defineComponent({
             ])
             : null,
           h('div', { class: 'q-markdown-editor__preview text-markdown', innerHTML: html.value }),
-          props.hint ? h('div', { class: 'text-caption text-grey-7 q-mt-xs' }, props.hint) : null,
+          props.error && props.errorMessage
+            ? h('div', { class: 'text-negative text-caption q-mt-xs' }, props.errorMessage)
+            : props.hint ? h('div', { class: 'text-caption text-grey-7 q-mt-xs' }, props.hint) : null,
         ])
       }
 

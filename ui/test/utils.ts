@@ -20,6 +20,7 @@ export function createTestI18n(messages: Record<string, any> = {}, locale = 'en'
 export interface MountFormOptions {
   messages?: Record<string, any>
   locale?: string
+  provide?: Record<string, any>
 }
 
 export function mountForm(props: Record<string, any>, options: MountFormOptions = {}) {
@@ -27,6 +28,7 @@ export function mountForm(props: Record<string, any>, options: MountFormOptions 
     props,
     global: {
       plugins: [Quasar, createTestI18n(options.messages, options.locale)],
+      provide: options.provide,
     },
     attachTo: document.body,
   })

@@ -74,12 +74,11 @@ export default defineComponent({
       return isNaN(value) ? 0 : value
     })
 
-    // Required: completed in all languages (when at least one is filled; when
-    // none is, the value is undefined and the schema `required` applies)
+    // Required: completed in all languages as soon as the object exists (a
+    // missing value is left to the schema `required`)
     const completedErrors = computed<string[]>(() => {
       if (!control.value.required) return []
-      const filled = Object.keys(data.value).filter((code) => !isBlank(data.value[code]))
-      if (filled.length === 0) return []
+      if (control.value.data === undefined || control.value.data === null) return []
       const missing = languages.value.some((language) => isBlank(data.value[language.code]))
       return missing ? [validationMessage('completed', 'localized.completed')] : []
     })
@@ -97,7 +96,8 @@ export default defineComponent({
       } else {
         next[code] = text
       }
-      controlResult.handleChange(control.value.path, Object.keys(next).length > 0 ? next : undefined)
+      const hasValue = Object.keys(next).some((key) => !isBlank(next[key]))
+      controlResult.handleChange(control.value.path, hasValue ? next : undefined)
     }
 
     watch(

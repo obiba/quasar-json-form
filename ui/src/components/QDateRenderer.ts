@@ -23,7 +23,8 @@ const pad2 = (n: number): string => String(n).padStart(2, '0')
  * Date control (`format: date` / `datepicker`): text input with a QDate popup.
  * Options (directly or under `dateOptions`):
  * - `dateFormat`: mask of the stored value (`YYYY-MM-DD` by default, `YYYY-MM`
- *   for `format: year-month`; angular-strap masks like `yyyy-MM-dd` accepted),
+ *   for `format: year-month`; angular-strap masks like `yyyy-MM-dd` accepted);
+ *   ignored for `format: date`, which AJV validates as an ISO date,
  * - `min` / `max`: bounds (also the filtrex `min` / `max` rules),
  * - `yearRef` / `monthRef` (`format: ymdatepicker`): names of the year and
  *   month fields (siblings, or from the root data) the date must belong to;
@@ -63,7 +64,10 @@ export default defineComponent({
       return control.value.schema.format === 'year-month' || options.value.format === 'year-month'
     })
 
+    // `format: date` is validated by AJV as an ISO date: the mask only applies
+    // to the other formats (datepicker, ymdatepicker, year-month)
     const mask = computed<string>(() => {
+      if (control.value.schema.format === 'date') return 'YYYY-MM-DD'
       return normalizeDateMask(dateOptions.value.dateFormat) || (isYearMonth.value ? 'YYYY-MM' : 'YYYY-MM-DD')
     })
 

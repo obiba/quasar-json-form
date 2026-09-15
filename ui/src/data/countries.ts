@@ -190,7 +190,7 @@ const en: CountryCode[] = [
   { code: "PRI", name: "Puerto Rico" },
   { code: "QAT", name: "Qatar" },
   { code: "ROU", name: "Romania" },
-  { code: "RUS", name: "Russian" },
+  { code: "RUS", name: "Russia" },
   { code: "RWA", name: "Rwanda" },
   { code: "REU", name: "Réunion" },
   { code: "BLM", name: "Saint Barthélemy" },

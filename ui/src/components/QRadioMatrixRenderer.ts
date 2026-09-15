@@ -88,12 +88,12 @@ export default defineComponent({
       controlResult.handleChange(control.value.path, { ...data.value, [itemKey]: value })
     }
 
-    // Required: every item answered (radio) / at least one checked (checkbox),
-    // once something has been answered (a missing value is left to `required`)
+    // Required: every item answered (radio) / at least one checked (checkbox)
+    // as soon as the object exists (a missing value is left to `required`)
     const selectionErrors = computed<string[]>(() => {
       if (!control.value.required) return []
       const value = control.value.data
-      if (!value || typeof value !== 'object' || Object.keys(value).length === 0) return []
+      if (value === undefined || value === null || typeof value !== 'object') return []
       const complete = checkboxMode.value
         ? items.value.some((item) => data.value[item.key] === true)
         : items.value.every((item) => data.value[item.key] !== undefined && data.value[item.key] !== null)
@@ -148,6 +148,7 @@ export default defineComponent({
             isReadonly.value
               ? (selected === true ? h(QIcon, { name: 'check', color: 'primary' }) : null)
               : h(QCheckbox, {
+                'aria-label': t(item.name),
                 modelValue: selected === true,
                 'onUpdate:modelValue': (checked: boolean) => setValue(item.key, checked),
                 disable: !isEnabled.value,
@@ -163,7 +164,7 @@ export default defineComponent({
                 'onUpdate:modelValue': (val: any) => setValue(item.key, val),
                 disable: !isEnabled.value,
                 dense: true,
-                'aria-label': t(value.caption),
+                'aria-label': `${t(item.name)}: ${t(value.caption)}`,
               }),
           ]))
         return h('tr', { key: item.key }, [

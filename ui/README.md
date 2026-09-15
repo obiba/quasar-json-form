@@ -170,7 +170,8 @@ defined (translated with `t()`), else from the built-in messages (`localized.com
 displayed for the current language, with a language selector when there is more than one language
 (switching it switches every localized control of the form). Languages come from `options.languages`
 on the control, then `config.languages`, then the `languages` prop of `QJsonForm` (or a
-`jsonforms-languages` provide at the application level), and default to `['en']`.
+`jsonforms-languages` provide at the application level, a plain value or a ref), and default to
+`['en']`.
 
 Options: `rows` (textarea when > 1), `marked: true` for a markdown editor with preview (also the
 default of `format: "obibaSimpleMde"`), `validationMessage.completed`. A required localized string
@@ -215,7 +216,9 @@ checked in checkbox mode): `validationMessage.allItemsSelected`.
 The date renderer (`format: date`, `datepicker`) accepts, directly or under `dateOptions`:
 
 - `dateFormat`: mask of the stored value (`YYYY-MM-DD` by default; angular-strap masks such as
-  `yyyy-MM-dd` are accepted). `format: "year-month"` uses `YYYY-MM` with a month picker.
+  `yyyy-MM-dd` are accepted). It applies to `datepicker` / `ymdatepicker` controls: `format: "date"`
+  is validated by AJV as an ISO date and keeps `YYYY-MM-DD`. `format: "year-month"` uses `YYYY-MM`
+  with a month picker.
 - `min` / `max`: bounds (ISO or mask format; the filtrex `min` / `max` rules work too), with
   `validationMessage.dateRange` / `dateMin` / `dateMax`.
 - `yearRef` / `monthRef` (`format: "ymdatepicker"`): names of the year and month fields (siblings of

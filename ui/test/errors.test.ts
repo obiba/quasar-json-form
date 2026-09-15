@@ -30,6 +30,7 @@ describe('renderer errors', () => {
     expect(toInstancePath('')).toBe('')
     expect(toInstancePath('a')).toBe('/a')
     expect(toInstancePath('a.0.b')).toBe('/a/0/b')
+    expect(toInstancePath('a/b.c~d')).toBe('/a~1b/c~0d')
   })
 
   it('collects errors per control and keyword', () => {

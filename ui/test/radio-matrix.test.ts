@@ -49,6 +49,13 @@ describe('radio matrix', () => {
     wrapper.unmount()
   })
 
+  it('flags an existing empty object of a required matrix', async () => {
+    const wrapper = mountForm({ schema, modelValue: { access: {} } })
+    await flush()
+    expect(wrapper.find('.q-radio-matrix-renderer .text-negative').text()).toBe('All options must be selected')
+    wrapper.unmount()
+  })
+
   it('reads values and items from the control options', async () => {
     const wrapper = mountForm({
       schema: { type: 'object', properties: { m: { type: 'object', format: 'radio-matrix' } } },

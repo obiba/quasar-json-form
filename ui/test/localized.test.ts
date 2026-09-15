@@ -80,6 +80,17 @@ describe('localized string', () => {
     wrapper.unmount()
   })
 
+  it('flags an existing empty object and drops blank-only values', async () => {
+    const wrapper = mountForm({ schema, languages: ['en', 'fr'], modelValue: { name: {} } })
+    await flush()
+    expect(wrapper.find('.q-localized-string .q-field__messages').text()).toBe('Must be completed in all languages')
+    await wrapper.find('.q-localized-string input').setValue('x')
+    await wrapper.find('.q-localized-string input').setValue('')
+    await flush()
+    expect(lastData(wrapper).name).toBeUndefined()
+    wrapper.unmount()
+  })
+
   it('uses the validationMessage option for the completed message', async () => {
     const wrapper = mountForm({
       schema,
@@ -111,6 +122,13 @@ describe('localized string', () => {
     wrapper = mountForm({ schema, modelValue: {} })
     await flush()
     expect(wrapper.find('.q-localized-toggle').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('accepts an application-level languages provide', async () => {
+    const wrapper = mountForm({ schema, modelValue: {} }, { provide: { 'jsonforms-languages': ['en', 'fr', 'de'] } })
+    await flush()
+    expect(wrapper.find('.q-localized-string').findAll('.q-localized-toggle .q-btn').map((b) => b.text())).toEqual(['EN', 'FR', 'DE'])
     wrapper.unmount()
   })
 

@@ -19,7 +19,8 @@ export interface FormErrorRegistry {
 
 /** JSON Forms dotted path -> JSON pointer, as in AJV `instancePath` */
 export function toInstancePath(path: string): string {
-  return path ? '/' + path.split('.').join('/') : ''
+  if (!path) return ''
+  return '/' + path.split('.').map((segment) => segment.replace(/~/g, '~0').replace(/\//g, '~1')).join('/')
 }
 
 export function createFormErrorRegistry(): FormErrorRegistry {

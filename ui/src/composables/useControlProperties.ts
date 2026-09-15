@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { computed, inject, ref, watch } from 'vue'
+import { computed, inject, ref, watch, unref } from 'vue'
 import type { Ref, ComputedRef } from 'vue'
 import { useFiltrexRules } from './useFiltrexRules'
 import { useFormI18n } from './useFormI18n'
@@ -119,7 +119,8 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
   // Inject form data and readonly state from provider
   const injectedFormData = inject(DATA_KEY, ref({}))
   const injectedReadonly = inject(READONLY_KEY, ref(false))
-  const injectedLanguages = inject<Ref<LanguagesInput>>(LANGUAGES_KEY, ref(undefined))
+  // raw value or ref, from QJsonForm or an application-level provide
+  const injectedLanguages = inject<unknown>(LANGUAGES_KEY, undefined)
 
   const { evaluateRule } = useFiltrexRules(injectedFormData)
 
@@ -253,7 +254,7 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
   // Languages of localized strings: control options, then form config, then
   // the `languages` prop of QJsonForm (or an application-level provide)
   const languages = computed<Language[]>(() => {
-    const candidates: LanguagesInput[] = [options.value.languages, config.value.languages, injectedLanguages.value]
+    const candidates: LanguagesInput[] = [options.value.languages, config.value.languages, unref(injectedLanguages) as LanguagesInput]
     for (const candidate of candidates) {
       const normalized = normalizeLanguages(candidate)
       if (normalized.length > 0) return normalized
