@@ -142,6 +142,7 @@ export default defineComponent({
             : props.hint ? h('div', { class: 'text-caption text-grey-7 q-mt-xs' }, props.hint) : null,
         ])
         : h(QInput, {
+          ...props.inputProps,
           ref: inputRef,
           modelValue: props.modelValue ?? '',
           'onUpdate:modelValue': (value: any) => emit('update:modelValue', value),
@@ -152,7 +153,6 @@ export default defineComponent({
           error: props.error,
           errorMessage: props.errorMessage,
           disable: props.disable,
-          ...props.inputProps,
         })
 
       return h('div', { class: 'q-markdown-editor' }, [toolbar, body])

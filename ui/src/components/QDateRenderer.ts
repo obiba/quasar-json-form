@@ -219,6 +219,7 @@ export default defineComponent({
       const disabled = (!isEnabled.value || refsMissing) && !isReadonly.value
 
       return h(QInput, {
+        ...omitOptions(options.value),
         modelValue: dateValue.value,
         'onUpdate:modelValue': onChange,
         label: inputLabel.value,
@@ -228,7 +229,6 @@ export default defineComponent({
         disable: disabled,
         readonly: isReadonly.value,
         hint: control.value.description ? t(control.value.description) : undefined,
-        ...omitOptions(options.value),
       }, isReadonly.value || disabled ? {} : {
         append: () => h(QIcon, {
           name: 'event',

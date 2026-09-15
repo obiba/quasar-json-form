@@ -86,6 +86,7 @@ export default defineComponent({
       }
 
       return h(QSelect, {
+        ...omitOptions(options.value, [...RENDERER_OPTION_KEYS, 'class']),
         class: ['q-countries-select', options.value.class],
         modelValue: control.value.data ?? (isMultiple.value ? [] : null),
         'onUpdate:modelValue': onChange,
@@ -105,7 +106,6 @@ export default defineComponent({
         multiple: isMultiple.value,
         useChips: isMultiple.value,
         clearable: !control.value.required && !isReadonly.value,
-        ...omitOptions(options.value, [...RENDERER_OPTION_KEYS, 'class']),
       })
     }
   },

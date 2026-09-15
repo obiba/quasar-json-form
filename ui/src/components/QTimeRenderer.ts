@@ -52,6 +52,7 @@ export default defineComponent({
       }
 
       return h(QInput, {
+        ...options.value,
         modelValue: timeValue.value,
         'onUpdate:modelValue': onChange,
         mask: timeFormat.value,
@@ -63,7 +64,6 @@ export default defineComponent({
         disable: !isEnabled.value && !isReadonly.value,
         readonly: isReadonly.value,
         hint: control.value.description ? t(control.value.description) : undefined,
-        ...options.value,
       }, isReadonly.value ? {} : {
         append: () => h(QIcon, {
           name: 'access_time',

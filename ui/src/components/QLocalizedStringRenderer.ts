@@ -150,6 +150,7 @@ export default defineComponent({
       }
 
       return h(QInput, {
+        ...omitOptions(inputProps, ['class']),
         class: ['q-localized-string', inputProps.class],
         modelValue: currentValue.value ?? '',
         'onUpdate:modelValue': (value: any) => onInput(currentLocale.value, value),
@@ -162,7 +163,6 @@ export default defineComponent({
         hint,
         type: rows.value > 1 ? 'textarea' : 'text',
         rows: rows.value > 1 ? rows.value : undefined,
-        ...omitOptions(inputProps, ['class']),
       }, toggle ? { append: () => toggle } : {})
     }
   },

@@ -113,6 +113,15 @@ export default defineComponent({
       required: false,
       default: undefined,
     },
+    /**
+     * Output only: accepted so that `v-model:errors` is a declared binding;
+     * the emitted `update:errors` is the source of truth.
+     */
+    errors: {
+      type: Array as PropType<ErrorObject[]>,
+      required: false,
+      default: () => [],
+    },
   },
   emits: ['update:modelValue', 'update:errors'],
   setup(props: any, { emit }: any) {

@@ -54,6 +54,7 @@ export default defineComponent({
       }
 
       children.push(h(QRating, {
+        ...options.value,
         modelValue: control.value.data,
         type: 'number',
         'onUpdate:modelValue': onChange,
@@ -62,7 +63,6 @@ export default defineComponent({
         required: control.value.required,
         disable: !isEnabled.value && !isReadonly.value,
         readonly: isReadonly.value,
-        ...options.value,
       }))
 
       if ((control.value.uischema as any).hint) {

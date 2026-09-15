@@ -8,6 +8,8 @@ const schema = {
     birth: { type: 'string', format: 'date', title: 'Birth' },
     color: { type: 'string', enum: ['red', 'blue'], title: 'Color' },
     gated: { type: 'string', title: 'Gated', rules: { enabled: 'name == "open"' } },
+    flag: { type: 'boolean', title: 'Flag' },
+    choice: { type: 'string', title: 'Choice', enum: ['a', 'b'] },
     items: {
       type: 'array',
       title: 'Items',
@@ -63,6 +65,57 @@ describe('readonly', () => {
     const fields = wrapper.findAll('.q-field')
     expect(fields[0]!.classes()).toContain('q-field--readonly')
     expect(fields[1]!.classes()).not.toContain('q-field--readonly')
+    wrapper.unmount()
+  })
+
+  it('cannot be undone by control options when the form is read-only', async () => {
+    const wrapper = mountForm({
+      schema,
+      uischema: {
+        type: 'VerticalLayout',
+        elements: [
+          { type: 'Control', scope: '#/properties/name', options: { readonly: false, disable: false } },
+          { type: 'Control', scope: '#/properties/color', options: { readonly: false } },
+          { type: 'Control', scope: '#/properties/birth', options: { readonly: false } },
+        ],
+      },
+      modelValue: { name: 'x', color: 'red', birth: '2020-01-01' },
+      readonly: true,
+    })
+    await flush()
+    for (const field of wrapper.findAll('.q-field')) {
+      expect(field.classes()).toContain('q-field--readonly')
+    }
+    wrapper.unmount()
+  })
+
+  it('keeps toggles and option groups non-interactive read-only', async () => {
+    const wrapper = mountForm({
+      schema,
+      uischema: {
+        type: 'VerticalLayout',
+        elements: [
+          { type: 'Control', scope: '#/properties/flag' },
+          { type: 'Control', scope: '#/properties/choice', options: { format: 'radio' } },
+        ],
+      },
+      modelValue: { flag: true, choice: 'a' },
+      readonly: true,
+    })
+    await flush()
+    const toggle = wrapper.find('.q-toggle')
+    expect(toggle.classes()).toContain('q-form-readonly')
+    expect(toggle.classes()).not.toContain('disabled')
+    await toggle.trigger('click')
+    await flush()
+    const radios = wrapper.findAll('.q-radio')
+    expect(wrapper.find('.q-option-group').classes()).toContain('q-form-readonly')
+    await radios[1]!.trigger('click')
+    await flush()
+    const emitted = wrapper.emitted('update:modelValue')!
+    const data = emitted[emitted.length - 1]![0] as any
+    expect(data.flag).toBe(true)
+    expect(data.choice).toBe('a')
     wrapper.unmount()
   })
 

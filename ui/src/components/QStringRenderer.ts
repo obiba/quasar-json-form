@@ -40,7 +40,8 @@ export default defineComponent({
     }
 
     const inputType = computed<QInputProps['type']>(() => {
-      const format = control.value.schema.format
+      if (options.value.type) return options.value.type as QInputProps['type']
+      const format = control.value.schema.format || options.value.format
       if (format && inputTypes[format]) return inputTypes[format]
       return options.value.rows ? 'textarea' : 'text'
     })
@@ -95,6 +96,7 @@ export default defineComponent({
       const errors = [errorMessage.value, ...wordErrors.value].filter((e) => e && e.length > 0)
 
       return h(QInput, {
+        ...omitOptions(options.value),
         modelValue: control.value.data,
         'onUpdate:modelValue': onChange,
         label: inputLabel.value,
@@ -106,7 +108,6 @@ export default defineComponent({
         hint: control.value.description ? t(control.value.description) : undefined,
         type: inputType.value,
         counter: wordCounter.value !== undefined,
-        ...omitOptions(options.value),
       }, wordCounter.value !== undefined ? {
         counter: () => wordCounter.value,
       } : {})

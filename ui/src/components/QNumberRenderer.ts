@@ -42,6 +42,7 @@ export default defineComponent({
       }
 
       return h(QInput, {
+        ...options.value,
         modelValue: control.value.data,
         type: 'number',
         'onUpdate:modelValue': onChange,
@@ -52,7 +53,6 @@ export default defineComponent({
         disable: !isEnabled.value && !isReadonly.value,
         readonly: isReadonly.value,
         hint: control.value.description ? t(control.value.description) : undefined,
-        ...options.value,
       })
     }
   },

@@ -397,7 +397,7 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
         // Don't clear if options are empty (might be temporary)
         // isValueValid already returns true for undefined/null, so we only get here
         // when there's an actual invalid selection that needs to be cleared
-        if (options.length > 0 && !isValueValid.value) {
+        if (!isReadonly.value && options.length > 0 && !isValueValid.value) {
           // Clear the selection if it's no longer valid
           const schema = control.value.schema
           const isMultiple = schema.type === 'array'

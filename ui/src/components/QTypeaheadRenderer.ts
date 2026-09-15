@@ -75,6 +75,7 @@ export default defineComponent({
       }
 
       return h(QSelect, {
+        ...omitOptions(options.value, [...RENDERER_OPTION_KEYS, 'class']),
         class: ['q-typeahead', options.value.class],
         modelValue: control.value.data ?? null,
         'onUpdate:modelValue': onChange,
@@ -95,7 +96,6 @@ export default defineComponent({
         emitValue: true,
         mapOptions: true,
         clearable: !control.value.required && !isReadonly.value,
-        ...omitOptions(options.value, [...RENDERER_OPTION_KEYS, 'class']),
       })
     }
   },

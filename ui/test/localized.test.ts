@@ -114,6 +114,24 @@ describe('localized string', () => {
     wrapper.unmount()
   })
 
+  it('passes the config and languages to controls inside lists', async () => {
+    const wrapper = mountForm({
+      schema: {
+        type: 'object',
+        properties: {
+          items: { type: 'array', items: { type: 'object', properties: { label: { type: 'object', format: 'localizedString', title: 'Label' } } } },
+        },
+      },
+      config: { languages: ['en', 'fr'] },
+      modelValue: { items: [{ label: { en: 'a', fr: 'b' } }] },
+    })
+    await flush()
+    const field = wrapper.find('.q-list-renderer .q-localized-string')
+    expect(field.exists()).toBe(true)
+    expect(field.findAll('.q-localized-toggle .q-btn').map((b) => b.text())).toEqual(['EN', 'FR'])
+    wrapper.unmount()
+  })
+
   it('renders a markdown editor for obibaSimpleMde and marked options', async () => {
     const wrapper = mountForm({ schema, languages: ['en', 'fr'], modelValue: { summary: { en: 'some **bold** text' } } })
     await flush()

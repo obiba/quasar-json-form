@@ -54,6 +54,7 @@ export default defineComponent({
       }
 
       return h(QSelect, {
+        ...options.value,
         modelValue: control.value.data,
         'onUpdate:modelValue': onChange,
         label: inputLabel.value,
@@ -68,7 +69,6 @@ export default defineComponent({
         mapOptions: true,
         multiple: isMultiple.value,
         clearable: !control.value.required,
-        ...options.value,
       })
     }
   },

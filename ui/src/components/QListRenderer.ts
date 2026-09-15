@@ -166,7 +166,11 @@ export default defineComponent({
               h(DispatchRenderer, {
                 schema: itemsSchema.value as any,
                 uischema: itemsUiSchema.value,
-                path: composePaths(control.value.path, `${index}`)
+                path: composePaths(control.value.path, `${index}`),
+                enabled: props.enabled && isEnabled.value,
+                renderers: props.renderers,
+                cells: props.cells,
+                config: props.config,
               }),
             ]),
             isReadonly.value ? null : h(QItemSection, { side: true, style: 'padding: 0' }, () => [

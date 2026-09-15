@@ -18,7 +18,7 @@ export default defineComponent({
     const control = controlResult.control
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, requiredMark, rootClass, options, selectOptions, clearInvalidSelection, title, description } =
+    const { isVisible, isEnabled, isReadonly, requiredMark, rootClass, options, selectOptions, clearInvalidSelection, title, description } =
       useControlProperties(control)
 
     const isMultiple = computed(() => {
@@ -89,12 +89,14 @@ export default defineComponent({
 
       children.push(
         h(QOptionGroup, {
+          ...options.value,
+          class: isReadonly.value ? 'q-form-readonly' : undefined,
           modelValue: control.value.data,
           options: selectOptions.value,
           type: type,
-          disable: !isEnabled.value,
-          'onUpdate:modelValue': onChange,
-          ...options.value,
+          disable: !isEnabled.value && !isReadonly.value,
+          // read-only: no change handler, the selection is displayed as-is
+          'onUpdate:modelValue': isReadonly.value ? undefined : onChange,
         }),
       )
 

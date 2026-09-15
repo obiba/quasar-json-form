@@ -58,6 +58,7 @@ export default defineComponent({
       }
 
       return h(QInput, {
+        ...options.value,
         modelValue: dateValue.value,
         'onUpdate:modelValue': onChange,
         label: inputLabel.value,
@@ -67,7 +68,6 @@ export default defineComponent({
         disable: !isEnabled.value && !isReadonly.value,
         readonly: isReadonly.value,
         hint: control.value.description ? t(control.value.description) : undefined,
-        ...options.value,
       }, isReadonly.value ? {} : {
         append: () => h('div', {}, [
           h(QIcon,

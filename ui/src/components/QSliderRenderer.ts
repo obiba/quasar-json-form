@@ -54,11 +54,11 @@ export default defineComponent({
       }
 
       children.push(h(QSlider, {
+        ...options.value,
         modelValue: control.value.data,
         'onUpdate:modelValue': onChange,
         disable: !isEnabled.value && !isReadonly.value,
         readonly: isReadonly.value,
-        ...options.value,
       }))
 
       if (hasError.value && errorMessage.value) {
