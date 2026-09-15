@@ -19,7 +19,7 @@ export default defineComponent({
     const control = controlResult.control
 
     // Use the generic control rules composable
-    const { isVisible, computeValue } = useControlProperties(control)
+    const { isVisible, computeValue, rootClass } = useControlProperties(control)
 
     onMounted(() => {
       // Initialize computed value on mount
@@ -86,7 +86,7 @@ export default defineComponent({
       }
 
       return h('div', {
-        class: 'q-computed-renderer',
+        class: ['q-computed-renderer', rootClass.value],
       }, children)
     }
   },

@@ -1,4 +1,7 @@
 export default {
+  errors: 'Errors',
+  readonly: 'Read-only',
+  validation_mode: 'Validation mode',
   json_form: 'JSON Form',
   failed: 'Action failed',
   success: 'Action was successful',

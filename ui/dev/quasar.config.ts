@@ -31,7 +31,27 @@ export default defineConfig(() => {
       vueOptionsAPI: true,
 
       alias: {
-        ui: path.resolve(__dirname, '../src/index.esm.js')
+        ui: path.resolve(__dirname, '../src/index.esm.ts')
+      },
+
+      // The library sources are consumed from ../src, whose imports would otherwise
+      // resolve to ../node_modules copies of vue/quasar/vue-i18n: use this app's copies
+      // both at bundle time and for the TypeScript program (vue types are nominal).
+      extendViteConf (viteConf) {
+        viteConf.resolve = viteConf.resolve || {}
+        viteConf.resolve.dedupe = [...(viteConf.resolve.dedupe || []), 'vue', 'quasar', 'vue-i18n']
+      },
+
+      typescript: {
+        extendTsConfig (tsConfig) {
+          tsConfig.compilerOptions = tsConfig.compilerOptions || {}
+          tsConfig.compilerOptions.paths = {
+            ...(tsConfig.compilerOptions.paths || {}),
+            vue: [path.resolve(__dirname, 'node_modules/vue')],
+            quasar: [path.resolve(__dirname, 'node_modules/quasar')],
+            'vue-i18n': [path.resolve(__dirname, 'node_modules/vue-i18n')]
+          }
+        }
       },
 
       define: {

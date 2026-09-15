@@ -46,8 +46,24 @@
       <q-separator />
       <q-tab-panels v-model="tabPreview" animated>
         <q-tab-panel name="form" class="q-pl-none q-pr-none">
-          <QJsonForm v-model="formData" :schema="props.schema" :uischema="props.uischema" @update:modelValue="onDataUpdate" />
+          <QJsonForm
+            v-model="formData"
+            v-model:errors="formErrors"
+            :schema="props.schema"
+            :uischema="props.uischema"
+            :readonly="props.formReadonly"
+            :validation-mode="props.validationMode"
+            @update:modelValue="onDataUpdate"
+          />
           <pre class="bg-grey-10 text-white q-pa-md"><code>{{ formData }}</code></pre>
+          <div v-if="formErrors.length" class="text-negative">
+            <div class="text-bold">{{ t('errors') }}</div>
+            <ul class="q-mt-none">
+              <li v-for="(error, index) in formErrors" :key="index">
+                <code>{{ error.instancePath || '/' }}</code> {{ error.keyword }}: {{ error.message }}
+              </li>
+            </ul>
+          </div>
         </q-tab-panel>
       </q-tab-panels>
     </div>
@@ -66,12 +82,16 @@ interface FormPresenterProps {
   schema: Record<string, unknown>;
   uischema?: Record<string, unknown>;
   readonly?: boolean;
+  formReadonly?: boolean;
+  validationMode?: 'ValidateAndShow' | 'ValidateAndHide' | 'NoValidation';
 }
 
 const props = withDefaults(defineProps<FormPresenterProps>(), {
   data: () => ({}),
   uischema: () => ({}),
   readonly: false,
+  formReadonly: false,
+  validationMode: 'ValidateAndShow',
 });
 
 const emit = defineEmits<{
@@ -79,6 +99,7 @@ const emit = defineEmits<{
 }>();
 
 const formData = ref<Record<string, unknown>>(props.data);
+const formErrors = ref<Array<{ instancePath: string; keyword: string; message?: string }>>([]);
 const formSchemaStr = ref(JSON.stringify(props.schema, null, 2));
 const formUischemaStr = ref(JSON.stringify(props.uischema, null, 2));
 const tabDesign = ref('schema');

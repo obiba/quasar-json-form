@@ -18,7 +18,12 @@ import QListRenderer from './components/QListRenderer'
 import QTabsLayout from './components/QTabsLayout'
 import QStepperLayout from './components/QStepperLayout'
 import QGroupRenderer from './components/QGroupRenderer'
+import QLayoutRenderer from './components/QLayoutRenderer'
+import QComputedRenderer from './components/QComputedRenderer'
 import QJsonForm from './components/QJsonForm'
+import { messages } from './i18n/messages'
+import { createJsonFormsI18n, createTranslator, errorTranslator } from './utils/i18n'
+import { renderMarkdown, renderMarkdownInline } from './utils/markdown'
 
 const version = __UI_VERSION__
 
@@ -40,6 +45,8 @@ function install(app: App): void {
   app.component(QTabsLayout.name!, QTabsLayout)
   app.component(QStepperLayout.name!, QStepperLayout)
   app.component(QGroupRenderer.name!, QGroupRenderer)
+  app.component(QLayoutRenderer.name!, QLayoutRenderer)
+  app.component(QComputedRenderer.name!, QComputedRenderer)
   app.component(QJsonForm.name!, QJsonForm)
 }
 
@@ -62,6 +69,14 @@ export {
   QTabsLayout,
   QStepperLayout,
   QGroupRenderer,
+  QLayoutRenderer,
+  QComputedRenderer,
   QJsonForm,
+  messages,
+  createJsonFormsI18n,
+  createTranslator,
+  errorTranslator,
+  renderMarkdown,
+  renderMarkdownInline,
   install
 }

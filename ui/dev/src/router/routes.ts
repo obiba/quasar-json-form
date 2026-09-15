@@ -4,6 +4,8 @@ const pages = [
   { path: '', file: 'Index' },
   { path: 'test-renderers', file: 'TestRenderers' },
   { path: 'test-rules', file: 'TestRules' },
+  { path: 'test-validation', file: 'TestValidation' },
+  { path: 'test-grid-layout', file: 'TestGridLayout' },
   { path: 'test-list', file: 'TestList' },
   { path: 'test-no-layout', file: 'TestNoLayout' },
   { path: 'test-tabs-layout', file: 'TestTabsLayout' },

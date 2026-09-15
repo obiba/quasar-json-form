@@ -18,7 +18,7 @@ export default defineComponent({
     const control = controlResult.control
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, hasError, errorMessage, options } =
+    const { isVisible, isEnabled, isReadonly, inputLabel, hasError, errorMessage, options } =
       useControlProperties(control)
 
     watch(
@@ -31,7 +31,9 @@ export default defineComponent({
     )
 
     const onChange = (value: any) => {
-      controlResult.handleChange(control.value.path, Number(value))
+      // an emptied input means "no value", so that `required` applies
+      const isEmpty = value === '' || value === null || value === undefined
+      controlResult.handleChange(control.value.path, isEmpty ? undefined : Number(value))
     }
 
     return () => {
@@ -43,11 +45,12 @@ export default defineComponent({
         modelValue: control.value.data,
         type: 'number',
         'onUpdate:modelValue': onChange,
-        label: control.value.label ? t(control.value.label) : undefined,
+        label: inputLabel.value,
         error: hasError.value,
         errorMessage: errorMessage.value,
         required: control.value.required,
-        disable: !isEnabled.value,
+        disable: !isEnabled.value && !isReadonly.value,
+        readonly: isReadonly.value,
         hint: control.value.description ? t(control.value.description) : undefined,
         ...options.value,
       })

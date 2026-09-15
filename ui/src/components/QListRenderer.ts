@@ -19,7 +19,7 @@ export default defineComponent({
     const control = controlResult.control
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, maxValue, minValue, hasError, errorMessage, options, title, description } =
+    const { isVisible, isEnabled, isReadonly, requiredMark, rootClass, maxValue, minValue, hasError, errorMessage, options, title, description } =
       useControlProperties(control)
 
     // Dialog state for confirming item removal
@@ -169,7 +169,7 @@ export default defineComponent({
                 path: composePaths(control.value.path, `${index}`)
               }),
             ]),
-            h(QItemSection, { side: true, style: 'padding: 0' }, () => [
+            isReadonly.value ? null : h(QItemSection, { side: true, style: 'padding: 0' }, () => [
               h(QBtn, {
                 dense: true,
                 flat: true,
@@ -181,7 +181,7 @@ export default defineComponent({
                 disabled: !isEnabled.value || !canRemoveItem.value,
               }),
             ]),
-            withOrdering.value && items.value.length > 1 ? h(QItemSection, { side: true, style: 'padding: 0' }, () => [
+            withOrdering.value && !isReadonly.value && items.value.length > 1 ? h(QItemSection, { side: true, style: 'padding: 0' }, () => [
               h(QBtn, {
                 dense: true,
                 flat: true,
@@ -193,7 +193,7 @@ export default defineComponent({
                 disabled: !isEnabled.value || index <= 0,
               }),
             ]) : null,
-            withOrdering.value && items.value.length > 1 ? h(QItemSection, { side: true, style: 'padding: 0' }, () => [
+            withOrdering.value && !isReadonly.value && items.value.length > 1 ? h(QItemSection, { side: true, style: 'padding: 0' }, () => [
               h(QBtn, {
                 dense: true,
                 flat: true,
@@ -210,11 +210,11 @@ export default defineComponent({
       }
 
       return h('div', {
-        class: 'q-list-renderer',
+        class: ['q-list-renderer', rootClass.value],
       }, [
         title.value ? h('div', {
           class: (control.value.uischema as any).titleClass || 'text-bold q-mb-sm',
-          innerHTML: t(title.value)
+          innerHTML: t(title.value) + requiredMark.value
         }) : null,
         description.value ? h('div', {
           class: ((control.value.uischema as any).descriptionClass || 'text-grey-7') + ' text-markdown q-mb-sm',
@@ -222,7 +222,7 @@ export default defineComponent({
         }) : null,
         listItems,
         confirmDialog,
-        h(QBtn, {
+        isReadonly.value ? null : h(QBtn, {
           label: (control.value as any).addLabel ? t((control.value as any).addLabel) : t('add-item'),
           color: 'primary',
           icon: (control.value as any).addIcon || 'add',

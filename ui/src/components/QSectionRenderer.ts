@@ -19,7 +19,7 @@ export default defineComponent({
     const control = controlResult.control
 
     // Use the generic control rules composable
-    const { isVisible } = useControlProperties(control)
+    const { isVisible, rootClass } = useControlProperties(control)
 
     watch(
       () => isVisible.value,
@@ -60,7 +60,7 @@ export default defineComponent({
       }
 
       return h('div', {
-        class: 'q-section-renderer',
+        class: ['q-section-renderer', rootClass.value],
       }, children)
     }
   },

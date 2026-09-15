@@ -18,7 +18,7 @@ export default defineComponent({
     const control = controlResult.control
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, hasError, errorMessage, options } =
+    const { isVisible, isEnabled, requiredMark, rootClass, hasError, errorMessage, options } =
       useControlProperties(control)
 
     watch(
@@ -44,7 +44,7 @@ export default defineComponent({
       children.push(h(QToggle, {
         modelValue: control.value.data,
         'onUpdate:modelValue': onChange,
-        label: control.value.label ? t(control.value.label) : undefined,
+        label: control.value.label ? t(control.value.label) + requiredMark.value : undefined,
         error: hasError.value,
         errorMessage: errorMessage.value,
         required: control.value.required,
@@ -64,7 +64,7 @@ export default defineComponent({
         }, t(options.value.hint)))
       }
 
-      return h('div', children)
+      return h('div', { class: rootClass.value }, children)
     }
   },
 })

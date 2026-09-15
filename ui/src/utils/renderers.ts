@@ -23,6 +23,7 @@ import {
   or,
   isArrayObjectControl,
 } from '@jsonforms/core'
+import QLayoutRenderer from '../components/QLayoutRenderer'
 import QStringRenderer from '../components/QStringRenderer'
 import QFileUploadRenderer from '../components/QFileUploadRenderer'
 import QNumRenderer from '../components/QNumberRenderer'
@@ -95,6 +96,10 @@ const isMultiEnumControl = and(
 const isGroupControl = (uischema: any): boolean => isGroup(uischema) || isCategory(uischema)
 
 const qRenderers = [
+  {
+    renderer: QLayoutRenderer,
+    tester: rankWith(2, or(uiTypeIs('VerticalLayout'), uiTypeIs('HorizontalLayout'))),
+  },
   {
     renderer: QComputedRenderer,
     tester: rankWith(4, isComputedControl),

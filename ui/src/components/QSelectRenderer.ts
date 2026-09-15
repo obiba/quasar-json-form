@@ -18,7 +18,7 @@ export default defineComponent({
     const control = controlResult.control
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, hasError, errorMessage, options, selectOptions, clearInvalidSelection } =
+    const { isVisible, isEnabled, isReadonly, inputLabel, hasError, errorMessage, options, selectOptions, clearInvalidSelection } =
       useControlProperties(control)
 
     const isMultiple = computed(() => {
@@ -27,7 +27,8 @@ export default defineComponent({
     })
 
     const onChange = (value: any) => {
-      controlResult.handleChange(controlResult.control.value.path, value)
+      // a cleared selection means "no value", so that `required` applies
+      controlResult.handleChange(controlResult.control.value.path, value === null ? undefined : value)
     }
 
     // Set up watch to clear invalid selections when options change
@@ -55,12 +56,13 @@ export default defineComponent({
       return h(QSelect, {
         modelValue: control.value.data,
         'onUpdate:modelValue': onChange,
-        label: control.value.label ? t(control.value.label) : undefined,
+        label: inputLabel.value,
         options: selectOptions.value,
         error: hasError.value,
         errorMessage: errorMessage.value,
         required: control.value.required,
-        disable: !isEnabled.value,
+        disable: !isEnabled.value && !isReadonly.value,
+        readonly: isReadonly.value,
         hint: control.value.description ? t(control.value.description) : undefined,
         emitValue: true,
         mapOptions: true,

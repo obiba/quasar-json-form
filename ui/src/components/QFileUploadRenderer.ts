@@ -22,7 +22,7 @@ export default defineComponent({
 
     const control = controlResult.control
 
-    const { isVisible, isEnabled, options, title, description, label } =
+    const { isVisible, isEnabled, isReadonly, requiredMark, rootClass, options, title, description, label } =
       useControlProperties(control)
 
     const fileInputRef = ref()
@@ -118,7 +118,7 @@ export default defineComponent({
       const children = []
 
       if (title.value) {
-        const titleText = t(title.value)
+        const titleText = t(title.value) + requiredMark.value
         children.push(h('div', {
           class: (control.value.uischema as any).titleClass || 'text-bold',
           innerHTML: titleText,
@@ -166,7 +166,7 @@ export default defineComponent({
 
 
       // File picker button with loading progress
-      if (control.value.data === undefined) {
+      if (control.value.data === undefined && !isReadonly.value) {
         // Hidden file input
         children.push(h('input', {
           ref: fileInputRef,
@@ -209,7 +209,7 @@ export default defineComponent({
         }
       }
 
-      return h('div', children)
+      return h('div', { class: rootClass.value }, children)
     }
   },
 })
