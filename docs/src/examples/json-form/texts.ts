@@ -7,7 +7,7 @@ export default {
       age: { type: 'integer', title: 'How old are you?', description: 'In *years*', minimum: 0 },
       city: { type: 'string', title: 'Where do you live?', enum: ['Montréal', 'Paris', 'Other'] },
       other: { type: 'string', title: 'Other city' },
-      agree: { type: 'boolean', title: 'Do you agree with the **terms**?', const: true },
+      agree: { type: 'boolean', title: 'Do you agree with the **terms**?', allOf: [{ const: true }] },
     },
     required: ['age', 'agree'],
   },
