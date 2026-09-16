@@ -1,0 +1,31 @@
+{
+  "name": "QDateRenderer",
+  "inherits": "control",
+  "triggers": [
+    { "schema": "{ \"type\": \"string\", \"format\": \"date\" }", "rank": 4, "desc": "ISO date (`YYYY-MM-DD`), validated by AJV; the mask option does not apply." },
+    { "schema": "format: \"datepicker\" (schema or options)", "rank": 4, "desc": "Date in the `dateFormat` mask (`YYYY-MM-DD` by default)." },
+    { "schema": "format: \"year-month\" (schema or options)", "rank": 4, "desc": "Month picker, `YYYY-MM` by default." },
+    { "schema": "format: \"ymdatepicker\" (schema or options)", "rank": 4, "desc": "Day within the month given by the `yearRef` and `monthRef` fields." }
+  ],
+  "options": {
+    "dateFormat": { "type": "String", "default": "YYYY-MM-DD", "desc": "Mask of the stored value (Quasar masks; angular-strap masks such as `yyyy-MM-dd` or `dd/MM/yyyy` are accepted). `YYYY-MM` for `year-month`." },
+    "min": { "type": "String | Number | Date", "desc": "Lower bound, in the mask format or ISO; the filtrex `min` rule of the control works too." },
+    "max": { "type": "String | Number | Date", "desc": "Upper bound, in the mask format or ISO; the filtrex `max` rule of the control works too." },
+    "yearRef": { "type": "String", "desc": "`ymdatepicker`: name of the year field (a sibling of the control, else a root field) the date must belong to." },
+    "monthRef": { "type": "String", "desc": "`ymdatepicker`: name of the month field (1 to 12)." },
+    "lastDay": { "type": "Boolean", "default": "false", "desc": "`ymdatepicker`: default to the last day of the referenced month instead of the first one." },
+    "dateOptions": { "type": "Object", "desc": "The same options nested, as in angular-schema-form: `{ dateFormat, min, max, yearRef, monthRef, lastDay, validationMessage }`. Direct options take precedence." },
+    "…": { "type": "any", "desc": "Every other option is passed as a prop to [QInput](https://quasar.dev/vue-components/input#qinput-api)." }
+  },
+  "validation": {
+    "dateInvalid": { "message": "error.dateInvalid", "desc": "The value does not match the mask (`{format}`); `validationMessage.dateInvalid`." },
+    "dateRange": { "message": "error.dateRange", "desc": "Outside `min` and `max` (`{min}`, `{max}`); `validationMessage.dateRange`." },
+    "dateMin": { "message": "error.dateMin", "desc": "Before `min` (`{limit}`); `validationMessage.dateMin`." },
+    "dateMax": { "message": "error.dateMax", "desc": "After `max` (`{limit}`); `validationMessage.dateMax`." },
+    "invalidYMDate": { "message": "error.dateRange", "desc": "`ymdatepicker`: not in the referenced month; `validationMessage.invalidYMDate`." }
+  },
+  "data": {
+    "desc": "A string in the mask format. The errors are reported with the `date` keyword. The picker only offers the dates within the bounds; the input is disabled until the `yearRef` / `monthRef` fields are set.",
+    "example": "{ \"birthDate\": \"1990-05-17\", \"period\": \"2024-03\" }"
+  }
+}

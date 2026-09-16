@@ -22,6 +22,7 @@ import { copyToClipboard, Notify } from 'quasar'
 import { useI18n } from 'vue-i18n'
 import Prism from 'prismjs'
 import 'prismjs/components/prism-json'
+import 'prismjs/components/prism-javascript'
 
 const props = withDefaults(defineProps<{ code: string; lang?: string }>(), { lang: 'json' })
 const { t } = useI18n()

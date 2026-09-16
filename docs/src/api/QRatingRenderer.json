@@ -1,0 +1,17 @@
+{
+  "name": "QRatingRenderer",
+  "inherits": "control",
+  "triggers": [
+    { "schema": "{ \"type\": \"integer\" } + options.format: \"rating\"", "rank": 3, "desc": "An integer property with the `rating` format option." }
+  ],
+  "element": {
+    "hint": { "type": "String", "desc": "Text displayed under the rating, translated with `t()`." }
+  },
+  "options": {
+    "…": { "type": "any", "desc": "Every option is passed as a prop to [QRating](https://quasar.dev/vue-components/rating#qrating-api): `max`, `icon`, `iconSelected`, `iconHalf`, `color`, `size`, `noReset`, `noDimming`..." }
+  },
+  "data": {
+    "desc": "An integer; no value displays no selected icon.",
+    "example": "{ \"stars\": 4 }"
+  }
+}

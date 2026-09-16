@@ -1,0 +1,16 @@
+{
+  "name": "QSectionRenderer",
+  "triggers": [
+    { "schema": "{ \"type\": \"Section\", \"label\": \"...\" }", "rank": 1, "desc": "A heading with an optional description, without children: announces the fields that follow." }
+  ],
+  "element": {
+    "label": { "type": "String", "desc": "The heading, translated with `t()`." },
+    "description": { "type": "String", "desc": "Text under the heading, markdown." },
+    "labelClass": { "type": "String", "desc": "CSS classes added to the heading (`q-form-label`)." },
+    "descriptionClass": { "type": "String", "desc": "CSS classes added to the description." },
+    "rules": { "type": "Object", "desc": "`visible` filtrex rule." }
+  },
+  "options": {
+    "class": { "type": "String", "desc": "CSS classes of the root element (`q-section-renderer`)." }
+  }
+}

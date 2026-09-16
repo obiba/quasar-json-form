@@ -1,0 +1,17 @@
+{
+  "name": "QSliderRenderer",
+  "inherits": "control",
+  "triggers": [
+    { "schema": "{ \"type\": \"integer\" } + options.format: \"slider\"", "rank": 3, "desc": "An integer property with the `slider` format option." }
+  ],
+  "element": {
+    "hint": { "type": "String", "desc": "Text displayed under the slider when there is no error, translated with `t()`." }
+  },
+  "options": {
+    "…": { "type": "any", "desc": "Every option is passed as a prop to [QSlider](https://quasar.dev/vue-components/slider#qslider-api): `min`, `max`, `step`, `label`, `labelAlways`, `markers`, `markerLabels`, `snap`, `color`, `dense`..." }
+  },
+  "data": {
+    "desc": "A number. The schema `title` is displayed above the slider, the `description` under it.",
+    "example": "{ \"satisfaction\": 7 }"
+  }
+}

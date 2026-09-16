@@ -7,6 +7,7 @@ Quasar SPA published on GitHub Pages at https://www.obiba.org/quasar-json-form/ 
 ```bash
 npm run dev      # http://localhost:9000
 npm run build    # dist/spa, served under DOCS_PUBLIC_PATH (default `/`)
+npm test         # API documentation consistency (test/api.test.ts)
 ```
 
 - `src/pages/**/*.md`: one page per entry of `src/menu.ts` (the route is the file path).

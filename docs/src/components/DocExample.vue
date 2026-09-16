@@ -15,7 +15,7 @@
         v-model:errors="errors"
         :schema="schema"
         :uischema="uischema"
-        :readonly="example.readonly"
+        :readonly="readonly"
         :validation-mode="example.validationMode"
         :languages="example.languages"
         :config="example.config"
@@ -36,7 +36,9 @@
               <q-badge v-if="errors.length" rounded color="negative">{{ errors.length }}</q-badge>
             </div>
           </q-tab>
+          <q-tab v-if="example?.configCode" name="config" :label="t('config')" />
           <q-space />
+          <q-toggle v-model="readonly" :label="t('readonly')" dense size="sm" class="q-mr-md" />
           <q-toggle v-model="editing" :label="t('edit')" dense size="sm" class="q-mr-sm" />
         </q-tabs>
         <q-separator />
@@ -51,6 +53,9 @@
           </q-tab-panel>
           <q-tab-panel name="data" class="q-pa-none">
             <DocCode :code="JSON.stringify(data, null, 2)" />
+          </q-tab-panel>
+          <q-tab-panel name="config" class="q-pa-none">
+            <DocCode :code="example?.configCode ?? ''" lang="javascript" />
           </q-tab-panel>
           <q-tab-panel name="errors" class="q-pa-none">
             <DocCode v-if="errors.length" :code="JSON.stringify(errors, null, 2)" />
@@ -80,6 +85,7 @@ const data = ref<Record<string, unknown>>(structuredClone(example.value?.data ??
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const errors = ref<any[]>([])
 const showSource = ref(props.source ?? false)
+const readonly = ref(example.value?.readonly ?? false)
 const editing = ref(false)
 const tab = ref('schema')
 

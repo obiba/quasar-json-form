@@ -35,13 +35,13 @@
           </q-markup-table>
         </q-tab-panel>
 
-        <q-tab-panel v-for="group in ['props', 'options', 'common', 'events', 'validation']" :key="group" :name="group" class="q-pa-none">
+        <q-tab-panel v-for="group in ['props', 'element', 'options', 'common', 'events', 'validation']" :key="group" :name="group" class="q-pa-none">
           <q-markup-table flat dense wrap-cells>
             <thead>
               <tr>
                 <th>{{ t('api.name') }}</th>
                 <th v-if="group !== 'events'">{{ group === 'validation' ? t('api.message') : t('api.type') }}</th>
-                <th v-if="group === 'props' || group === 'options' || group === 'common'">{{ t('api.default') }}</th>
+                <th v-if="withDefault(group)">{{ t('api.default') }}</th>
                 <th>{{ t('api.description') }}</th>
               </tr>
             </thead>
@@ -49,7 +49,7 @@
               <tr v-for="entry in filtered(entries(group))" :key="entry.name">
                 <td class="text-no-wrap"><code>{{ entry.name }}</code></td>
                 <td v-if="group !== 'events'"><code v-if="entry.type || entry.message">{{ entry.type ?? entry.message }}</code></td>
-                <td v-if="group === 'props' || group === 'options' || group === 'common'"><code v-if="entry.default !== undefined">{{ entry.default }}</code></td>
+                <td v-if="withDefault(group)"><code v-if="entry.default !== undefined">{{ entry.default }}</code></td>
                 <td v-html="md(entry.desc)"></td>
               </tr>
             </tbody>
@@ -79,6 +79,8 @@ interface ApiDef {
   inherits?: string
   triggers?: { schema: string; rank: number; desc: string }[]
   props?: Record<string, Omit<ApiEntry, 'name'>>
+  /** properties read on the UI schema element itself (next to `type`, `scope`, `options`) */
+  element?: Record<string, Omit<ApiEntry, 'name'>>
   events?: Record<string, Omit<ApiEntry, 'name'>>
   options?: Record<string, Omit<ApiEntry, 'name'>>
   validation?: Record<string, Omit<ApiEntry, 'name'>>
@@ -114,6 +116,7 @@ const sections = computed(() => {
   const all = [
     { name: 'triggers', label: t('api.triggers'), count: api.value?.triggers?.length ?? 0 },
     { name: 'props', label: t('api.props'), count: entries('props').length },
+    { name: 'element', label: t('api.element'), count: entries('element').length },
     { name: 'events', label: t('api.events'), count: entries('events').length },
     { name: 'options', label: t('api.options'), count: entries('options').length },
     { name: 'common', label: t('api.common'), count: entries('common').length },
@@ -122,6 +125,8 @@ const sections = computed(() => {
   ]
   return all.filter((s) => s.count > 0)
 })
+
+const withDefault = (group: string) => ['props', 'element', 'options', 'common'].includes(group)
 
 const tab = ref(sections.value[0]?.name ?? 'options')
 
