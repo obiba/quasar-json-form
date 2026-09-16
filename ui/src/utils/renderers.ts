@@ -42,6 +42,7 @@ import QSectionRenderer from '../components/QSectionRenderer'
 import QLabelRenderer from '../components/QLabelRenderer'
 import QTabsLayout from '../components/QTabsLayout'
 import QStepperLayout from '../components/QStepperLayout'
+import QGridLayout from '../components/QGridLayout'
 import QListRenderer from '../components/QListRenderer'
 import QGroupRenderer from '../components/QGroupRenderer'
 import QComputedRenderer from '../components/QComputedRenderer'
@@ -178,6 +179,10 @@ const qRenderers = [
   {
     renderer: QStepperLayout,
     tester: rankWith(2, uiTypeIs('StepperLayout')),
+  },
+  {
+    renderer: QGridLayout,
+    tester: rankWith(2, uiTypeIs('GridLayout')),
   },
   {
     renderer: QLabelRenderer,

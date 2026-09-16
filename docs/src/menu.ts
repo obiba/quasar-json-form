@@ -30,6 +30,7 @@ const menu: MenuSection[] = [
     icon: 'dashboard',
     pages: [
       { title: 'Vertical and horizontal', path: 'layouts/vertical-horizontal' },
+      { title: 'Grid', path: 'layouts/grid' },
       { title: 'Group', path: 'layouts/group' },
       { title: 'Section and label', path: 'layouts/section-label' },
       { title: 'Tabs', path: 'layouts/tabs' },

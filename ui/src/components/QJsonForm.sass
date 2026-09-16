@@ -14,6 +14,16 @@
   > *
     flex: 1 1 0
     min-width: 0
+// GridLayout (QGridLayout): the template and gaps are inline styles computed
+// from the layout options, the placement of each cell from `options.grid` of
+// the element it wraps. A cell whose element is hidden by a rule is empty
+// (comment node only) and removed from the flow.
+.q-grid-layout
+  display: grid
+.q-grid-layout__cell
+  min-width: 0
+  &:empty
+    display: none
 .q-form-title
   font-weight: bold
   font-size: larger

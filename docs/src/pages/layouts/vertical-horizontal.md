@@ -21,6 +21,8 @@ markup of angular-schema-form.
 
 <DocExample name="layouts/grid" title="Responsive grid" />
 
+For a CSS grid with explicit rows, spans and named areas, see the [grid layout](#/layouts/grid).
+
 ## Rules
 
 A layout accepts `rules.visible` and `rules.enabled` [filtrex rules](#/start/rules), applied to
