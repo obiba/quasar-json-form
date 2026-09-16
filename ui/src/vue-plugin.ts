@@ -18,6 +18,7 @@ import QLabelRenderer from './components/QLabelRenderer'
 import QListRenderer from './components/QListRenderer'
 import QTabsLayout from './components/QTabsLayout'
 import QStepperLayout from './components/QStepperLayout'
+import QGridLayout from './components/QGridLayout'
 import QGroupRenderer from './components/QGroupRenderer'
 import QLayoutRenderer from './components/QLayoutRenderer'
 import QComputedRenderer from './components/QComputedRenderer'
@@ -64,6 +65,7 @@ function install(app: App): void {
   app.component(QLabelRenderer.name!, QLabelRenderer)
   app.component(QTabsLayout.name!, QTabsLayout)
   app.component(QStepperLayout.name!, QStepperLayout)
+  app.component(QGridLayout.name!, QGridLayout)
   app.component(QGroupRenderer.name!, QGroupRenderer)
   app.component(QLayoutRenderer.name!, QLayoutRenderer)
   app.component(QComputedRenderer.name!, QComputedRenderer)
@@ -95,6 +97,7 @@ export {
   QLabelRenderer,
   QTabsLayout,
   QStepperLayout,
+  QGridLayout,
   QGroupRenderer,
   QLayoutRenderer,
   QComputedRenderer,
