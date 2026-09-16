@@ -363,7 +363,9 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
     return optionValues.has(currentValue)
   })
 
+  // `label: false` on the control hides the title (JSON Forms convention)
   const title = computed(() => {
+    if ((control.value.uischema as any).label === false) return undefined
     return control.value.uischema.title || control.value.schema.title || undefined
   })
 
@@ -380,7 +382,9 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
   })
 
   const validationMessage = (name: string, fallbackKey: string, named?: Record<string, unknown>): string => {
-    const custom = options.value.validationMessage?.[name]
+    const messages = options.value.validationMessage
+    // a single string applies to every check of the control (angular-schema-form convention)
+    const custom = typeof messages === 'string' ? messages : messages?.[name]
     if (typeof custom === 'string' && custom.length > 0) {
       return t(custom, named)
     }

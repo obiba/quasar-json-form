@@ -41,8 +41,11 @@ export default defineComponent({
 
       const children = []
 
-      if ((control.value as any).title || (control.value.uischema as any).title) {
-        let title = t(String((control.value as any).title || (control.value.uischema as any).title))
+      // `title` (this library) or the JSON Forms `label` of the group
+      const groupTitle = (control.value as any).title || (control.value.uischema as any).title
+        || (typeof (control.value.uischema as any).label === 'string' ? (control.value.uischema as any).label : undefined)
+      if (groupTitle) {
+        let title = t(String(groupTitle))
         title = renderMarkdown(title)
         children.push(h('div', {
           class: 'q-form-title' + ((control.value.uischema as any).titleClass ? ` ${(control.value.uischema as any).titleClass}` : ''),

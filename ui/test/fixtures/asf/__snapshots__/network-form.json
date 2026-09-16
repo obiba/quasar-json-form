@@ -1,0 +1,60 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "website": {
+        "title": "website",
+        "type": "string"
+      },
+      "_name": {
+        "title": "network.name",
+        "type": "object",
+        "format": "localizedString"
+      },
+      "_acronym": {
+        "title": "network.acronym",
+        "type": "object",
+        "format": "localizedString"
+      },
+      "_description": {
+        "title": "network.description",
+        "type": "object",
+        "format": "obibaSimpleMde"
+      }
+    },
+    "required": [
+      "_name",
+      "_acronym",
+      "_description"
+    ]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Label",
+        "text": "<h3>network.general-info</h3>"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/_name"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/_acronym"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/_description",
+        "options": {
+          "marked": true,
+          "rows": 5
+        }
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/website"
+      }
+    ]
+  }
+}

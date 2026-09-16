@@ -86,6 +86,9 @@ export class FiltrexRuleEngine {
 
     // number of whitespace-separated words in a string
     this.addFunction('wordCount', (value: any) => countWords(value))
+
+    // truthy(value): JavaScript truthiness (used by the transpiled ASF conditions)
+    this.addFunction('truthy', (value: any) => !!value)
   }
 
   addFunction(name: string, fn: (...args: any[]) => any): void {

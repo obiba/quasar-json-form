@@ -1,0 +1,998 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "website": {
+        "title": "t(website)",
+        "type": "string",
+        "pattern": "^https?://\\S+$"
+      },
+      "funding": {
+        "type": "object",
+        "format": "localizedString",
+        "title": "t(funding)"
+      },
+      "info": {
+        "type": "object",
+        "format": "localizedString",
+        "title": "t(suppl-info)"
+      },
+      "methods": {
+        "type": "object",
+        "title": "t(study.design)",
+        "properties": {
+          "design": {
+            "type": "string",
+            "title": "t(study_taxonomy.vocabulary.methods-design.title)",
+            "enum": [
+              "cohort_study",
+              "case_control",
+              "case_only",
+              "cross_sectional",
+              "clinical_trial",
+              "other"
+            ]
+          },
+          "otherDesign": {
+            "type": "object",
+            "format": "localizedString",
+            "title": "t(study.other-design)"
+          },
+          "followUpInfo": {
+            "type": "object",
+            "format": "localizedString",
+            "title": "t(study.follow-up)"
+          },
+          "recruitments": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "individuals",
+                "families",
+                "other"
+              ]
+            },
+            "title": "t(study.recruitment-sources.label)"
+          },
+          "otherRecruitment": {
+            "type": "object",
+            "format": "localizedString",
+            "title": "t(study.recruitment-sources.other)"
+          },
+          "info": {
+            "type": "object",
+            "format": "localizedString",
+            "title": "t(suppl-info)"
+          }
+        }
+      },
+      "numberOfParticipants": {
+        "type": "object",
+        "properties": {
+          "participant": {
+            "type": "object",
+            "properties": {
+              "number": {
+                "type": "number",
+                "title": "t(numberOfParticipants.participants)"
+              },
+              "noLimit": {
+                "type": "boolean",
+                "title": "t(numberOfParticipants.no-limit)"
+              }
+            }
+          },
+          "sample": {
+            "type": "object",
+            "properties": {
+              "number": {
+                "type": "number",
+                "title": "t(numberOfParticipants.sample)"
+              },
+              "noLimit": {
+                "type": "boolean",
+                "title": "t(numberOfParticipants.no-limit)"
+              }
+            }
+          },
+          "info": {
+            "type": "object",
+            "format": "localizedString",
+            "title": "t(numberOfParticipants.suppl-info)"
+          }
+        },
+        "title": "t(numberOfParticipants.label)"
+      },
+      "startYear": {
+        "type": "integer",
+        "title": "t(study.start-year)"
+      },
+      "endYear": {
+        "type": "integer",
+        "title": "t(study.end-year)"
+      },
+      "access": {
+        "type": "object",
+        "format": "radioGroupCollection",
+        "values": [
+          {
+            "key": "yes",
+            "caption": "t(global.yes)"
+          },
+          {
+            "key": "no",
+            "caption": "t(global.no)"
+          },
+          {
+            "key": "na",
+            "caption": "t(global.not-applicable)"
+          }
+        ],
+        "items": [
+          {
+            "key": "access_data",
+            "name": "t(study_taxonomy.vocabulary.access_data.title)"
+          },
+          {
+            "key": "access_bio_samples",
+            "name": "t(study_taxonomy.vocabulary.access_bio_samples.title)"
+          },
+          {
+            "key": "access_other",
+            "name": "t(study_taxonomy.vocabulary.access_other.title)"
+          }
+        ]
+      },
+      "otherAccess": {
+        "type": "object",
+        "format": "localizedString",
+        "title": "t(study.access.other)"
+      },
+      "access_info_location": {
+        "title": "t(study.access.external_researchers_obtaining_study_data_bio_info.title)",
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "study_website",
+            "study_representative"
+          ]
+        }
+      },
+      "access_info_representative": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "t(contact.name)"
+          },
+          "title": {
+            "type": "string",
+            "title": "t(contact.title)"
+          },
+          "institution": {
+            "type": "string",
+            "title": "t(contact.institution)"
+          },
+          "email": {
+            "type": "string",
+            "pattern": "^\\S+@\\S+$",
+            "title": "t(contact.email)"
+          },
+          "telephone": {
+            "type": "string",
+            "title": "t(contact.phone)"
+          }
+        }
+      },
+      "access_permission_data": {
+        "type": "object",
+        "format": "radioGroupCollection",
+        "title": "Data",
+        "values": [
+          {
+            "key": "yes",
+            "caption": "t(global.yes)"
+          },
+          {
+            "key": "no",
+            "caption": "t(global.no)"
+          },
+          {
+            "key": "na",
+            "caption": "t(global.not-applicable)"
+          },
+          {
+            "key": "dk",
+            "caption": "t(global.don-know)"
+          }
+        ],
+        "items": [
+          {
+            "key": "public_sector",
+            "name": "t(study.access.access_permission_data.public_sector)"
+          },
+          {
+            "key": "private_sector",
+            "name": "t(study.access.access_permission_data.private_sector)"
+          },
+          {
+            "key": "not_for_profit_organization",
+            "name": "t(study.access.access_permission_data.not_for_profit_organization)"
+          }
+        ]
+      },
+      "access_restrictions": {
+        "type": "boolean",
+        "title": "t(study.access.access_permission_data.any-restrictions)"
+      },
+      "access_permission_biological_samples": {
+        "type": "object",
+        "format": "radioGroupCollection",
+        "title": "Biological Samples",
+        "values": [
+          {
+            "key": "yes",
+            "caption": "t(global.yes)"
+          },
+          {
+            "key": "no",
+            "caption": "t(global.no)"
+          },
+          {
+            "key": "na",
+            "caption": "t(global.not-applicable)"
+          },
+          {
+            "key": "dk",
+            "caption": "t(global.don-know)"
+          }
+        ],
+        "items": [
+          {
+            "key": "public_sector",
+            "name": "t(study.access.access_permission_data.public_sector)"
+          },
+          {
+            "key": "private_sector",
+            "name": "t(study.access.access_permission_data.private_sector)"
+          },
+          {
+            "key": "not_for_profit_organization",
+            "name": "t(study.access.access_permission_data.not_for_profit_organization)"
+          }
+        ]
+      },
+      "access_permission_additional_info": {
+        "type": "object",
+        "format": "localizedString"
+      },
+      "access_data_can_leave": {
+        "type": "object",
+        "title": "t(study_taxonomy.vocabulary.access_data.title)",
+        "format": "radioGroupCollection",
+        "values": [
+          {
+            "key": "yes",
+            "caption": "t(global.yes)"
+          },
+          {
+            "key": "no",
+            "caption": "t(global.no)"
+          },
+          {
+            "key": "na",
+            "caption": "t(global.not-applicable)"
+          },
+          {
+            "key": "dk",
+            "caption": "t(global.don-know)"
+          }
+        ],
+        "items": [
+          {
+            "key": "study_facility",
+            "name": "t(study.access.access_data_can_leave.study_facility)"
+          },
+          {
+            "key": "country",
+            "name": "t(study.access.access_data_can_leave.country)"
+          }
+        ]
+      },
+      "access_biological_samples_can_leave": {
+        "type": "object",
+        "title": "t(study_taxonomy.vocabulary.access_bio_samples.title)",
+        "format": "radioGroupCollection",
+        "values": [
+          {
+            "key": "yes",
+            "caption": "t(global.yes)"
+          },
+          {
+            "key": "no",
+            "caption": "t(global.no)"
+          },
+          {
+            "key": "na",
+            "caption": "t(global.not-applicable)"
+          },
+          {
+            "key": "dk",
+            "caption": "t(global.don-know)"
+          }
+        ],
+        "items": [
+          {
+            "key": "study_facility",
+            "name": "t(study.access.access_data_can_leave.study_facility)"
+          },
+          {
+            "key": "country",
+            "name": "t(study.access.access_data_can_leave.country)"
+          }
+        ]
+      },
+      "access_special_conditions_to_leave": {
+        "type": "object",
+        "format": "localizedString"
+      },
+      "access_fees": {
+        "type": "boolean",
+        "title": "t(study.access.access_fees.any-fees)"
+      },
+      "access_data_sharing_cost": {
+        "type": "object",
+        "format": "radioGroupCollection",
+        "values": [
+          {
+            "key": "no_cost",
+            "caption": "t(study.access.access_data_sharing_cost.no_cost)"
+          },
+          {
+            "key": "fix_cost",
+            "caption": "t(study.access.access_data_sharing_cost.fix_cost)"
+          },
+          {
+            "key": "variable_cost",
+            "caption": "t(study.access.access_data_sharing_cost.variable_cost)"
+          },
+          {
+            "key": "nyd",
+            "caption": "t(study.access.access_data_sharing_cost.nyd)"
+          },
+          {
+            "key": "na",
+            "caption": "t(global.not-applicable)"
+          }
+        ],
+        "items": [
+          {
+            "key": "data",
+            "name": "t(study_taxonomy.vocabulary.access_data.title)"
+          },
+          {
+            "key": "biological_samples",
+            "name": "t(study_taxonomy.vocabulary.access_bio_samples.title)"
+          }
+        ]
+      },
+      "access_cost_reduction_consideration": {
+        "title": "t(study.access.access_cost_reduction_consideration.title)",
+        "type": "object",
+        "format": "radioGroupCollection",
+        "properties": {
+          "data": {
+            "type": "string"
+          },
+          "bio_samples": {
+            "type": "string"
+          },
+          "other": {
+            "type": "string"
+          }
+        },
+        "values": [
+          {
+            "key": "yes",
+            "caption": "t(global.yes)"
+          },
+          {
+            "key": "no",
+            "caption": "t(global.no)"
+          },
+          {
+            "key": "na",
+            "caption": "t(global.not-applicable)"
+          }
+        ],
+        "items": [
+          {
+            "key": "data",
+            "name": "t(study_taxonomy.vocabulary.access_data.title)"
+          },
+          {
+            "key": "bio_samples",
+            "name": "t(study_taxonomy.vocabulary.access_bio_samples.title)"
+          }
+        ]
+      },
+      "access_cost_reduction_consideration_specification": {
+        "title": "t(study.access.access_cost_reduction_consideration_specification.title)",
+        "type": "object",
+        "format": "localizedString"
+      },
+      "access_cost_additional_information": {
+        "title": "t(study.access.access_cost_additional_information.title)",
+        "type": "object",
+        "format": "localizedString"
+      },
+      "access_supplementary_info": {
+        "type": "object",
+        "format": "localizedString"
+      },
+      "markerPaper": {
+        "type": "string",
+        "title": "t(study.marker-paper)"
+      },
+      "pubmedId": {
+        "type": "string",
+        "title": "t(study.pubmed-id)"
+      },
+      "_name": {
+        "title": "t(study.name)",
+        "type": "object",
+        "format": "localizedString"
+      },
+      "_acronym": {
+        "title": "t(study.acronym)",
+        "type": "object",
+        "format": "localizedString"
+      },
+      "_objectives": {
+        "title": "t(study.objectives)",
+        "type": "object",
+        "format": "obibaSimpleMde"
+      },
+      "_opal": {
+        "title": "t(study.opal)",
+        "type": "string",
+        "pattern": "^https?://[a-zA-Z0-9._/?&=:%-]+$"
+      }
+    },
+    "required": [
+      "_name",
+      "_acronym",
+      "_objectives"
+    ]
+  },
+  "definition": [
+    {
+      "type": "help",
+      "helpvalue": "<h3>t(study.general-info)</h3>"
+    },
+    {
+      "type": "section",
+      "htmlClass": "row",
+      "items": [
+        {
+          "type": "section",
+          "htmlClass": "col-xs-6",
+          "items": [
+            {
+              "key": "_name",
+              "type": "localizedstring",
+              "description": "t(study.name-help)"
+            },
+            {
+              "key": "_acronym",
+              "type": "localizedstring",
+              "description": "t(study.acronym-help)"
+            },
+            {
+              "key": "_opal",
+              "type": "string",
+              "description": "t(study.opal-help)"
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "htmlClass": "col-xs-6",
+          "items": [
+            {
+              "key": "_objectives",
+              "type": "obibaSimpleMde",
+              "rows": 3,
+              "marked": true,
+              "description": "t(study.objectives-help)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "help",
+      "helpvalue": "<div class='alert alert-info' role='alert'><strong>License Info.</strong>This model (version <a href='https://github.com/maelstrom-research/maelstrom-models/tree/1.1.3' target='_blank'>1.1.3</a>) was released by <a href='https://www.maelstrom-research.org/' target='_blank'>Maelstrom Research</a> under the <a href='https://creativecommons.org/licenses/by-nc-nd/4.0/' target='_blank'>Creative Commons License with Non Commercial and No Derivatives</a> constraints.</div>"
+    },
+    {
+      "type": "section",
+      "htmlClass": "row",
+      "items": [
+        {
+          "type": "section",
+          "htmlClass": "col-xs-6",
+          "items": [
+            "startYear",
+            "endYear",
+            "website"
+          ]
+        },
+        {
+          "type": "section",
+          "htmlClass": "col-xs-6",
+          "items": [
+            "funding",
+            {
+              "key": "info",
+              "type": "localizedstring",
+              "rows": 3,
+              "marked": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "help",
+      "helpvalue": "<h3>t(study.general-design)</h3>"
+    },
+    {
+      "type": "section",
+      "htmlClass": "row",
+      "items": [
+        {
+          "type": "section",
+          "htmlClass": "col-xs-6",
+          "items": [
+            {
+              "key": "methods",
+              "notitle": true,
+              "items": [
+                {
+                  "type": "help",
+                  "helpvalue": "<h4>t(study.design)</h4>"
+                },
+                {
+                  "key": "methods.design",
+                  "notitle": true,
+                  "type": "radios",
+                  "description": "t(study_taxonomy.vocabulary.methods-design.description)",
+                  "titleMap": [
+                    {
+                      "value": "cohort_study",
+                      "name": "t(study_taxonomy.vocabulary.methods-design.term.cohort_study.title)"
+                    },
+                    {
+                      "value": "case_control",
+                      "name": "t(study_taxonomy.vocabulary.methods-design.term.case_control.title)"
+                    },
+                    {
+                      "value": "case_only",
+                      "name": "t(study_taxonomy.vocabulary.methods-design.term.case_only.title)"
+                    },
+                    {
+                      "value": "cross_sectional",
+                      "name": "t(study_taxonomy.vocabulary.methods-design.term.cross_sectional.title)"
+                    },
+                    {
+                      "value": "clinical_trial",
+                      "name": "t(study_taxonomy.vocabulary.methods-design.term.clinical_trial.title)"
+                    },
+                    {
+                      "value": "other",
+                      "name": "t(study_taxonomy.vocabulary.methods-design.term.other.title)"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "htmlClass": "hoffset3",
+                  "items": [
+                    {
+                      "key": "methods.otherDesign",
+                      "condition": "model.methods.design==\"other\""
+                    }
+                  ]
+                },
+                {
+                  "key": "methods.followUpInfo",
+                  "type": "localizedstring",
+                  "rows": 3,
+                  "marked": true,
+                  "description": "t(study.follow-up-help)"
+                },
+                {
+                  "key": "methods.info",
+                  "type": "localizedstring",
+                  "rows": 3,
+                  "marked": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "htmlClass": "col-xs-6",
+          "items": [
+            {
+              "type": "help",
+              "helpvalue": "<h4>t(study.recruitment-sources.label)</h4>"
+            },
+            {
+              "key": "methods.recruitments",
+              "notitle": true,
+              "description": "t(study_taxonomy.vocabulary.methods-recruitments.description)",
+              "titleMap": [
+                {
+                  "value": "individuals",
+                  "name": "t(study_taxonomy.vocabulary.methods-recruitments.term.individuals.title)"
+                },
+                {
+                  "value": "families",
+                  "name": "t(study_taxonomy.vocabulary.methods-recruitments.term.families.title)"
+                },
+                {
+                  "value": "other",
+                  "name": "t(study_taxonomy.vocabulary.methods-recruitments.term.other.title)"
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "htmlClass": "hoffset3",
+              "items": [
+                {
+                  "key": "methods.otherRecruitment",
+                  "condition": "model.methods.recruitments.indexOf(\"other\")>=0"
+                }
+              ]
+            },
+            {
+              "type": "help",
+              "helpvalue": "<h4>t(numberOfParticipants.label)</h4>"
+            },
+            {
+              "key": "numberOfParticipants",
+              "notitle": true,
+              "items": [
+                {
+                  "key": "numberOfParticipants.participant",
+                  "notitle": true
+                },
+                {
+                  "key": "numberOfParticipants.sample",
+                  "notitle": true
+                },
+                {
+                  "key": "numberOfParticipants.info",
+                  "rows": 3,
+                  "marked": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "htmlClass": "row",
+      "items": [
+        {
+          "type": "help",
+          "helpvalue": "<h3>t(study.access.label)</h3>"
+        },
+        {
+          "type": "help",
+          "helpvalue": "<h4>t(study.general-info)</h4>"
+        },
+        {
+          "type": "section",
+          "htmlClass": "row",
+          "items": [
+            {
+              "type": "section",
+              "htmlClass": "col-md-6",
+              "items": [
+                {
+                  "type": "help",
+                  "helpvalue": "<label>t(study.access.access_external_researchers_permitted_foreseen.title)</label>"
+                },
+                {
+                  "type": "radioGroupCollection",
+                  "key": "access",
+                  "notitle": true
+                },
+                {
+                  "type": "section",
+                  "htmlClass": "hoffset3",
+                  "items": [
+                    {
+                      "key": "otherAccess",
+                      "type": "localizedstring",
+                      "rows": 2,
+                      "condition": "model.access.access_other == 'yes'"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "htmlClass": "col-md-6",
+              "items": [
+                {
+                  "type": "help",
+                  "helpvalue": "<label>t(study.access.external_researchers_obtaining_study_data_bio_info.title)</label>"
+                },
+                {
+                  "key": "access_info_location",
+                  "titleMap": [
+                    {
+                      "value": "study_website",
+                      "name": "t(study.access.external_researchers_obtaining_study_data_bio_info.access_info_location.study_website)"
+                    },
+                    {
+                      "value": "study_representative",
+                      "name": "t(study.access.external_researchers_obtaining_study_data_bio_info.access_info_location.study_representative)"
+                    }
+                  ],
+                  "notitle": true
+                },
+                {
+                  "key": "access_info_representative",
+                  "items": [
+                    "access_info_representative.name",
+                    "access_info_representative.title",
+                    "access_info_representative.email",
+                    "access_info_representative.telephone",
+                    "access_info_representative.institution"
+                  ],
+                  "notitle": true,
+                  "condition": "model.access_info_location.indexOf('study_representative')>-1"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "htmlClass": "col-xs-12",
+          "items": [
+            "access_restrictions"
+          ],
+          "condition": "model.access.access_data=='yes' || model.access.access_bio_samples=='yes' || model.access.access_other=='yes'"
+        },
+        {
+          "type": "section",
+          "htmlClass": "col-xs-12",
+          "items": [
+            {
+              "type": "help",
+              "helpvalue": "<h4>t(study.access.access_restrictions.title)</h4>"
+            },
+            {
+              "type": "help",
+              "helpvalue": "<label>t(study.access.access_restrictions.sector-of-research.title)</label>"
+            },
+            {
+              "type": "section",
+              "items": [
+                {
+                  "type": "section",
+                  "htmlClass": "row",
+                  "items": [
+                    {
+                      "type": "section",
+                      "htmlClass": "col-xs-6",
+                      "items": [
+                        {
+                          "type": "help",
+                          "helpvalue": "<label>t(study_taxonomy.vocabulary.access_data.title)</label>"
+                        },
+                        {
+                          "key": "access_permission_data",
+                          "type": "radioGroupCollection",
+                          "notitle": true
+                        },
+                        {
+                          "type": "help",
+                          "helpvalue": "<label>t(study_taxonomy.vocabulary.access_bio_samples.title)</label>"
+                        },
+                        {
+                          "key": "access_permission_biological_samples",
+                          "type": "radioGroupCollection",
+                          "notitle": true
+                        },
+                        {
+                          "type": "help",
+                          "helpvalue": "<label>t(study.access.access_permission_additional_info.label)</label>"
+                        },
+                        {
+                          "key": "access_permission_additional_info",
+                          "type": "localizedstring",
+                          "rows": 2,
+                          "notitle": true
+                        }
+                      ]
+                    },
+                    {
+                      "type": "section",
+                      "htmlClass": "col-xs-6",
+                      "items": [
+                        {
+                          "type": "help",
+                          "helpvalue": "<label>t(study.access.access_restrictions.transfer.title)</label>"
+                        },
+                        {
+                          "key": "access_data_can_leave",
+                          "type": "radioGroupCollection"
+                        },
+                        {
+                          "key": "access_biological_samples_can_leave",
+                          "type": "radioGroupCollection"
+                        },
+                        {
+                          "type": "help",
+                          "helpvalue": "<label>t(study.access.access_special_conditions_to_leave.label)</label>"
+                        },
+                        {
+                          "key": "access_special_conditions_to_leave",
+                          "type": "localizedstring",
+                          "rows": 2,
+                          "notitle": true
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "condition": "model.access_restrictions && (model.access.access_data=='yes' || model.access.access_bio_samples=='yes' || model.access.access_other=='yes')"
+        },
+        {
+          "type": "section",
+          "htmlClass": "col-xs-12",
+          "items": [
+            "access_fees"
+          ],
+          "condition": "model.access.access_data=='yes' || model.access.access_bio_samples=='yes' || model.access.access_other=='yes'"
+        },
+        {
+          "type": "section",
+          "htmlClass": "col-xs-12",
+          "items": [
+            {
+              "type": "section",
+              "htmlClass": "row",
+              "items": [
+                {
+                  "type": "section",
+                  "htmlClass": "col-xs-12",
+                  "items": [
+                    {
+                      "type": "help",
+                      "helpvalue": "<h4>t(study.access.access_fees.title)</h4>"
+                    },
+                    {
+                      "type": "help",
+                      "helpvalue": "<label>t(study.access.access_data_sharing_cost.cost-title)</label>"
+                    },
+                    {
+                      "key": "access_data_sharing_cost",
+                      "type": "radioGroupCollection",
+                      "notitle": true
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "htmlClass": "col-md-6",
+                  "items": [
+                    {
+                      "type": "help",
+                      "helpvalue": "<label>t(study.access.access_data_sharing_cost.cost-reduction-title)</label>"
+                    },
+                    {
+                      "key": "access_cost_reduction_consideration",
+                      "notitle": true
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "htmlClass": "col-md-6",
+                  "items": [
+                    {
+                      "type": "section",
+                      "items": [
+                        {
+                          "type": "help",
+                          "helpvalue": "<label>t(study.access.access_cost_reduction_consideration_specification.title)</label>"
+                        },
+                        {
+                          "key": "access_cost_reduction_consideration_specification",
+                          "type": "localizedstring",
+                          "rows": 2,
+                          "notitle": true
+                        },
+                        {
+                          "type": "help",
+                          "helpvalue": "<label>t(study.access.access_cost_additional_information.title)</label>"
+                        },
+                        {
+                          "key": "access_cost_additional_information",
+                          "type": "localizedstring",
+                          "rows": 2,
+                          "notitle": true
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "condition": "model.access_fees && (model.access.access_data=='yes' || model.access.access_bio_samples=='yes' || model.access.access_other=='yes')"
+        },
+        {
+          "type": "section",
+          "htmlClass": "col-xs-12",
+          "items": [
+            {
+              "type": "help",
+              "helpvalue": "<h4>t(study.access.suppl-info)</h4>"
+            },
+            {
+              "key": "access_supplementary_info",
+              "type": "localizedstring",
+              "rows": 2,
+              "notitle": true
+            }
+          ],
+          "condition": "model.access.access_data=='yes' || model.access.access_bio_samples=='yes' || model.access.access_other=='yes'"
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "htmlClass": "row",
+      "items": [
+        {
+          "type": "help",
+          "helpvalue": "<hr>"
+        },
+        {
+          "type": "section",
+          "htmlClass": "col-xs-6",
+          "items": [
+            {
+              "type": "help",
+              "helpvalue": "<h3>t(study.marker-paper)</h3>"
+            },
+            {
+              "key": "markerPaper",
+              "type": "textarea",
+              "notitle": true
+            },
+            "pubmedId"
+          ]
+        }
+      ]
+    }
+  ]
+}

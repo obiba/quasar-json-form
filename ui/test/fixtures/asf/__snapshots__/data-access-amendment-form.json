@@ -1,0 +1,773 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "modificationNature": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "oneOf": [
+            {
+              "const": "IA",
+              "title": "data-access-amendment.default.I.A.title"
+            },
+            {
+              "const": "IB",
+              "title": "data-access-amendment.default.I.B.title"
+            },
+            {
+              "const": "IC",
+              "title": "data-access-amendment.default.I.C.title"
+            },
+            {
+              "const": "ID",
+              "title": "data-access-amendment.default.I.D.title"
+            },
+            {
+              "const": "IE",
+              "title": "data-access-amendment.default.I.E.title"
+            },
+            {
+              "const": "IF",
+              "title": "data-access-amendment.default.I.F.title"
+            },
+            {
+              "const": "IG",
+              "title": "data-access-amendment.default.I.G.title"
+            },
+            {
+              "const": "IH",
+              "title": "data-access-amendment.default.I.H.title"
+            },
+            {
+              "const": "IIrdRebResearchProtocol",
+              "title": "data-access-amendment.default.documents.reb-research-protocol"
+            },
+            {
+              "const": "IIrdRebDecisionLetter",
+              "title": "data-access-amendment.default.documents.reb-decision-letter"
+            },
+            {
+              "const": "IIrdCV",
+              "title": "data-access-amendment.default.documents.cvt"
+            },
+            {
+              "const": "IIrdPeerReview",
+              "title": "data-access-amendment.default.documents.peer-review"
+            },
+            {
+              "const": "other",
+              "title": "Other"
+            }
+          ]
+        },
+        "uniqueItems": true
+      },
+      "name": {
+        "title": "data-access-amendment.default.name",
+        "type": "string"
+      },
+      "title": {
+        "title": "data-access-amendment.default.title",
+        "type": "string"
+      },
+      "position": {
+        "title": "data-access-amendment.default.position",
+        "type": "string"
+      },
+      "institution": {
+        "title": "data-access-amendment.default.institution",
+        "type": "string"
+      },
+      "email": {
+        "title": "data-access-amendment.default.institution-email",
+        "type": "string",
+        "pattern": "^\\S+@\\S+$"
+      },
+      "emailAlt": {
+        "title": "data-access-amendment.default.email-alt",
+        "type": "string",
+        "pattern": "^\\S+@\\S+$"
+      },
+      "mailingAddress": {
+        "title": "data-access-amendment.default.address",
+        "type": "string"
+      },
+      "phone": {
+        "title": "data-access-amendment.default.phone",
+        "type": "string"
+      },
+      "repName": {
+        "title": "data-access-amendment.default.name",
+        "type": "string"
+      },
+      "repTitle": {
+        "title": "data-access-amendment.default.title",
+        "type": "string"
+      },
+      "repPosition": {
+        "title": "data-access-amendment.default.position",
+        "type": "string"
+      },
+      "repInstitution": {
+        "title": "data-access-amendment.default.institution",
+        "type": "string"
+      },
+      "repEmail": {
+        "title": "data-access-amendment.default.institution-email",
+        "type": "string",
+        "pattern": "^\\S+@\\S+$"
+      },
+      "repMailingAddress": {
+        "title": "data-access-amendment.default.address",
+        "type": "string"
+      },
+      "repPhone": {
+        "title": "data-access-amendment.default.phone",
+        "type": "string"
+      },
+      "projectTitle": {
+        "type": "string"
+      },
+      "projectWebsite": {
+        "title": "data-access-amendment.default.I.C.website",
+        "type": "string",
+        "description": "data-access-amendment.default.I.C.website-help"
+      },
+      "hasNoStaff": {
+        "title": "data-access-amendment.default.I.D.check",
+        "type": "boolean"
+      },
+      "staff": {
+        "type": "array",
+        "maxItems": 5,
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "title": "data-access-amendment.default.name",
+              "type": "string"
+            },
+            "title": {
+              "title": "data-access-amendment.default.title",
+              "type": "string"
+            },
+            "position": {
+              "title": "data-access-amendment.default.position",
+              "type": "string"
+            },
+            "email": {
+              "title": "data-access-amendment.default.email",
+              "type": "string",
+              "pattern": "^\\S+@\\S+$"
+            }
+          },
+          "required": [
+            "name",
+            "email"
+          ]
+        }
+      },
+      "hasNoStudents": {
+        "title": "data-access-amendment.default.I.E.check",
+        "type": "boolean"
+      },
+      "students": {
+        "type": "array",
+        "maxItems": 5,
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "title": "data-access-amendment.default.name",
+              "type": "string"
+            },
+            "title": {
+              "title": "data-access-amendment.default.title",
+              "type": "string"
+            },
+            "position": {
+              "title": "data-access-amendment.default.position",
+              "type": "string"
+            },
+            "email": {
+              "title": "data-access-amendment.default.email",
+              "type": "string",
+              "pattern": "^\\S+@\\S+$"
+            }
+          },
+          "required": [
+            "name",
+            "email"
+          ]
+        }
+      },
+      "abstract": {
+        "type": "string"
+      },
+      "summary": {
+        "type": "string"
+      },
+      "endDate": {
+        "type": "string",
+        "format": "datepicker"
+      },
+      "other": {
+        "title": "data-access-amendment.default.other-modifications",
+        "type": "string"
+      },
+      "rdRebResearchProtocol": {
+        "type": "object",
+        "format": "obibaFiles",
+        "title": "data-access-amendment.default.documents.reb-research-protocol"
+      },
+      "rdRebDecisionLetter": {
+        "type": "object",
+        "format": "obibaFiles",
+        "title": "data-access-amendment.default.documents.reb-decision-letter"
+      },
+      "rdCV": {
+        "type": "object",
+        "format": "obibaFiles",
+        "title": "data-access-amendment.default.documents.cv"
+      },
+      "rdPeerReview": {
+        "type": "object",
+        "format": "obibaFiles",
+        "title": "data-access-amendment.default.documents.peer-review"
+      },
+      "isFormCompleted": {
+        "title": "data-access-amendment.default.signature.check",
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "isFormCompleted",
+      "modificationNature"
+    ]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Label",
+        "text": "<h2>data-access-amendment.default.form-title</h2>"
+      },
+      {
+        "type": "Group",
+        "elements": [
+          {
+            "type": "Label",
+            "text": "<h3>data-access-amendment.default.modification-nature-title</h3>"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/modificationNature",
+            "label": false,
+            "options": {
+              "format": "checkbox"
+            }
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "elements": [
+          {
+            "type": "Label",
+            "text": "<h3>A. data-access-amendment.default.I.A.title</h3><p class='help-block'>data-access-request.default.I.A.info</p>"
+          },
+          {
+            "type": "VerticalLayout",
+            "elements": [
+              {
+                "type": "VerticalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/name"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/title"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/position"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/institution"
+                  }
+                ],
+                "options": {
+                  "class": "col-6"
+                }
+              },
+              {
+                "type": "VerticalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/email"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/emailAlt"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/phone"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/mailingAddress",
+                    "options": {
+                      "rows": 3
+                    }
+                  }
+                ],
+                "options": {
+                  "class": "col-6"
+                }
+              }
+            ],
+            "options": {
+              "class": "row q-col-gutter-md"
+            }
+          }
+        ],
+        "rules": {
+          "visible": "contains(modificationNature, \"IA\")"
+        }
+      },
+      {
+        "type": "Group",
+        "elements": [
+          {
+            "type": "Label",
+            "text": "<h3>B. data-access-amendment.default.I.B.title</h3><p class='help-block'>data-access-amendment.default.I.B.info</p>"
+          },
+          {
+            "type": "VerticalLayout",
+            "elements": [
+              {
+                "type": "VerticalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/repName"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/repTitle"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/repPosition"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/repInstitution"
+                  }
+                ],
+                "options": {
+                  "class": "col-6"
+                }
+              },
+              {
+                "type": "VerticalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/repEmail"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/repPhone"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/repMailingAddress",
+                    "options": {
+                      "rows": 3
+                    }
+                  }
+                ],
+                "options": {
+                  "class": "col-6"
+                }
+              }
+            ],
+            "options": {
+              "class": "row q-col-gutter-md"
+            }
+          }
+        ],
+        "rules": {
+          "visible": "contains(modificationNature, \"IB\")"
+        }
+      },
+      {
+        "type": "Group",
+        "elements": [
+          {
+            "type": "Label",
+            "text": "<h3>C. data-access-amendment.default.I.C.title</h3>"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/projectTitle",
+            "label": false,
+            "options": {
+              "rows": 3
+            }
+          },
+          {
+            "type": "VerticalLayout",
+            "elements": [
+              {
+                "type": "VerticalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/projectWebsite"
+                  }
+                ],
+                "options": {
+                  "class": "col-6"
+                }
+              },
+              {
+                "type": "VerticalLayout",
+                "elements": [],
+                "options": {
+                  "class": "col-6"
+                }
+              }
+            ],
+            "options": {
+              "class": "row q-col-gutter-md"
+            }
+          }
+        ],
+        "rules": {
+          "visible": "contains(modificationNature, \"IC\")"
+        }
+      },
+      {
+        "type": "Group",
+        "elements": [
+          {
+            "type": "Label",
+            "text": "<h3>D. data-access-amendment.default.I.D.title</h3><p class='help-block'>data-access-amendment.default.I.D.info</p>"
+          },
+          {
+            "type": "VerticalLayout",
+            "elements": [
+              {
+                "type": "VerticalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/hasNoStaff"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/staff",
+                    "label": false,
+                    "options": {
+                      "addLabel": "New",
+                      "items": {
+                        "type": "VerticalLayout",
+                        "elements": [
+                          {
+                            "type": "Control",
+                            "scope": "#/properties/name"
+                          },
+                          {
+                            "type": "Control",
+                            "scope": "#/properties/title"
+                          },
+                          {
+                            "type": "Control",
+                            "scope": "#/properties/position"
+                          },
+                          {
+                            "type": "Control",
+                            "scope": "#/properties/email"
+                          }
+                        ]
+                      }
+                    },
+                    "rules": {
+                      "visible": "not (truthy(hasNoStaff))"
+                    }
+                  }
+                ],
+                "options": {
+                  "class": "col-6"
+                }
+              },
+              {
+                "type": "VerticalLayout",
+                "elements": [],
+                "options": {
+                  "class": "col-6"
+                }
+              }
+            ],
+            "options": {
+              "class": "row q-col-gutter-md"
+            }
+          }
+        ],
+        "rules": {
+          "visible": "contains(modificationNature, \"ID\")"
+        }
+      },
+      {
+        "type": "Group",
+        "elements": [
+          {
+            "type": "Label",
+            "text": "<h3>E. data-access-amendment.default.I.E.title</h3><p class='help-block'>data-access-amendment.default.I.E.info</p>"
+          },
+          {
+            "type": "VerticalLayout",
+            "elements": [
+              {
+                "type": "VerticalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/hasNoStudents"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/students",
+                    "label": false,
+                    "options": {
+                      "addLabel": "New",
+                      "items": {
+                        "type": "VerticalLayout",
+                        "elements": [
+                          {
+                            "type": "Control",
+                            "scope": "#/properties/name"
+                          },
+                          {
+                            "type": "Control",
+                            "scope": "#/properties/title"
+                          },
+                          {
+                            "type": "Control",
+                            "scope": "#/properties/position"
+                          },
+                          {
+                            "type": "Control",
+                            "scope": "#/properties/email"
+                          }
+                        ]
+                      }
+                    },
+                    "rules": {
+                      "visible": "not (truthy(hasNoStudents))"
+                    }
+                  }
+                ],
+                "options": {
+                  "class": "col-6"
+                }
+              },
+              {
+                "type": "VerticalLayout",
+                "elements": [],
+                "options": {
+                  "class": "col-6"
+                }
+              }
+            ],
+            "options": {
+              "class": "row q-col-gutter-md"
+            }
+          }
+        ],
+        "rules": {
+          "visible": "contains(modificationNature, \"IE\")"
+        }
+      },
+      {
+        "type": "Group",
+        "elements": [
+          {
+            "type": "Label",
+            "text": "<h3>F. data-access-amendment.default.I.F.title</h3><p class='help-block'>data-access-amendment.default.I.F.info</p>"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/abstract",
+            "label": false,
+            "options": {
+              "rows": 3,
+              "wordLimit": "0:500",
+              "validationMessage": {
+                "wordLimitError": "The 500 words limit has been exceeded."
+              }
+            }
+          }
+        ],
+        "rules": {
+          "visible": "contains(modificationNature, \"IF\")"
+        }
+      },
+      {
+        "type": "Group",
+        "elements": [
+          {
+            "type": "Label",
+            "text": "<h3>G. data-access-amendment.default.I.G.title</h3><p class='help-block'>data-access-amendment.default.I.G.info</p>"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/summary",
+            "label": false,
+            "options": {
+              "rows": 3,
+              "wordLimit": "0:200",
+              "validationMessage": {
+                "wordLimitError": "The 200 words limit has been exceeded."
+              }
+            }
+          }
+        ],
+        "rules": {
+          "visible": "contains(modificationNature, \"IG\")"
+        }
+      },
+      {
+        "type": "Group",
+        "elements": [
+          {
+            "type": "Label",
+            "text": "<h3>G. data-access-amendment.default.I.H.title</h3><p class='help-block'>data-access-amendment.default.I.H.info</p>"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/endDate",
+            "label": false,
+            "options": {
+              "validationMessage": "data-access-amendment.default.date-error",
+              "dateOptions": {
+                "dateFormat": "yyyy-MM-dd"
+              }
+            }
+          }
+        ],
+        "rules": {
+          "visible": "contains(modificationNature, \"IH\")"
+        }
+      },
+      {
+        "type": "Label",
+        "text": "<h2>II - data-access-amendment.default.documents.title</h2>",
+        "rules": {
+          "visible": "contains(modificationNature, \"IIrdRebResearchProtocol\") or contains(modificationNature, \"IIrdRebDecisionLetter\") or contains(modificationNature, \"IIrdCV\") or contains(modificationNature, \"IIrdPeerReview\")"
+        }
+      },
+      {
+        "type": "Group",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/rdRebResearchProtocol",
+            "options": {
+              "emptyMessage": "data-access-request.no-documents",
+              "validationMessage": {
+                "missingFiles": "missing-files",
+                "minItems": "min-items"
+              }
+            },
+            "rules": {
+              "visible": "contains(modificationNature, \"IIrdRebResearchProtocol\")"
+            }
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/rdRebDecisionLetter",
+            "options": {
+              "emptyMessage": "data-access-request.no-documents",
+              "validationMessage": {
+                "missingFiles": "missing-files",
+                "minItems": "min-items"
+              }
+            },
+            "rules": {
+              "visible": "contains(modificationNature, \"IIrdRebDecisionLetter\")"
+            }
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/rdCV",
+            "options": {
+              "emptyMessage": "data-access-request.no-documents",
+              "validationMessage": {
+                "missingFiles": "missing-files",
+                "minItems": "min-items"
+              }
+            },
+            "rules": {
+              "visible": "contains(modificationNature, \"IIrdCV\")"
+            }
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/rdPeerReview",
+            "options": {
+              "emptyMessage": "data-access-request.no-documents",
+              "validationMessage": {
+                "missingFiles": "missing-files",
+                "minItems": "min-items"
+              }
+            },
+            "rules": {
+              "visible": "contains(modificationNature, \"IIrdPeerReview\")"
+            }
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/other",
+            "options": {
+              "rows": 5,
+              "wordLimit": "0:500",
+              "validationMessage": {
+                "wordLimitError": "The 500 words limit has been exceeded."
+              }
+            }
+          }
+        ],
+        "rules": {
+          "visible": "contains(modificationNature, \"other\")"
+        }
+      },
+      {
+        "type": "Group",
+        "elements": [
+          {
+            "type": "Label",
+            "text": "<h3>data-access-amendment.default.signature.title</h3>"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/isFormCompleted"
+          }
+        ]
+      }
+    ]
+  }
+}

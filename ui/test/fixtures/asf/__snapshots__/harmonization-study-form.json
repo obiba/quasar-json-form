@@ -1,0 +1,146 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "startYear": {
+        "type": "integer",
+        "title": "study.start-year"
+      },
+      "endYear": {
+        "type": "integer",
+        "title": "study.end-year"
+      },
+      "additionalInformation": {
+        "type": "object",
+        "format": "obibaSimpleMde",
+        "title": "global.additional-information"
+      },
+      "_name": {
+        "title": "harmonization-initiative.name",
+        "type": "object",
+        "format": "localizedString",
+        "description": "harmonization-initiative.name-help"
+      },
+      "_acronym": {
+        "title": "harmonization-initiative.acronym",
+        "type": "object",
+        "format": "localizedString",
+        "description": "harmonization-initiative.acronym-help"
+      },
+      "_objectives": {
+        "title": "harmonization-initiative.objectives",
+        "type": "object",
+        "format": "obibaSimpleMde",
+        "description": "harmonization-initiative.objectives-help"
+      },
+      "_opal": {
+        "title": "harmonization-initiative.opal",
+        "type": "string",
+        "pattern": "^https?://[a-zA-Z0-9._/?&=:%-]+$",
+        "description": "harmonization-initiative.opal-help"
+      }
+    },
+    "required": [
+      "_name",
+      "_acronym",
+      "_objectives"
+    ]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Label",
+        "text": "<h3>study.general-info</h3>"
+      },
+      {
+        "type": "VerticalLayout",
+        "elements": [
+          {
+            "type": "VerticalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/_name"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/_acronym"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/_opal"
+              }
+            ],
+            "options": {
+              "class": "col-6"
+            }
+          },
+          {
+            "type": "VerticalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/_objectives",
+                "options": {
+                  "marked": true,
+                  "rows": 3
+                }
+              }
+            ],
+            "options": {
+              "class": "col-6"
+            }
+          }
+        ],
+        "options": {
+          "class": "row q-col-gutter-md"
+        }
+      },
+      {
+        "type": "Group",
+        "elements": [
+          {
+            "type": "VerticalLayout",
+            "elements": [
+              {
+                "type": "VerticalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/startYear"
+                  }
+                ],
+                "options": {
+                  "class": "col-12 col-md-6"
+                }
+              },
+              {
+                "type": "VerticalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/endYear"
+                  }
+                ],
+                "options": {
+                  "class": "col-12 col-md-6"
+                }
+              }
+            ],
+            "options": {
+              "class": "row q-col-gutter-md"
+            }
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/additionalInformation",
+        "options": {
+          "marked": true
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "website": {
+        "title": "t(website)",
+        "type": "string"
+      },
+      "_name": {
+        "title": "t(network.name)",
+        "type": "object",
+        "format": "localizedString"
+      },
+      "_acronym": {
+        "title": "t(network.acronym)",
+        "type": "object",
+        "format": "localizedString"
+      },
+      "_description": {
+        "title": "t(network.description)",
+        "type": "object",
+        "format": "obibaSimpleMde"
+      }
+    },
+    "required": [
+      "_name",
+      "_acronym",
+      "_description"
+    ]
+  },
+  "definition": [
+    {
+      "type": "help",
+      "helpvalue": "<h3>t(network.general-info)</h3>"
+    },
+    {
+      "key": "_name",
+      "type": "localizedstring"
+    },
+    {
+      "key": "_acronym",
+      "type": "localizedstring"
+    },
+    {
+      "key": "_description",
+      "type": "obibaSimpleMde",
+      "rows": 5,
+      "marked": true
+    },
+    "website"
+  ]
+}

@@ -22,6 +22,7 @@ import {
   and,
   or,
   isArrayObjectControl,
+  isPrimitiveArrayControl,
 } from '@jsonforms/core'
 import type { Tester } from '@jsonforms/core'
 import QLayoutRenderer from '../components/QLayoutRenderer'
@@ -269,7 +270,7 @@ const qRenderers = [
   },
   {
     renderer: QListRenderer,
-    tester: rankWith(3, isArrayObjectControl),
+    tester: rankWith(3, or(isArrayObjectControl, isPrimitiveArrayControl)),
   },
 ]
 

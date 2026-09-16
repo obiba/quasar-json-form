@@ -92,3 +92,24 @@ describe('layouts', () => {
     wrapper.unmount()
   })
 })
+
+describe('Group label and hidden control titles', () => {
+  it('renders the JSON Forms label of a Group', async () => {
+    const wrapper = mountForm({
+      schema: { type: 'object', properties: { a: { type: 'string' } } },
+      uischema: { type: 'Group', label: 'Address', elements: [{ type: 'Control', scope: '#/properties/a' }] },
+    })
+    await flush()
+    expect(wrapper.find('.q-group-renderer .q-form-title').text()).toBe('Address')
+    wrapper.unmount()
+  })
+
+  it('hides the title of an option group with label: false', async () => {
+    const schema = { type: 'object', properties: { g: { type: 'string', title: 'Gender', enum: ['m', 'f'] } } }
+    const wrapper = mountForm({ schema, uischema: { type: 'Control', scope: '#/properties/g', label: false, options: { format: 'radio' } } })
+    await flush()
+    expect(wrapper.find('.q-options-renderer').exists()).toBe(true)
+    expect(wrapper.text()).not.toContain('Gender')
+    wrapper.unmount()
+  })
+})

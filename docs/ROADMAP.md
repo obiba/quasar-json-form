@@ -167,23 +167,47 @@ See the `ui/README.md` sections for the options; `ui/dev` pages "test-localized-
   "unknown format" warnings).
 - Deferred: `sf-obiba-selection-tree` until a customer config using it is found.
 
-### Phase 2 — ASF compatibility converter
+### Phase 2 — ASF compatibility converter — done (September 2026)
 
-`@obiba/quasar-ui-json-form/asf`, pure TypeScript, unit-tested:
+`@obiba/quasar-ui-json-form/asf` (`ui/src/asf`, pure TypeScript, also exported by the main entry as
+`convertAsf` / `toJsonForms`), documented in `ui/README.md` "angular-schema-form compatibility":
 
 ```
-convert(schema, definition, { languages, readonly }) → { schema, uischema }
+convert(schema, definition, { translate, languages, readonly, rowClass, logger }) → { schema, uischema, diagnostics }
+toJsonForms(schema, definitionOrUischema, options)   // dialect detected by shape (array / object)
 ```
 
-- `"a.b"` / `"arr[].x"` keys → `Control` scopes; `section` / `fieldset` (+ `htmlClass`) →
-  layouts/groups with classes; `help` → `Label`; `textarea` / `rows` / `notitle` / `titleMap` /
-  `radios` / `checkboxes` / `add` / `minItems` / `emptyMessage` / `validationMessage` /
-  `x-schema-form` → renderer options.
-- `condition` → `rules.visible`: a small transpiler for the patterns actually in use (strip
-  `model.`; `==` / `===`; `!`; `&&` / `||`; `.indexOf(v) >= 0` and `> -1` → `contains(arr, v)`
-  custom function). Log and skip anything it cannot parse.
-- **Acceptance fixtures**: the 13 default Mica form pairs as snapshot tests, plus a `ui/dev`
-  page that renders any pasted schema/definition pair.
+- [x] `"a.b"` / `"arr[].x"` keys → `Control` scopes (item scopes relative to the array item, in
+  `options.items`); `section` / `fieldset` (+ `htmlClass`, `col-xs-N` → `col-N`, `row` →
+  `row q-col-gutter-md`) → layouts / groups with classes; object keys → fieldsets of their
+  properties; `help` → `Label`; `tabs` → `Categorization`; `textarea` / `rows` / `notitle` /
+  `titleMap` (→ `oneOf`, enum arrays rendered as checkboxes like ASF) / `radios` / `checkboxes` /
+  `add` / `minItems` / `emptyMessage` / `validationMessage` / `dateOptions` (incl. `minDate` refs →
+  `rules.min`) / `x-schema-form` / definition `required` / `title` / `description` → renderer
+  options or schema copy. `"*"` expands to the properties not listed elsewhere.
+- [x] `condition` → `rules.visible`: a tokenizer + recursive-descent parser of the JavaScript subset
+  in use (`transpileCondition`), emitting filtrex. filtrex has no boolean / null literals, rejects
+  single-quoted strings and `not undefined`, so the transpiler emits `truthy(x)` (new engine
+  function) for values used as booleans, `contains(list, v)` for `indexOf` / `includes`,
+  `isEmpty` / `isNotEmpty` for `null` comparisons and guards ordering comparisons. Anything else
+  (`arrayIndex`, computed access, function calls) is reported and left visible.
+- [x] `t(...)` tokens: resolved with the `translate` option (vue-i18n `t` in mica-ui, at conversion
+  time, so a locale switch re-converts) or unwrapped to the key so that single-token strings are
+  still translated by the renderers.
+- [x] Diagnostics (`{ level, message, key, element }`) for unknown keys / types, skipped elements
+  (`submit`, `template`, `sf-obiba-selection-tree`...) and unparsed conditions; `console.warn` by
+  default, `logger` option.
+- [x] Acceptance fixtures: the 13 default Mica form pairs (`ui/test/fixtures/asf`, refreshed from a
+  Mica checkout with `update.mjs`, mandatory parts merged like `EntityConfigService`), converted
+  as file snapshots with no unexpected diagnostic, resolvable scopes, no `t(` left, and rendered
+  with `QJsonForm`. `ui/dev` page "test-asf-converter" renders any pasted pair (fixtures preloadable,
+  diagnostics shown). Finding: the default `project-form` definition lists a `title` key that its
+  schema does not declare (reported and skipped).
+- Library changes needed by the converter: `label: false` hides the title of every renderer;
+  `Group` displays its JSON Forms `label`; `QListRenderer` also handles arrays of primitives and
+  of formatted objects (item `Control` with scope `#`) and reads `options.addLabel`; a string
+  `options.validationMessage` applies to every renderer-level check (ASF convention); `package.json`
+  `exports` map (`.`, `./asf`, `./dist/*`, `./src/*`).
 
 ### Phase 3 — Portal data-access forms (independent of mica-ui)
 
@@ -239,7 +263,7 @@ corresponding mica-ui page ships, then the AngularJS page is retired.
 |---|---|---|
 | 0 | small | |
 | 1 | large | done |
-| 2 | medium | |
+| 2 | medium | done |
 | 3 | medium | mostly build / CSS plumbing |
 | 4 | ongoing | tracks mica-ui page delivery; renderers land as pages need them |
 

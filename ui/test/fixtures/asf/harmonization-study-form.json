@@ -1,0 +1,120 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "startYear": {
+        "type": "integer",
+        "title": "t(study.start-year)"
+      },
+      "endYear": {
+        "type": "integer",
+        "title": "t(study.end-year)"
+      },
+      "additionalInformation": {
+        "type": "object",
+        "format": "obibaSimpleMde",
+        "title": "t(global.additional-information)"
+      },
+      "_name": {
+        "title": "t(harmonization-initiative.name)",
+        "type": "object",
+        "format": "localizedString"
+      },
+      "_acronym": {
+        "title": "t(harmonization-initiative.acronym)",
+        "type": "object",
+        "format": "localizedString"
+      },
+      "_objectives": {
+        "title": "t(harmonization-initiative.objectives)",
+        "type": "object",
+        "format": "obibaSimpleMde"
+      },
+      "_opal": {
+        "title": "t(harmonization-initiative.opal)",
+        "type": "string",
+        "pattern": "^https?://[a-zA-Z0-9._/?&=:%-]+$"
+      }
+    },
+    "required": [
+      "_name",
+      "_acronym",
+      "_objectives"
+    ]
+  },
+  "definition": [
+    {
+      "type": "help",
+      "helpvalue": "<h3>t(study.general-info)</h3>"
+    },
+    {
+      "type": "section",
+      "htmlClass": "row",
+      "items": [
+        {
+          "type": "section",
+          "htmlClass": "col-xs-6",
+          "items": [
+            {
+              "key": "_name",
+              "type": "localizedstring",
+              "description": "t(harmonization-initiative.name-help)"
+            },
+            {
+              "key": "_acronym",
+              "type": "localizedstring",
+              "description": "t(harmonization-initiative.acronym-help)"
+            },
+            {
+              "key": "_opal",
+              "type": "string",
+              "description": "t(harmonization-initiative.opal-help)"
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "htmlClass": "col-xs-6",
+          "items": [
+            {
+              "key": "_objectives",
+              "type": "obibaSimpleMde",
+              "rows": 3,
+              "marked": true,
+              "description": "t(harmonization-initiative.objectives-help)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "fieldset",
+      "items": [
+        {
+          "type": "section",
+          "htmlClass": "row",
+          "items": [
+            {
+              "type": "section",
+              "htmlClass": "col-xs-12 col-md-6",
+              "items": [
+                "startYear"
+              ]
+            },
+            {
+              "type": "section",
+              "htmlClass": "col-xs-12 col-md-6",
+              "items": [
+                "endYear"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "additionalInformation",
+      "type": "obibaSimpleMde"
+    }
+  ]
+}

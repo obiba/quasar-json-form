@@ -136,7 +136,8 @@ createI18n({ messages: { en: { ...messages.en, ...appEn } } })
 ## Layout classes
 
 `options.class` sets CSS classes on the root element of any layout, group, section, label or
-control. `VerticalLayout` / `HorizontalLayout` render their elements as direct children, so Quasar
+control. A `Group` displays its `label` (or `title`) as a heading; `label: false` on a control hides
+its title. `VerticalLayout` / `HorizontalLayout` render their elements as direct children, so Quasar
 grid classes work as in Bootstrap:
 
 ```json
@@ -161,8 +162,17 @@ not applied.
 ## Renderer messages
 
 A renderer-level check reads its message from `options.validationMessage.<name>` on the control when
-defined (translated with `t()`), else from the built-in messages (`localized.completed`, `error.wordLimit`,
+defined (translated with `t()`; a single string applies to every check of the control), else from the built-in messages (`localized.completed`, `error.wordLimit`,
 `files.missing`...), which the application can override in its own vue-i18n bundles.
+
+## Lists
+
+Arrays of objects and arrays of primitives (strings, numbers, booleans, or objects with a `format`
+such as localized strings) render as a list with add / remove / reorder buttons. The UI schema of
+one item comes from `options.items` (`Control` scopes relative to the item schema, `#` for the item
+itself), by default one control per property of an object item, or the item itself. Options:
+`addLabel`, `addIcon`, `ordering` (default true), `confirmation` (confirm before removing);
+`minItems` / `maxItems` from the schema (or the filtrex `min` / `max` rules) bound the list.
 
 ## Localized strings
 
@@ -248,6 +258,67 @@ import { countryCodes } from '@obiba/quasar-ui-json-form'
 
 `format: "typeahead"` on a string is an input with suggestions from `options.values` (strings or
 `{ label, value }`), or the schema `examples` / `enum`; `options.editable: true` accepts any text.
+
+## angular-schema-form compatibility
+
+`@obiba/quasar-ui-json-form/asf` converts a form of the
+[angular-schema-form](https://github.com/json-schema-form/angular-schema-form) dialect (a JSON
+schema and a `definition` array, as stored by Mica) into a `(schema, uischema)` pair for `QJsonForm`.
+It is pure TypeScript (also exported by the main entry as `convertAsf` / `toJsonForms`):
+
+```js
+import { convert, toJsonForms } from '@obiba/quasar-ui-json-form/asf'
+
+const { schema, uischema, diagnostics } = convert(asfSchema, asfDefinition, { translate: t })
+// <QJsonForm :schema="schema" :uischema="uischema" ... />
+
+// either dialect, detected by shape (array: ASF definition, object: JSON Forms UI schema)
+const result = toJsonForms(schema, definitionOrUischema)
+```
+
+Options: `translate(key)` resolves the `t(key)` tokens of the schema and the definition (titles,
+help blocks, option labels, messages); without it the `t()` wrapper is removed and the key kept, so
+that strings made of a single token are still translated by the renderers with vue-i18n. `readonly`
+sets `options.readonly` on every control, `languages` sets `options.languages` on the localized
+strings, `rowClass` replaces the Bootstrap `row` class (`row q-col-gutter-md` by default),
+`textareaRows` (3), `logger` receives the diagnostics (`console.warn` by default, `false` to silence).
+
+| ASF | JSON Forms |
+|---|---|
+| `"a.b"`, `{ key: "a.b" }`, `"*"` (the properties not listed elsewhere) | `Control` with scope `#/properties/a/properties/b` |
+| `section` (+ `htmlClass`), object key with `items` | `VerticalLayout` (+ `options.class`) |
+| `fieldset` (+ `title`), object key without `items` | `Group` (+ `label`), one control per property |
+| `help` + `helpvalue` | `Label` (`text`, HTML allowed) |
+| `tabs` | `Categorization` / `Category` |
+| `htmlClass` | `options.class`, with `col-xs-N` → `col-N`, `col-*-offset-N` → `offset-*-N`, `row` → `rowClass` |
+| `condition` | `rules.visible` (filtrex, see below) |
+| `notitle` | `label: false` |
+| `title`, `description` | written on the schema property |
+| `titleMap` | `oneOf` (`{ const, title }`) on the property or its items; enum arrays get `uniqueItems` |
+| `radios`, `checkboxes` | `options.format: "radio"` / `"checkbox"`; enum arrays default to checkboxes |
+| `textarea`, `rows` | `options.rows` |
+| `localizedstring`, `obibaSimpleMde` (`marked`), `obibaFileUpload`, `radioGroupCollection`, `obibaCountriesUiSelect`, `sf-typeahead`, `datepicker` | `options.format` when the schema `format` does not already select the renderer |
+| `wordLimit`, `emptyMessage`, `validationMessage` (object or string), `placeholder`, `readonly`, `marked` | same option |
+| `add` | `options.addLabel` |
+| `minItems`, `maxItems`, `required: true` | written on the schema |
+| `dateOptions` (`dateFormat`, `yearRef`, `monthRef`, `lastDay`, `validationMessage`) | `options.dateOptions` / `options.validationMessage` |
+| `dateOptions.minDate` / `maxDate` (+ `minDateIsRef` / `maxDateIsRef`) | `options.min` / `max`, or `rules.min` / `max` when it names a field |
+| array key with `items` (`"arr[].x"` keys) | `options.items` (item UI schema, scopes relative to the item) |
+| `x-schema-form` on a schema property | definition defaults for that key |
+| `actions`, `submit`, `button`, `template`, `hidden`, `sf-obiba-selection-tree` | skipped (info diagnostic) |
+
+Unknown keys, unknown types and conditions that cannot be translated are skipped and reported in
+`diagnostics` (`{ level, message, key?, element? }`).
+
+Conditions (`transpileCondition`) accept the JavaScript subset found in form definitions:
+`model.a.b` paths, string / number / boolean / null literals, `!`, `&&`, `||`, parentheses,
+`==` / `===` / `!=` / `!==` / `<` / `<=` / `>` / `>=`, `model.list.indexOf(v) >= 0` (or `> -1`,
+`!= -1`, and the negative forms), `model.list.includes(v)` and `model.list.length`. JavaScript
+truthiness is kept through the `truthy()` filtrex function (`!model.b` → `not (truthy(b))`),
+`indexOf` becomes `contains(list, v)` and comparisons with `null` become `isEmpty` / `isNotEmpty`.
+
+The 13 default Mica forms are converted as acceptance fixtures (`test/fixtures/asf`, snapshots in
+`__snapshots__`), and the `ui/dev` page "test-asf-converter" renders any pasted pair.
 
 # Setup
 ```bash

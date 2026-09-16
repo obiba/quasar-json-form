@@ -15,6 +15,7 @@ const pages = [
   { path: 'test-localized-string', file: 'TestLocalizedString' },
   { path: 'test-file-upload', file: 'TestFileUpload' },
   { path: 'test-mica-widgets', file: 'TestMicaWidgets' },
+  { path: 'test-asf-converter', file: 'TestAsfConverter' },
 ]
 
 const children = pages.map(page => ({

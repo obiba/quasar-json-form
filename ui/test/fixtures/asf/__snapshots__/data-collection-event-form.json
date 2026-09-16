@@ -1,0 +1,410 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "dataSources": {
+        "type": "array",
+        "default": [],
+        "items": {
+          "type": "string",
+          "oneOf": [
+            {
+              "const": "questionnaires",
+              "title": "study_taxonomy.vocabulary.populations-dataCollectionEvents-dataSources.term.questionnaires.title"
+            },
+            {
+              "const": "cognitive_measures",
+              "title": "study_taxonomy.vocabulary.populations-dataCollectionEvents-dataSources.term.cognitive_measures.title"
+            },
+            {
+              "const": "physical_measures",
+              "title": "study_taxonomy.vocabulary.populations-dataCollectionEvents-dataSources.term.physical_measures.title"
+            },
+            {
+              "const": "biological_samples",
+              "title": "study_taxonomy.vocabulary.populations-dataCollectionEvents-dataSources.term.biological_samples.title"
+            },
+            {
+              "const": "administratives_databases",
+              "title": "study_taxonomy.vocabulary.populations-dataCollectionEvents-dataSources.term.administratives_databases.title"
+            },
+            {
+              "const": "others",
+              "title": "study_taxonomy.vocabulary.populations-dataCollectionEvents-dataSources.term.others.title"
+            }
+          ]
+        },
+        "title": "data-collection-event.data-sources",
+        "description": "study_taxonomy.vocabulary.populations-dataCollectionEvents-dataSources.description",
+        "uniqueItems": true
+      },
+      "administrativeDatabases": {
+        "type": "array",
+        "title": "study_taxonomy.vocabulary.populations-dataCollectionEvents-dataSources.term.administratives_databases.title",
+        "items": {
+          "type": "string",
+          "oneOf": [
+            {
+              "const": "health_databases",
+              "title": "study_taxonomy.vocabulary.populations-dataCollectionEvents-administrativeDatabases.term.health_databases.title"
+            },
+            {
+              "const": "vital_statistics_databases",
+              "title": "study_taxonomy.vocabulary.populations-dataCollectionEvents-administrativeDatabases.term.vital_statistics_databases.title"
+            },
+            {
+              "const": "socioeconomic_databases",
+              "title": "study_taxonomy.vocabulary.populations-dataCollectionEvents-administrativeDatabases.term.socioeconomic_databases.title"
+            },
+            {
+              "const": "environmental_databases",
+              "title": "study_taxonomy.vocabulary.populations-dataCollectionEvents-administrativeDatabases.term.environmental_databases.title"
+            }
+          ]
+        },
+        "description": "study_taxonomy.vocabulary.populations-dataCollectionEvents-dataSources.term.administratives_databases.description",
+        "uniqueItems": true
+      },
+      "otherDataSources": {
+        "type": "object",
+        "format": "localizedString",
+        "title": "data-collection-event.other-data-sources",
+        "description": "study_taxonomy.vocabulary.populations-dataCollectionEvents-dataSources.term.others.description"
+      },
+      "bioSamples": {
+        "type": "array",
+        "title": "data-collection-event.bio-samples",
+        "default": [],
+        "items": {
+          "type": "string",
+          "oneOf": [
+            {
+              "const": "blood",
+              "title": "study_taxonomy.vocabulary.populations-dataCollectionEvents-bioSamples.term.blood.title"
+            },
+            {
+              "const": "urine",
+              "title": "study_taxonomy.vocabulary.populations-dataCollectionEvents-bioSamples.term.urine.title"
+            },
+            {
+              "const": "saliva",
+              "title": "study_taxonomy.vocabulary.populations-dataCollectionEvents-bioSamples.term.saliva.title"
+            },
+            {
+              "const": "hair",
+              "title": "study_taxonomy.vocabulary.populations-dataCollectionEvents-bioSamples.term.hair.title"
+            },
+            {
+              "const": "cord_blood",
+              "title": "study_taxonomy.vocabulary.populations-dataCollectionEvents-bioSamples.term.cord_blood.title"
+            },
+            {
+              "const": "tissues",
+              "title": "study_taxonomy.vocabulary.populations-dataCollectionEvents-bioSamples.term.tissues.title"
+            },
+            {
+              "const": "nail",
+              "title": "study_taxonomy.vocabulary.populations-dataCollectionEvents-bioSamples.term.nail.title"
+            },
+            {
+              "const": "buccal_cells",
+              "title": "study_taxonomy.vocabulary.populations-dataCollectionEvents-bioSamples.term.buccal_cells.title"
+            },
+            {
+              "const": "others",
+              "title": "study_taxonomy.vocabulary.populations-dataCollectionEvents-bioSamples.term.others.title"
+            }
+          ]
+        },
+        "description": "study_taxonomy.vocabulary.populations-dataCollectionEvents-dataSources.term.biological_samples.description",
+        "uniqueItems": true
+      },
+      "tissueTypes": {
+        "type": "object",
+        "format": "localizedString",
+        "title": "data-collection-event.tissue-types"
+      },
+      "otherBioSamples": {
+        "type": "object",
+        "format": "localizedString",
+        "title": "data-collection-event.other-bio-samples"
+      },
+      "_id": {
+        "title": "data-collection-event.id",
+        "type": "string"
+      },
+      "_name": {
+        "title": "data-collection-event.name",
+        "type": "object",
+        "format": "localizedString"
+      },
+      "_startYear": {
+        "title": "data-collection-event.start-year",
+        "type": "number",
+        "minimum": 1900,
+        "maximum": 2500
+      },
+      "_startMonth": {
+        "title": "data-collection-event.start-month",
+        "type": "number",
+        "minimum": 1,
+        "maximum": 12
+      },
+      "_startDay": {
+        "title": "data-collection-event.start-day",
+        "type": "string",
+        "format": "ymdatepicker"
+      },
+      "_endYear": {
+        "title": "data-collection-event.end-year",
+        "type": "number",
+        "minimum": 1900,
+        "maximum": 2500
+      },
+      "_endMonth": {
+        "title": "data-collection-event.end-month",
+        "type": "number",
+        "minimum": 1,
+        "maximum": 12
+      },
+      "_endDay": {
+        "title": "data-collection-event.end-day",
+        "type": "string",
+        "format": "ymdatepicker"
+      },
+      "_description": {
+        "type": "object",
+        "format": "obibaSimpleMde",
+        "title": "data-collection-event.description"
+      }
+    },
+    "required": [
+      "_id",
+      "_name",
+      "_startYear"
+    ]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "VerticalLayout",
+        "elements": [
+          {
+            "type": "VerticalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/_id",
+                "options": {
+                  "validationMessage": {
+                    "uniqueId": "global.messages.error.unique-id"
+                  }
+                }
+              }
+            ],
+            "options": {
+              "class": "col-6"
+            }
+          },
+          {
+            "type": "VerticalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/_name"
+              }
+            ],
+            "options": {
+              "class": "col-6"
+            }
+          }
+        ],
+        "options": {
+          "class": "row q-col-gutter-md"
+        }
+      },
+      {
+        "type": "VerticalLayout",
+        "elements": [
+          {
+            "type": "VerticalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/_description",
+                "options": {
+                  "marked": true,
+                  "rows": 3
+                }
+              }
+            ],
+            "options": {
+              "class": "col-12"
+            }
+          }
+        ],
+        "options": {
+          "class": "row q-col-gutter-md"
+        }
+      },
+      {
+        "type": "VerticalLayout",
+        "elements": [
+          {
+            "type": "VerticalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/_startYear"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/_endYear"
+              }
+            ],
+            "options": {
+              "class": "col-4"
+            }
+          },
+          {
+            "type": "VerticalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/_startMonth"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/_endMonth"
+              }
+            ],
+            "options": {
+              "class": "col-4"
+            }
+          },
+          {
+            "type": "VerticalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/_startDay",
+                "options": {
+                  "dateOptions": {
+                    "dateFormat": "yyyy-MM-dd",
+                    "yearRef": "_startYear",
+                    "monthRef": "_startMonth"
+                  },
+                  "validationMessage": {
+                    "invalidYMDate": "global.messages.error.invalid-ym-date"
+                  }
+                }
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/_endDay",
+                "options": {
+                  "dateOptions": {
+                    "dateFormat": "yyyy-MM-dd",
+                    "yearRef": "_endYear",
+                    "monthRef": "_endMonth",
+                    "lastDay": true
+                  },
+                  "validationMessage": {
+                    "invalidYMDate": "global.messages.error.invalid-ym-date"
+                  }
+                }
+              }
+            ],
+            "options": {
+              "class": "col-4"
+            }
+          }
+        ],
+        "options": {
+          "class": "row q-col-gutter-md"
+        }
+      },
+      {
+        "type": "VerticalLayout",
+        "elements": [
+          {
+            "type": "VerticalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/dataSources",
+                "options": {
+                  "format": "checkbox"
+                }
+              }
+            ],
+            "options": {
+              "class": "col-6"
+            }
+          },
+          {
+            "type": "VerticalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/bioSamples",
+                "options": {
+                  "format": "checkbox"
+                },
+                "rules": {
+                  "visible": "contains(dataSources, \"biological_samples\")"
+                }
+              },
+              {
+                "type": "VerticalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/tissueTypes",
+                    "rules": {
+                      "visible": "contains(bioSamples, \"tissues\")"
+                    }
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/otherBioSamples",
+                    "rules": {
+                      "visible": "contains(bioSamples, \"others\")"
+                    }
+                  }
+                ],
+                "options": {
+                  "class": "hoffset3"
+                }
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/administrativeDatabases",
+                "options": {
+                  "format": "checkbox"
+                },
+                "rules": {
+                  "visible": "contains(dataSources, \"administratives_databases\")"
+                }
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/otherDataSources",
+                "rules": {
+                  "visible": "contains(dataSources, \"others\")"
+                }
+              }
+            ],
+            "options": {
+              "class": "col-6"
+            }
+          }
+        ],
+        "options": {
+          "class": "row q-col-gutter-md"
+        }
+      }
+    ]
+  }
+}

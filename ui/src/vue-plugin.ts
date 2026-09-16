@@ -40,6 +40,8 @@ import { normalizeLanguages } from './composables/useControlProperties'
 import type { Language, LanguagesInput } from './composables/useControlProperties'
 import type { FileItem, FileUploadHooks, FileUploadContext } from './components/QFileUploadRenderer'
 import { DATA_KEY, READONLY_KEY, LANGUAGES_KEY, LOCALE_KEY, COUNTRIES_KEY, FORM_ERRORS_KEY } from './composables/keys'
+import { convert as convertAsf, toJsonForms, isAsfDefinition, transpileCondition as transpileAsfCondition, ConditionError as AsfConditionError } from './asf'
+import type { AsfConvertOptions, AsfConvertResult, AsfDiagnostic } from './asf'
 
 const version = __UI_VERSION__
 
@@ -120,6 +122,11 @@ export {
   LOCALE_KEY,
   COUNTRIES_KEY,
   FORM_ERRORS_KEY,
+  convertAsf,
+  toJsonForms,
+  isAsfDefinition,
+  transpileAsfCondition,
+  AsfConditionError,
   install
 }
 
@@ -131,4 +138,7 @@ export type {
   FileItem,
   FileUploadHooks,
   FileUploadContext,
+  AsfConvertOptions,
+  AsfConvertResult,
+  AsfDiagnostic,
 }
