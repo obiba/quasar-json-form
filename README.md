@@ -5,10 +5,14 @@ Compatible with Quasar UI v2 and Vue 3.
 
 A Quasar app extension that renders dynamic, schema-driven forms based on a JSON Schema and an optional UI schema, using [JSON Forms](https://jsonforms.io/) renderers styled with Quasar components.
 
+Documentation: https://www.obiba.org/quasar-json-form/
+
 # Structure
 * [/ui](ui) - standalone npm package
 
 * [/app-extension](app-extension) - Quasar app extension
+
+* [/docs](docs) - documentation site, published on GitHub Pages
 
 # Development
 
@@ -38,6 +42,7 @@ make help                  # Show all available commands
 make install               # Install all dependencies
 make dev                   # Start development server
 make build                 # Build all packages
+make docs                  # Start documentation site
 make clean                 # Clean build artifacts and node_modules
 ```
 
@@ -53,9 +58,12 @@ make clean                 # Clean build artifacts and node_modules
 ├── app-extension/              # Quasar App Extension
 │   └── package.json           # @obiba/quasar-app-extension-json-form
 │
+├── docs/                       # Documentation site (Quasar SPA, GitHub Pages)
+│
 ├── .github/
 │   └── workflows/
 │       ├── ci.yaml            # CI builds on push/PR
+│       ├── docs.yaml          # Publish docs to GitHub Pages on push to master
 │       └── release.yaml       # Publish to npm on tags
 │
 └── Makefile                   # Development commands

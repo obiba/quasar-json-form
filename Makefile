@@ -1,4 +1,4 @@
-.PHONY: help install build dev clean release-ui-patch release-ui-minor release-ui-major release-app-ext-patch release-app-ext-minor release-app-ext-major
+.PHONY: help install build dev docs docs-build clean release-ui-patch release-ui-minor release-ui-major release-app-ext-patch release-app-ext-minor release-app-ext-major
 
 # Default target
 help:
@@ -7,6 +7,8 @@ help:
 	@echo "Development:"
 	@echo "  make install              - Install all dependencies"
 	@echo "  make dev                  - Start development server"
+	@echo "  make docs                 - Start documentation site dev server"
+	@echo "  make docs-build           - Build documentation site (docs/dist/spa)"
 	@echo "  make build                - Build all packages"
 	@echo "  make clean                - Clean build artifacts and node_modules"
 	@echo ""
@@ -27,12 +29,24 @@ install:
 	cd ui && npm install
 	@echo "Installing UI dev app dependencies..."
 	cd ui/dev && npm install
+	@echo "Installing docs dependencies..."
+	cd docs && npm install
 	@echo "✓ All dependencies installed"
 	
 # Development server
 dev:
 	@echo "Starting development server..."
 	cd ui && npm run dev
+
+# Documentation site
+docs:
+	@echo "Starting documentation site..."
+	cd docs && npm run dev
+
+docs-build:
+	@echo "Building documentation site..."
+	cd docs && npm run build
+	@echo "✓ Docs built in docs/dist/spa"
 
 # Build all packages
 build:
@@ -47,6 +61,8 @@ clean:
 	rm -rf ui/node_modules
 	rm -rf ui/dev/node_modules
 	rm -rf app-extension/node_modules
+	rm -rf docs/node_modules
+	rm -rf docs/dist
 	@echo "✓ Clean complete"
 
 # Release UI package commands

@@ -1,0 +1,10 @@
+{
+  "name": "Control",
+  "options": {
+    "class": { "type": "String", "desc": "CSS classes set on the root element of the control (Quasar grid classes such as `col-md-6` work inside a layout with `row`)." },
+    "readonly": { "type": "Boolean", "default": "false", "desc": "Render the control read-only. Also `readOnly` in the schema, or the `readonly` prop of `QJsonForm`." },
+    "format": { "type": "String", "desc": "Select a renderer when the schema `format` is not set (`radio`, `checkbox`, `slider`, `rating`, `typeahead`, `markdown`, `datepicker`...)." },
+    "validationMessage": { "type": "String | Object", "desc": "Message of the renderer-level checks, translated with `t()`: a string applies to every check of the control; in a map, `default` is the fallback of the named messages (`validationMessage.wordLimitError`...)." },
+    "languages": { "type": "Array | Object", "desc": "Languages of a localized string control, `['en', 'fr']` or `{ en: 'English' }`; defaults to `config.languages`, then the `languages` prop of `QJsonForm`." }
+  }
+}

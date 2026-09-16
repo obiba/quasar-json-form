@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://github.com/obiba/quasar-json-form/issues"
   },
-  "homepage": "https://github.com/obiba/quasar-json-form",
+  "homepage": "https://www.obiba.org/quasar-json-form/",
   "type": "module",
   "main": "src/index.js",
   "imports": {
