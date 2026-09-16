@@ -14,11 +14,12 @@
  *   and `model.list.includes(v)`, mapped to the `contains(list, v)` function;
  * - `model.list.length`, mapped to `length(list)`.
  *
- * JavaScript truthiness is preserved with the `truthy(value)` function where a
- * value is used as a boolean (`!model.b`, `model.a && ...`), and comparisons
- * with `null` / `undefined` become `isNull(x)` (null or undefined, not the
- * empty string), since filtrex has neither boolean nor null literals and
- * rejects `not undefined`.
+ * filtrex has neither boolean nor null literals and rejects `not undefined`,
+ * so JavaScript truthiness is preserved with the `truthy(value)` function
+ * where a value is used as a boolean (`!model.b`, `model.a && ...`, loose
+ * `== true`), and the comparisons with `true` / `false` / `null` /
+ * `undefined` are expressed with the `isBoolean`, `isNull` and `isUndefined`
+ * functions, keeping the strict (`===`) and loose (`==`) distinctions.
  */
 
 export class ConditionError extends Error {
@@ -44,7 +45,7 @@ type Node =
   | { kind: 'string'; value: string }
   | { kind: 'number'; value: number }
   | { kind: 'bool'; value: boolean }
-  | { kind: 'nullish' }
+  | { kind: 'nullish'; value: null | undefined }
   | { kind: 'indexOf'; path: Node; arg: Node }
   | { kind: 'contains'; path: Node; arg: Node }
   | { kind: 'length'; path: Node }
@@ -228,8 +229,9 @@ class Parser {
       case 'false':
         return { kind: 'bool', value: false }
       case 'null':
+        return { kind: 'nullish', value: null }
       case 'undefined':
-        return { kind: 'nullish' }
+        return { kind: 'nullish', value: undefined }
       default:
         break
     }
@@ -299,6 +301,7 @@ function isRelational(op: string): boolean {
 
 function emitComparison(node: Extract<Node, { kind: 'cmp' }>, source: string): string {
   const { left, right } = node
+  const strict = node.op === '===' || node.op === '!=='
   const op = node.op === '===' ? '==' : node.op === '!==' ? '!=' : node.op
   const negated = op === '!='
 
@@ -323,21 +326,32 @@ function emitComparison(node: Extract<Node, { kind: 'cmp' }>, source: string): s
     throw new ConditionError(`unsupported operator '${node.op}'`, source)
   }
 
-  // x == null / undefined (loose and strict: the accepted literals are both nullish)
+  // x == null / undefined: loosely, null and undefined are equal to each other only;
+  // strictly, `=== null` and `=== undefined` are distinct
   if (right.kind === 'nullish' || left.kind === 'nullish') {
+    const literal = right.kind === 'nullish' ? right : (left as Extract<Node, { kind: 'nullish' }>)
     const other = right.kind === 'nullish' ? left : right
-    if (other.kind === 'nullish') return negated ? FALSE : TRUE
-    const isNull = `isNull(${emitValue(other, source)})`
-    return negated ? `not (${isNull})` : isNull
+    if (other.kind === 'nullish') return (other.value === literal.value || !strict) !== negated ? TRUE : FALSE
+    if (other.kind === 'bool') return negated ? TRUE : FALSE
+    const value = emitValue(other, source)
+    let test: string
+    if (!strict) test = `isNull(${value})`
+    else if (literal.value === undefined) test = `isUndefined(${value})`
+    else test = `(isNull(${value}) and not (isUndefined(${value})))`
+    return negated ? `not (${test})` : test
   }
 
-  // x == true / false: JavaScript truthiness
+  // x == true / false: JavaScript truthiness when loose, a boolean of that value when strict
   if (right.kind === 'bool' || left.kind === 'bool') {
     const other = right.kind === 'bool' ? left : right
     const expected = (right.kind === 'bool' ? right : (left as Extract<Node, { kind: 'bool' }>)).value
     if (other.kind === 'bool') return (other.value === expected) !== negated ? TRUE : FALSE
-    const truthy = `truthy(${emitValue(other, source)})`
-    return expected !== negated ? truthy : `not (${truthy})`
+    const value = emitValue(other, source)
+    const truthy = `truthy(${value})`
+    const test = strict
+      ? `(isBoolean(${value}) and ${expected ? truthy : `not (${truthy})`})`
+      : expected ? truthy : `not (${truthy})`
+    return negated ? `not (${test})` : test
   }
 
   if (isRelational(op)) {

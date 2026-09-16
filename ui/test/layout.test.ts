@@ -113,3 +113,32 @@ describe('Group label and hidden control titles', () => {
     wrapper.unmount()
   })
 })
+
+describe('conditional layouts and labels', () => {
+  it('do not clear the form data when hidden', async () => {
+    const schema = { type: 'object', properties: { show: { type: 'boolean' }, a: { type: 'string' }, b: { type: 'string' } } }
+    const wrapper = mountForm({
+      schema,
+      uischema: {
+        type: 'VerticalLayout',
+        elements: [
+          { type: 'Control', scope: '#/properties/show' },
+          { type: 'Label', text: 'Hidden label', rules: { visible: 'truthy(show)' } },
+          { type: 'Section', label: 'Hidden section', rules: { visible: 'truthy(show)' } },
+          { type: 'Group', label: 'Hidden group', rules: { visible: 'truthy(show)' }, elements: [{ type: 'Control', scope: '#/properties/a' }] },
+          { type: 'Control', scope: '#/properties/b' },
+        ],
+      },
+      modelValue: { show: true, a: 'A', b: 'B' },
+    })
+    await flush()
+    expect(wrapper.find('.q-group-renderer').exists()).toBe(true)
+    await wrapper.setProps({ modelValue: { show: false, a: 'A', b: 'B' } })
+    await flush()
+    expect(wrapper.find('.q-group-renderer').exists()).toBe(false)
+    expect(wrapper.find('.q-section-renderer').exists()).toBe(false)
+    const emitted = wrapper.emitted('update:modelValue') || []
+    emitted.forEach((event) => expect(event[0]).toMatchObject({ b: 'B' }))
+    wrapper.unmount()
+  })
+})

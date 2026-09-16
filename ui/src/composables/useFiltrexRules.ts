@@ -23,6 +23,14 @@ export class FiltrexRuleEngine {
       return value === null || value === undefined
     })
 
+    this.addFunction('isUndefined', (value: any) => {
+      return value === undefined
+    })
+
+    this.addFunction('isBoolean', (value: any) => {
+      return typeof value === 'boolean'
+    })
+
     this.addFunction('ifElse', (condition: boolean, trueVal: any, falseVal: any) => {
       return condition ? trueVal : falseVal
     })

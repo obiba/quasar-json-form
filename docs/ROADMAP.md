@@ -186,11 +186,13 @@ toJsonForms(schema, definitionOrUischema, options)   // dialect detected by shap
   `rules.min`) / `x-schema-form` / definition `required` / `title` / `description` → renderer
   options or schema copy. `"*"` expands to the properties not listed elsewhere.
 - [x] `condition` → `rules.visible`: a tokenizer + recursive-descent parser of the JavaScript subset
-  in use (`transpileCondition`), emitting filtrex. filtrex has no boolean / null literals, rejects
-  single-quoted strings and `not undefined`, so the transpiler emits `truthy(x)` (new engine
-  function) for values used as booleans, `contains(list, v)` for `indexOf` / `includes`,
-  `isEmpty` / `isNotEmpty` for `null` comparisons and guards ordering comparisons. Anything else
-  (`arrayIndex`, computed access, function calls) is reported and left visible.
+  in use (`transpileCondition`) emitting filtrex: paths, single or double quoted strings, numbers,
+  `true` / `false` / `null` / `undefined`, `!` / `&&` / `||`, comparisons, `indexOf` / `includes` /
+  `length`. filtrex has no boolean / null literals and rejects `not undefined`, so the transpiler
+  emits `truthy(x)` for values used as booleans, `contains(list, v)` for `indexOf` / `includes`,
+  `isBoolean` / `isNull` / `isUndefined` for the comparisons with those literals (strict and loose
+  kept distinct) and `isNotEmpty` guards on ordering comparisons (new engine functions). Anything
+  else (`arrayIndex`, computed access, function calls) is reported and left visible.
 - [x] `t(...)` tokens: resolved with the `translate` option (vue-i18n `t` in mica-ui, at conversion
   time, so a locale switch re-converts) or unwrapped to the key so that single-token strings are
   still translated by the renderers.

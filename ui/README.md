@@ -316,8 +316,10 @@ Conditions (`transpileCondition`) accept the JavaScript subset found in form def
 `==` / `===` / `!=` / `!==` / `<` / `<=` / `>` / `>=`, `model.list.indexOf(v) >= 0` (or `> -1`,
 `!= -1`, and the negative forms), `model.list.includes(v)` and `model.list.length`. JavaScript
 truthiness is kept through the `truthy()` filtrex function (`!model.b` → `not (truthy(b))`),
-`indexOf` becomes `contains(list, v)` and comparisons with `null` / `undefined` become `isNull(x)`
-(null or undefined, not the empty string).
+`indexOf` becomes `contains(list, v)`, and comparisons with `true` / `false` / `null` / `undefined` use
+the `isBoolean` / `isNull` / `isUndefined` functions with the strict / loose distinction of JavaScript
+(`model.a == null` → `isNull(a)`, `model.a === null` → `(isNull(a) and not (isUndefined(a)))`,
+`model.a === true` → `(isBoolean(a) and truthy(a))`).
 
 The 13 default Mica forms are converted as acceptance fixtures (`test/fixtures/asf`, snapshots in
 `__snapshots__`), and the `ui/dev` page "test-asf-converter" renders any pasted pair.
