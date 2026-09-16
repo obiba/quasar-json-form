@@ -71,8 +71,7 @@
       "projectWebsite": {
         "title": "data-access-request.default.I.C.website",
         "type": "string",
-        "pattern": "^https?://\\S+$",
-        "description": "data-access-request.default.I.C.website-help"
+        "pattern": "^https?://\\S+$"
       },
       "abstract": {
         "type": "string"
@@ -260,7 +259,8 @@
                 "elements": [
                   {
                     "type": "Control",
-                    "scope": "#/properties/projectWebsite"
+                    "scope": "#/properties/projectWebsite",
+                    "hint": "data-access-request.default.I.C.website-help"
                   }
                 ],
                 "options": {

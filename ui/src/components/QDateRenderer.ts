@@ -7,7 +7,7 @@ import { useControlProperties } from '../composables/useControlProperties'
 import { useFormI18n } from '../composables/useFormI18n'
 import { useReportedErrors } from '../composables/useFormErrors'
 import { DATA_KEY } from '../composables/keys'
-import { getByPath, omitOptions } from '../utils/options'
+import { getByPath, omitOptions, RENDERER_OPTION_KEYS } from '../utils/options'
 
 /** angular-strap style masks (`yyyy-MM-dd`) to Quasar masks (`YYYY-MM-DD`) */
 export function normalizeDateMask(mask: unknown): string | undefined {
@@ -45,7 +45,8 @@ export default defineComponent({
     const control = controlResult.control
 
     const {
-      isVisible, isEnabled, isReadonly, inputLabel, hasError, errorMessage, options, minValue, maxValue, validationMessage,
+      isVisible, isEnabled, isReadonly, inputLabel, rootClass, hasError, errorMessage, options, minValue, maxValue, validationMessage,
+      renderHeader, hintSlot,
     } = useControlProperties(control)
 
     const dateOptions = computed<Record<string, any>>(() => {
@@ -219,8 +220,8 @@ export default defineComponent({
       const refsMissing = hasRefs.value && !refRange.value
       const disabled = (!isEnabled.value || refsMissing) && !isReadonly.value
 
-      return h(QInput, {
-        ...omitOptions(options.value),
+      return h('div', { class: ['q-date-renderer', rootClass.value] }, [...renderHeader(), h(QInput, {
+        ...omitOptions(options.value, [...RENDERER_OPTION_KEYS, 'class']),
         modelValue: dateValue.value,
         'onUpdate:modelValue': onChange,
         label: inputLabel.value,
@@ -229,8 +230,9 @@ export default defineComponent({
         required: control.value.required,
         disable: disabled,
         readonly: isReadonly.value,
-        hint: control.value.description ? t(control.value.description) : undefined,
-      }, isReadonly.value || disabled ? {} : {
+      }, {
+        ...hintSlot.value,
+        ...(isReadonly.value || disabled ? {} : {
         append: () => h(QIcon, {
           name: 'event',
           class: 'cursor-pointer',
@@ -264,7 +266,8 @@ export default defineComponent({
             }),
           }),
         }),
-      })
+        }),
+      })])
     }
   },
 })

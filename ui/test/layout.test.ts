@@ -29,8 +29,8 @@ describe('layouts', () => {
     const horizontal = root.find(':scope > .q-horizontal-layout')
     expect(horizontal.exists()).toBe(true)
     // elements are direct children of the layout root (no item wrapper)
-    expect(horizontal.findAll(':scope > .q-field').length).toBe(2)
-    expect(root.findAll(':scope > .q-field').length).toBe(1)
+    expect(horizontal.findAll(':scope > .q-string-renderer').length).toBe(2)
+    expect(root.findAll(':scope > .q-string-renderer').length).toBe(1)
     wrapper.unmount()
   })
 
@@ -52,7 +52,7 @@ describe('layouts', () => {
     expect(root.classes()).toEqual(expect.arrayContaining(['q-vertical-layout', 'row', 'q-col-gutter-md']))
     expect(root.find(':scope > .q-vertical-layout.col-md-6').exists()).toBe(true)
     expect(root.find(':scope > .q-group-renderer.col-md-6').exists()).toBe(true)
-    expect(root.find(':scope > .q-field.col-12').exists()).toBe(true)
+    expect(root.find(':scope > .q-string-renderer.col-12').exists()).toBe(true)
     wrapper.unmount()
   })
 

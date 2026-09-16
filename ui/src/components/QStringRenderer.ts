@@ -6,7 +6,7 @@ import type { QInputProps } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
 import { useFormI18n } from '../composables/useFormI18n'
 import { useReportedErrors } from '../composables/useFormErrors'
-import { omitOptions } from '../utils/options'
+import { omitOptions, RENDERER_OPTION_KEYS } from '../utils/options'
 import { countWords, isWithinWordLimit, parseWordLimit } from '../utils/words'
 
 
@@ -14,15 +14,17 @@ export default defineComponent({
   name: 'QStringRenderer',
   props: rendererProps(),
   setup(props: any) {
-    const { t, translate } = useFormI18n()
+    const { translate } = useFormI18n()
 
     const controlResult = useJsonFormsControl(props)
 
     const control = controlResult.control
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, isReadonly, inputLabel, hasError, errorMessage, options, validationMessage } =
-      useControlProperties(control)
+    const {
+      isVisible, isEnabled, isReadonly, inputLabel, rootClass, hasError, errorMessage, options, validationMessage,
+      renderHeader, hintSlot,
+    } = useControlProperties(control)
 
     // schema `format` values that map to an HTML input type; anything else is plain text
     const inputTypes: Record<string, QInputProps['type']> = {
@@ -92,22 +94,25 @@ export default defineComponent({
 
       const errors = [errorMessage.value, ...wordErrors.value].filter((e) => e && e.length > 0)
 
-      return h(QInput, {
-        ...omitOptions(options.value),
-        modelValue: control.value.data,
-        'onUpdate:modelValue': onChange,
-        label: inputLabel.value,
-        error: hasError.value || wordErrors.value.length > 0,
-        errorMessage: errors.join('; '),
-        required: control.value.required,
-        disable: !isEnabled.value && !isReadonly.value,
-        readonly: isReadonly.value,
-        hint: control.value.description ? t(control.value.description) : undefined,
-        type: inputType.value,
-        counter: wordCounter.value !== undefined,
-      }, wordCounter.value !== undefined ? {
-        counter: () => wordCounter.value,
-      } : {})
+      return h('div', { class: ['q-string-renderer', rootClass.value] }, [
+        ...renderHeader(),
+        h(QInput, {
+          ...omitOptions(options.value, [...RENDERER_OPTION_KEYS, 'class']),
+          modelValue: control.value.data,
+          'onUpdate:modelValue': onChange,
+          label: inputLabel.value,
+          error: hasError.value || wordErrors.value.length > 0,
+          errorMessage: errors.join('; '),
+          required: control.value.required,
+          disable: !isEnabled.value && !isReadonly.value,
+          readonly: isReadonly.value,
+          type: inputType.value,
+          counter: wordCounter.value !== undefined,
+        }, {
+          ...hintSlot.value,
+          ...(wordCounter.value !== undefined ? { counter: () => wordCounter.value } : {}),
+        }),
+      ])
     }
   },
 })

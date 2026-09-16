@@ -430,6 +430,13 @@ class Converter {
 
     if (item.notitle === true) element.label = false
 
+    // ASF renders the description as a help block under the input: the hint
+    // of the control (the schema `description` is displayed above the input)
+    if (typeof node.description === 'string' && node.description.length > 0) {
+      element.hint = node.description
+      delete node.description
+    }
+
     // definition type → renderer format / options
     if (type === 'textarea' || type === 'ui-ace') {
       options.rows = typeof item.rows === 'number' ? item.rows : (this.options.textareaRows ?? 3)

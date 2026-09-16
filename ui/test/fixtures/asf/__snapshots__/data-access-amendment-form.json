@@ -131,8 +131,7 @@
       },
       "projectWebsite": {
         "title": "data-access-amendment.default.I.C.website",
-        "type": "string",
-        "description": "data-access-amendment.default.I.C.website-help"
+        "type": "string"
       },
       "hasNoStaff": {
         "title": "data-access-amendment.default.I.D.check",
@@ -431,7 +430,8 @@
                 "elements": [
                   {
                     "type": "Control",
-                    "scope": "#/properties/projectWebsite"
+                    "scope": "#/properties/projectWebsite",
+                    "hint": "data-access-amendment.default.I.C.website-help"
                   }
                 ],
                 "options": {

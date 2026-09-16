@@ -4,12 +4,8 @@
   "triggers": [
     { "schema": "format: \"computed\" (schema or options) + rules.compute", "rank": 4, "desc": "A value computed from the other fields with the filtrex `compute` rule, written into the data." }
   ],
-  "element": {
-    "labelClass": { "type": "String", "default": "text-bold q-mb-sm", "desc": "CSS classes of the label, which is rendered as markdown." },
-    "descriptionClass": { "type": "String", "default": "text-grey-7", "desc": "CSS classes of the description, rendered as markdown." }
-  },
   "options": {
-    "show": { "type": "Boolean", "default": "false", "desc": "Display the computed value under the label (the `noValue` i18n key when undefined)." }
+    "show": { "type": "Boolean", "default": "false", "desc": "Display the computed value under the title (the `noValue` i18n key when undefined)." }
   },
   "data": {
     "desc": "The result of the `compute` rule (`rules.compute` on the schema property or the control), re-evaluated whenever the form data changes; `undefined` while the control is hidden.",

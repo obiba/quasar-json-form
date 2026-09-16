@@ -104,10 +104,12 @@ describe('ASF converter', () => {
       type: 'Control',
       scope: '#/properties/notes',
       label: false,
+      // the ASF description is a help block under the input: the hint
+      hint: 'notes.help',
       options: { rows: 3, wordLimit: '0:500', validationMessage: { wordLimitError: 'too-long' } },
     })
     expect(converted.properties.notes.title).toBe('Notes')
-    expect(converted.properties.notes.description).toBe('notes.help')
+    expect(converted.properties.notes.description).toBeUndefined()
     expect(email.options).toEqual({ placeholder: 'x@y.z', readonly: true })
     expect(converted.required).toEqual(['name', 'email'])
     expect(files.options).toEqual({ emptyMessage: 'no-files', validationMessage: { missingFiles: 'missing' } })

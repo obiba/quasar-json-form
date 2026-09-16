@@ -2,7 +2,7 @@ import { h, defineComponent } from 'vue'
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
 import { useControlProperties } from '../composables/useControlProperties'
 import { useFormI18n } from '../composables/useFormI18n'
-import { renderMarkdown } from '../utils/markdown'
+import { renderMarkdown, renderMarkdownInline } from '../utils/markdown'
 
 
 export default defineComponent({
@@ -25,22 +25,21 @@ export default defineComponent({
       }
 
       const children = []
+      const uischema = control.value.uischema as any
 
-      if (control.value.label || control.value.uischema.label) {
-        let label = t(String(control.value.label || control.value.uischema.label))
-        // label = renderMarkdown(label);
+      // the heading: `label` (JSON Forms convention), `title` accepted too
+      const label = control.value.label || uischema.label || uischema.title
+      if (label) {
         children.push(h('div', {
-          class: 'q-form-label' + ((control.value.uischema as any).labelClass ? ` ${(control.value.uischema as any).labelClass}` : ''),
-          innerHTML: label,
+          class: ['q-form-label', uischema.labelClass],
+          innerHTML: renderMarkdownInline(t(String(label))),
         }))
       }
 
-      if (control.value.description || (control.value.uischema as any).description) {
-        let description = t(String(control.value.description || (control.value.uischema as any).description))
-        description = renderMarkdown(description)
+      if (control.value.description || uischema.description) {
         children.push(h('div', {
-          class: 'q-label-renderer text-grey-7' + ((control.value.uischema as any).descriptionClass ? ` ${(control.value.uischema as any).descriptionClass}` : ''),
-          innerHTML: description,
+          class: ['q-form-description text-markdown', uischema.descriptionClass],
+          innerHTML: renderMarkdown(t(String(control.value.description || uischema.description))),
         }))
       }
 

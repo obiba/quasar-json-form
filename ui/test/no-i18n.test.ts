@@ -26,9 +26,10 @@ describe('without vue-i18n', () => {
     const wrapper = mountWithoutI18n({ schema, modelValue: {} })
     await flush()
     const fields = wrapper.findAll('.q-field')
-    expect(fields[0]!.find('.q-field__label').text()).toBe('Name *')
+    const titles = wrapper.findAll('.q-form-title')
+    expect(titles[0]!.text()).toBe('Name *')
     expect(fields[0]!.find('.q-field__messages').text()).toBe('This field is required')
-    expect(fields[1]!.find('.q-field__label').text()).toBe('Color')
+    expect(titles[1]!.text()).toBe('Color')
     expect(warn).toHaveBeenCalled()
     wrapper.unmount()
 

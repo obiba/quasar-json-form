@@ -1,5 +1,35 @@
 {
   "name": "Control",
+  "element": {
+    "title": {
+      "type": "String",
+      "desc": "Question displayed above the control (also `title` on the schema property), translated with `t()` and rendered as inline markdown, with the `*` of a required control. `label: false` hides it."
+    },
+    "description": {
+      "type": "String",
+      "desc": "Text under the title (also `description` on the schema property), translated with `t()` and rendered as markdown."
+    },
+    "label": {
+      "type": "String | false",
+      "desc": "Label inside the input (also `label` on the schema property): floating label of an input or select, text of a toggle, upload button... Plain text, translated with `t()`. `false` hides the title."
+    },
+    "hint": {
+      "type": "String",
+      "desc": "Help text under the input (also `hint` on the schema property), translated with `t()` and rendered as markdown; the error messages replace it."
+    },
+    "titleClass": {
+      "type": "String",
+      "desc": "CSS classes added to the title (`q-form-title`)."
+    },
+    "descriptionClass": {
+      "type": "String",
+      "desc": "CSS classes added to the description (`q-form-description`)."
+    },
+    "hintClass": {
+      "type": "String",
+      "desc": "CSS classes added to the hint (`q-form-hint`)."
+    }
+  },
   "options": {
     "class": {
       "type": "String",

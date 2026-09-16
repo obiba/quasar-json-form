@@ -22,7 +22,7 @@ describe('QJsonForm', () => {
     await flush()
     const root = wrapper.find('.json-form-wrapper > .q-vertical-layout')
     expect(root.exists()).toBe(true)
-    expect(root.findAll(':scope > .q-field').length).toBe(1)
+    expect(root.findAll(':scope > .q-string-renderer').length).toBe(1)
     expect(root.findAll('.q-toggle').length).toBe(1)
     wrapper.unmount()
   })

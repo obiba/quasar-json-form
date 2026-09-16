@@ -42,8 +42,8 @@ describe('computed renderer', () => {
     await flush()
     const renderer = wrapper.find('.q-computed-renderer')
     expect(renderer.exists()).toBe(true)
-    expect(renderer.find('.text-bold').text()).toBe('Total')
-    expect(renderer.find('.text-grey-7').html()).toContain('<strong>A</strong>')
+    expect(renderer.find('.q-form-title').text()).toBe('Total')
+    expect(renderer.find('.q-form-description').html()).toContain('<strong>A</strong>')
     expect(renderer.find('.q-computed-value').text()).toBe('3')
     wrapper.unmount()
   })
@@ -51,7 +51,7 @@ describe('computed renderer', () => {
   it('hides the value without the show option and uses custom classes', async () => {
     const wrapper = mountForm({
       schema,
-      uischema: control({ class: 'my-computed' }, { labelClass: 'lbl', descriptionClass: 'desc' }),
+      uischema: control({ class: 'my-computed' }, { titleClass: 'lbl', descriptionClass: 'desc' }),
       modelValue: { a: 1, b: 2 },
     })
     await flush()

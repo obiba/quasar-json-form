@@ -1,21 +1,19 @@
 import { h, computed, watch, defineComponent, onMounted, onUnmounted } from 'vue'
+import type { VNode } from 'vue'
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
 import { QOptionGroup } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
-import { useFormI18n } from '../composables/useFormI18n'
 
 export default defineComponent({
   name: 'QOptionsRenderer',
   props: rendererProps(),
   setup(props: any) {
-    const { t } = useFormI18n()
-
     const controlResult = useJsonFormsControl(props)
 
     const control = controlResult.control
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, isReadonly, requiredMark, rootClass, options, selectOptions, clearInvalidSelection, title, description } =
+    const { isVisible, isEnabled, isReadonly, rootClass, options, selectOptions, clearInvalidSelection, renderHeader, renderHint } =
       useControlProperties(control)
 
     const isMultiple = computed(() => {
@@ -66,19 +64,7 @@ export default defineComponent({
         return null
       }
 
-      const children = []
-
-      if (title.value) {
-        children.push(h('div', {
-          class: 'text-label text-grey-7 q-mb-xs',
-        }, t(title.value) + requiredMark.value))
-      }
-
-      if (description.value) {
-        children.push(h('div', {
-          class: 'text-description text-caption text-grey-7',
-        }, t(description.value)))
-      }
+      const children: (VNode | null)[] = [...renderHeader()]
 
       const type = isMultiple.value
             ? (options.value && options.value.format) || 'checkbox'
@@ -96,6 +82,8 @@ export default defineComponent({
           'onUpdate:modelValue': isReadonly.value ? undefined : onChange,
         }),
       )
+
+      children.push(renderHint())
 
       return h('div', { class: ['q-options-renderer', rootClass.value] }, children)
     }

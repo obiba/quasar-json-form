@@ -24,8 +24,12 @@
   min-width: 0
   &:empty
     display: none
+// Texts of the controls and groups: the title (and its description) above,
+// the label inside the input, the hint under it. A control title is a
+// question; a group title is a heading.
 .q-form-title
   font-weight: bold
+.q-group-renderer > .q-form-title
   font-size: larger
 .q-form-description
   color: $grey-7
@@ -34,6 +38,12 @@
 .q-form-hint
   color: $grey-7
   font-size: smaller
+// A hint in the bottom slot of a Quasar field inherits the field messages style
+.q-field__messages .q-form-hint
+  color: inherit
+  font-size: inherit
+.q-form-error
+  color: $negative
 .text-markdown > p:last-child
   margin-bottom: 0
 

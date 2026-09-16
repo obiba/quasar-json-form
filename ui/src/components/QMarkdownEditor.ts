@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { h, ref, computed, defineComponent, nextTick } from 'vue'
-import type { PropType } from 'vue'
+import type { PropType, VNode } from 'vue'
 import { QInput, QBtn, QSpace } from 'quasar'
 import { renderMarkdown } from '../utils/markdown'
 import { useFormI18n } from '../composables/useFormI18n'
@@ -17,7 +17,8 @@ interface Edit {
  * (`format: "markdown"`) and localized string (`marked`) renderers.
  *
  * The `toolbar` slot adds content to the right of the toolbar (for instance a
- * language selector).
+ * language selector); the `hint` slot is the hint under the editor when the
+ * `hint` prop is not set (the `hint` slot of the QInput).
  */
 export default defineComponent({
   name: 'QMarkdownEditor',
@@ -91,6 +92,13 @@ export default defineComponent({
       { icon: 'link', title: 'markdown.link', run: link },
     ]
 
+    // Hint under the rendered markdown (read-only and preview): the `hint` prop, else the `hint` slot
+    const renderHint = (): VNode | null => {
+      const content = props.hint ?? (slots.hint ? slots.hint() : undefined)
+      if (content === undefined || content === null || content === '') return null
+      return h('div', { class: 'text-caption text-grey-7 q-mt-xs q-markdown-editor__hint' }, [content])
+    }
+
     return () => {
       const extra = slots.toolbar ? slots.toolbar() : []
 
@@ -106,7 +114,7 @@ export default defineComponent({
           h('div', { class: 'q-markdown-editor__preview text-markdown', innerHTML: html.value }),
           props.error && props.errorMessage
             ? h('div', { class: 'text-negative text-caption q-mt-xs' }, props.errorMessage)
-            : props.hint ? h('div', { class: 'text-caption text-grey-7 q-mt-xs' }, props.hint) : null,
+            : renderHint(),
         ])
       }
 
@@ -141,7 +149,7 @@ export default defineComponent({
           h('div', { class: 'q-markdown-editor__preview text-markdown', innerHTML: html.value }),
           props.error && props.errorMessage
             ? h('div', { class: 'text-negative text-caption q-mt-xs' }, props.errorMessage)
-            : props.hint ? h('div', { class: 'text-caption text-grey-7 q-mt-xs' }, props.hint) : null,
+            : renderHint(),
         ])
         : h(QInput, {
           ...props.inputProps,
@@ -155,7 +163,7 @@ export default defineComponent({
           error: props.error,
           errorMessage: props.errorMessage,
           disable: props.disable,
-        })
+        }, slots.hint ? { hint: slots.hint } : {})
 
       return h('div', { class: 'q-markdown-editor' }, [toolbar, body])
     }

@@ -18,26 +18,22 @@
       "_name": {
         "title": "harmonization-initiative.name",
         "type": "object",
-        "format": "localizedString",
-        "description": "harmonization-initiative.name-help"
+        "format": "localizedString"
       },
       "_acronym": {
         "title": "harmonization-initiative.acronym",
         "type": "object",
-        "format": "localizedString",
-        "description": "harmonization-initiative.acronym-help"
+        "format": "localizedString"
       },
       "_objectives": {
         "title": "harmonization-initiative.objectives",
         "type": "object",
-        "format": "obibaSimpleMde",
-        "description": "harmonization-initiative.objectives-help"
+        "format": "obibaSimpleMde"
       },
       "_opal": {
         "title": "harmonization-initiative.opal",
         "type": "string",
-        "pattern": "^https?://[a-zA-Z0-9._/?&=:%-]+$",
-        "description": "harmonization-initiative.opal-help"
+        "pattern": "^https?://[a-zA-Z0-9._/?&=:%-]+$"
       }
     },
     "required": [
@@ -61,15 +57,18 @@
             "elements": [
               {
                 "type": "Control",
-                "scope": "#/properties/_name"
+                "scope": "#/properties/_name",
+                "hint": "harmonization-initiative.name-help"
               },
               {
                 "type": "Control",
-                "scope": "#/properties/_acronym"
+                "scope": "#/properties/_acronym",
+                "hint": "harmonization-initiative.acronym-help"
               },
               {
                 "type": "Control",
-                "scope": "#/properties/_opal"
+                "scope": "#/properties/_opal",
+                "hint": "harmonization-initiative.opal-help"
               }
             ],
             "options": {
@@ -82,6 +81,7 @@
               {
                 "type": "Control",
                 "scope": "#/properties/_objectives",
+                "hint": "harmonization-initiative.objectives-help",
                 "options": {
                   "marked": true,
                   "rows": 3

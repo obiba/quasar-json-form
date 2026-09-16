@@ -28,7 +28,7 @@ describe('localized string', () => {
     const field = wrapper.find('.q-localized-string')
     expect(field.exists()).toBe(true)
     expect((field.find('input').element as HTMLInputElement).value).toBe('Hello')
-    expect(field.find('.q-field__label').text()).toBe('Name *')
+    expect(wrapper.find('.q-localized-string-renderer .q-form-title').text()).toBe('Name *')
     const buttons = field.findAll('.q-localized-toggle .q-btn')
     expect(buttons.map((b) => b.text())).toEqual(['EN', 'FR'])
     await buttons[1]!.trigger('click')

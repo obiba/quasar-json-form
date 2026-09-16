@@ -30,7 +30,7 @@ describe('radio matrix', () => {
     expect(rows.length).toBe(2)
     expect(rows[1]!.find('td').html()).toContain('Bio <em>samples</em>')
     expect(table.findAll('.q-radio').length).toBe(4)
-    expect(wrapper.find('.text-label').text()).toBe('Access *')
+    expect(wrapper.find('.q-form-title').text()).toBe('Access *')
     wrapper.unmount()
   })
 

@@ -2,21 +2,21 @@ import { h, computed, watch, defineComponent, onUnmounted } from 'vue'
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
 import { QSelect } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
-import { useFormI18n } from '../composables/useFormI18n'
+import { omitOptions } from '../utils/options'
 
 export default defineComponent({
   name: 'QSelectRenderer',
   props: rendererProps(),
   setup(props: any) {
-    const { t } = useFormI18n()
-
     const controlResult = useJsonFormsControl(props)
 
     const control = controlResult.control
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, isReadonly, inputLabel, hasError, errorMessage, options, selectOptions, clearInvalidSelection } =
-      useControlProperties(control)
+    const {
+      isVisible, isEnabled, isReadonly, inputLabel, rootClass, hasError, errorMessage, options, selectOptions,
+      clearInvalidSelection, renderHeader, hintSlot,
+    } = useControlProperties(control)
 
     const isMultiple = computed(() => {
       const schema = controlResult.control.value.schema
@@ -50,23 +50,27 @@ export default defineComponent({
         return null
       }
 
-      return h(QSelect, {
-        ...options.value,
-        modelValue: control.value.data,
-        'onUpdate:modelValue': onChange,
-        label: inputLabel.value,
-        options: selectOptions.value,
-        error: hasError.value,
-        errorMessage: errorMessage.value,
-        required: control.value.required,
-        disable: !isEnabled.value && !isReadonly.value,
-        readonly: isReadonly.value,
-        hint: control.value.description ? t(control.value.description) : undefined,
-        emitValue: true,
-        mapOptions: true,
-        multiple: isMultiple.value,
-        clearable: !control.value.required,
-      })
+      return h('div', { class: ['q-select-renderer', rootClass.value] }, [
+        ...renderHeader(),
+        h(QSelect, {
+          ...omitOptions(options.value, ['class']),
+          modelValue: control.value.data,
+          'onUpdate:modelValue': onChange,
+          label: inputLabel.value,
+          options: selectOptions.value,
+          error: hasError.value,
+          errorMessage: errorMessage.value,
+          required: control.value.required,
+          disable: !isEnabled.value && !isReadonly.value,
+          readonly: isReadonly.value,
+          emitValue: true,
+          mapOptions: true,
+          multiple: isMultiple.value,
+          clearable: !control.value.required,
+        }, {
+          ...hintSlot.value,
+        }),
+      ])
     }
   },
 })

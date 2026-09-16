@@ -41,9 +41,11 @@ describe('select renderer', () => {
     expect(color.props('options')).toEqual([{ label: 'Red', value: 'red' }, { label: 'blue', value: 'blue' }])
     expect(color.props('clearable')).toBe(false)
     expect(color.props('multiple')).toBe(false)
-    expect(color.find('.q-field__label').text()).toBe('Color *')
+    expect(color.find('.q-field__label').exists()).toBe(false)
     expect(color.find('.q-field__native').text()).toBe('Red')
-    expect(color.find('.q-field__messages').text()).toBe('Pick one')
+    const renderer = color.element.parentElement!
+    expect(renderer.querySelector('.q-form-title')!.textContent).toBe('Color *')
+    expect(renderer.querySelector('.q-form-description')!.textContent).toBe('Pick one')
     const size = selectOf(wrapper, 1)
     expect(size.props('options')).toEqual([{ label: 'Small', value: 's' }, { label: 'Large', value: 'l' }])
     expect(size.props('clearable')).toBe(true)
@@ -142,8 +144,8 @@ describe('options renderer (radio / checkbox)', () => {
     await flush()
     const renderer = wrapper.find('.q-options-renderer')
     expect(renderer.classes()).toContain('my-options')
-    expect(renderer.find('.text-label').text()).toBe('Color')
-    expect(renderer.find('.text-description').text()).toBe('Pick one')
+    expect(renderer.find('.q-form-title').text()).toBe('Color')
+    expect(renderer.find('.q-form-description').text()).toBe('Pick one')
     const radios = renderer.findAll('.q-radio')
     expect(radios.length).toBe(2)
     await radios[1]!.trigger('click')
@@ -213,18 +215,21 @@ describe('toggle renderer', () => {
     required: ['agree'],
   }
 
-  it('renders the label with the required mark, the description and the hint option', async () => {
+  it('renders the title with the required mark, the description, the label on the toggle and the hint', async () => {
     const wrapper = mountForm({
       schema,
-      uischema: { type: 'Control', scope: '#/properties/agree', options: { hint: 'toggle.hint', class: 'my-toggle' } },
+      uischema: { type: 'Control', scope: '#/properties/agree', label: 'Yes', hint: 'toggle.hint', options: { class: 'my-toggle' } },
       modelValue: { agree: false },
     }, { messages: { en: { toggle: { hint: 'Please agree' } } } })
     await flush()
     const toggle = wrapper.find('.q-toggle')
-    expect(toggle.find('.q-toggle__label').text()).toBe('Agree *')
+    expect(toggle.find('.q-toggle__label').text()).toBe('Yes')
     const root = toggle.element.parentElement!
     expect(root.classList.contains('my-toggle')).toBe(true)
-    expect(Array.from(root.querySelectorAll('.text-caption')).map((e) => e.textContent)).toEqual(['Terms', 'Please agree'])
+    expect(Array.from(root.children).map((e) => e.className.split(' ')[0])).toEqual(['q-form-title', 'q-form-description', 'q-toggle', 'q-form-hint'])
+    expect(root.querySelector('.q-form-title')!.textContent).toBe('Agree *')
+    expect(root.querySelector('.q-form-description')!.textContent).toBe('Terms')
+    expect(root.querySelector('.q-form-hint')!.textContent).toBe('Please agree')
     await toggle.trigger('click')
     await flush()
     expect(lastData(wrapper).agree).toBe(true)
@@ -276,7 +281,7 @@ describe('number renderer', () => {
     await flush()
     const fields = wrapper.findAll('.q-field')
     expect(fields[0]!.find('input').attributes('type')).toBe('number')
-    expect(fields[0]!.find('.q-field__messages').text()).toBe('Years')
+    expect(fields[0]!.element.parentElement!.querySelector('.q-form-description')!.textContent).toBe('Years')
     await fields[1]!.find('input').setValue('1.5')
     await flush()
     expect(lastData(wrapper).ratio).toBe(1.5)
@@ -336,7 +341,7 @@ describe('typeahead renderer', () => {
     expect(select.props('options')).toEqual([{ label: 'analyst', value: 'analyst' }, { label: 'investigator', value: 'investigator' }])
     expect(select.props('clearable')).toBe(false)
     expect(select.props('newValueMode')).toBeUndefined()
-    expect(select.find('.q-field__messages').text()).toBe('Your role')
+    expect(select.element.parentElement!.querySelector('.q-form-description')!.textContent).toBe('Your role')
     await filter(select, 'INV')
     expect(select.props('options')).toEqual([{ label: 'investigator', value: 'investigator' }])
     await filter(select, '')
@@ -361,7 +366,8 @@ describe('typeahead renderer', () => {
     expect(kind.props('options')).toEqual([{ label: 'one', value: 'one' }, { label: 'two', value: 'two' }])
     expect(kind.props('newValueMode')).toBe('add-unique')
     expect(kind.props('clearable')).toBe(true)
-    expect(kind.classes()).toContain('my-typeahead')
+    expect(kind.classes()).toContain('q-typeahead')
+    expect(kind.element.parentElement!.classList.contains('my-typeahead')).toBe(true)
     const role = wrapper.findAllComponents(QSelect)[1]!
     expect(role.props('options')).toEqual([
       { label: 'Key name', value: 'k' },

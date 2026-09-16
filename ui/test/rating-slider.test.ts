@@ -27,16 +27,16 @@ const uischema = (starsExtra: Record<string, unknown> = {}, levelExtra: Record<s
 })
 
 describe('rating renderer', () => {
-  it('renders the label with the required mark, the description and the hint', async () => {
+  it('renders the title with the required mark, the description and the hint', async () => {
     const wrapper = mountForm({ schema, uischema: uischema(), modelValue: { stars: 3 } })
     await flush()
     const rating = wrapper.find('.q-rating')
     expect(rating.exists()).toBe(true)
     const root = rating.element.parentElement!
     expect(root.classList.contains('my-rating')).toBe(true)
-    expect(root.querySelector('.text-label')!.textContent).toBe('Stars *')
-    expect(root.querySelector('.text-description')!.textContent).toBe('How many')
-    expect(root.querySelector('.text-hint')!.textContent).toBe('rate it')
+    expect(root.querySelector('.q-form-title')!.textContent).toBe('Stars *')
+    expect(root.querySelector('.q-form-description')!.textContent).toBe('How many')
+    expect(root.querySelector('.q-form-hint')!.textContent).toBe('rate it')
     expect(rating.findAll('.q-rating__icon-container').length).toBe(4)
     expect(rating.classes()).toContain('q-rating--editable')
     wrapper.unmount()
@@ -78,16 +78,16 @@ describe('rating renderer', () => {
 })
 
 describe('slider renderer', () => {
-  it('renders the label, description and hint', async () => {
+  it('renders the title, description and hint', async () => {
     const wrapper = mountForm({ schema, uischema: uischema(), modelValue: { level: 3 } })
     await flush()
     const slider = wrapper.find('.q-slider')
     expect(slider.exists()).toBe(true)
     const root = slider.element.parentElement!
     expect(root.classList.contains('my-slider')).toBe(true)
-    expect(root.querySelector('.text-label')!.textContent).toBe('Level')
-    expect(root.querySelector('.text-description')!.textContent).toBe('How much')
-    expect(root.querySelector('.text-hint')!.textContent).toBe('slide it')
+    expect(root.querySelector('.q-form-title')!.textContent).toBe('Level')
+    expect(root.querySelector('.q-form-description')!.textContent).toBe('How much')
+    expect(root.querySelector('.q-form-hint')!.textContent).toBe('slide it')
     expect(wrapper.findComponent(QSlider).props('max')).toBe(10)
     wrapper.unmount()
   })
@@ -98,8 +98,8 @@ describe('slider renderer', () => {
     wrapper.findComponent(QSlider).vm.$emit('update:modelValue', 7)
     await flush()
     expect(lastData(wrapper).level).toBe(7)
-    expect(wrapper.find('.q-slider').element.parentElement!.querySelector('.text-error')!.textContent).toBe('Must be less than or equal to 5')
-    expect(wrapper.find('.q-slider').element.parentElement!.querySelector('.text-hint')).toBeNull()
+    expect(wrapper.find('.q-slider').element.parentElement!.querySelector('.q-form-error')!.textContent).toBe('Must be less than or equal to 5')
+    expect(wrapper.find('.q-slider').element.parentElement!.querySelector('.q-form-hint')).toBeNull()
     wrapper.unmount()
   })
 

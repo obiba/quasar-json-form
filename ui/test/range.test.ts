@@ -33,16 +33,16 @@ const uischema = (extra: Record<string, unknown> = {}) => ({
 })
 
 describe('range renderer', () => {
-  it('renders the label with the required mark, the description and the hint', async () => {
+  it('renders the title with the required mark, the description and the hint', async () => {
     const wrapper = mountForm({ schema, uischema: uischema(), modelValue: { ages: { min: 20, max: 60 } } })
     await flush()
     const range = wrapper.find('.q-range')
     expect(range.exists()).toBe(true)
     const root = range.element.parentElement!
     expect(root.classList.contains('my-range')).toBe(true)
-    expect(root.querySelector('.text-label')!.textContent).toBe('Ages *')
-    expect(root.querySelector('.text-description')!.textContent).toBe('Youngest and oldest')
-    expect(root.querySelector('.text-hint')!.textContent).toBe('drag both')
+    expect(root.querySelector('.q-form-title')!.textContent).toBe('Ages *')
+    expect(root.querySelector('.q-form-description')!.textContent).toBe('Youngest and oldest')
+    expect(root.querySelector('.q-form-hint')!.textContent).toBe('drag both')
     const props = wrapper.findComponent(QRange).props()
     expect(props.max).toBe(100)
     expect(props.step).toBe(5)
@@ -67,8 +67,8 @@ describe('range renderer', () => {
     await flush()
     expect(wrapper.findComponent(QRange).props('modelValue')).toEqual({ min: null, max: null })
     const root = wrapper.find('.q-range').element.parentElement!
-    expect(root.querySelector('.text-error')!.textContent).toBe('This field is required')
-    expect(root.querySelector('.text-hint')).toBeNull()
+    expect(root.querySelector('.q-form-error')!.textContent).toBe('This field is required')
+    expect(root.querySelector('.q-form-hint')).toBeNull()
     wrapper.unmount()
   })
 

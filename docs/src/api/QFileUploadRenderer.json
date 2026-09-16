@@ -22,16 +22,6 @@
     "label": {
       "type": "String",
       "desc": "Label of the upload button (also `label` on the schema property); defaults to the `files.upload` message."
-    },
-    "titleClass": {
-      "type": "String",
-      "default": "text-bold",
-      "desc": "CSS classes of the title."
-    },
-    "descriptionClass": {
-      "type": "String",
-      "default": "text-grey-7",
-      "desc": "CSS classes of the description, which is rendered as markdown."
     }
   },
   "options": {

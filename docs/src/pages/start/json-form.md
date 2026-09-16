@@ -44,6 +44,25 @@ specific control, then `error.<keyword>` (`error.required`, `error.minLength`, `
 with the AJV error params available for interpolation (`{limit}`, `{pattern}`, `{format}`...),
 then `error.default`.
 
+## Title, description, label and hint
+
+Every control displays its texts the same way, questionnaire style:
+
+- the `title` above the control, in bold, with the `*` of a required control, and the
+  `description` under the title;
+- the `label` inside the input: the floating label of a `QInput` / `QSelect`, the text of a
+  toggle, the upload button of a file control;
+- the `hint` under the input, in the messages of a `QInput` / `QSelect` (where the errors replace
+  it) or after the component.
+
+Each one is read from the UI schema element first, then from the schema property. They are
+translated with vue-i18n when they are keys, and rendered as markdown (inline for the title; the
+label is plain text). The `*` of a required control goes on the title, or on the label when there
+is no title; `label: false` on the element hides the title. The texts carry the `q-form-title`, `q-form-description` and `q-form-hint` classes;
+`titleClass`, `descriptionClass` and `hintClass` on the element add classes to each of them.
+
+<DocExample name="json-form/texts" title="Title, description, label and hint" source />
+
 ## Read-only
 
 The `readonly` prop renders every control read-only: inputs are not editable and list / upload

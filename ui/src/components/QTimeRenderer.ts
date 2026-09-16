@@ -4,6 +4,7 @@ import { QInput, QIcon, QPopupProxy, QTime, QBtn } from 'quasar'
 import type { QPopupProxy as QPopupProxyInstance } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
 import { useFormI18n } from '../composables/useFormI18n'
+import { omitOptions } from '../utils/options'
 
 export default defineComponent({
   name: 'QTimeRenderer',
@@ -17,8 +18,9 @@ export default defineComponent({
 
     const control = controlResult.control
 
-    const { isVisible, isEnabled, isReadonly, inputLabel, hasError, errorMessage, options } =
-      useControlProperties(control)
+    const {
+      isVisible, isEnabled, isReadonly, inputLabel, rootClass, hasError, errorMessage, options, renderHeader, hintSlot,
+    } = useControlProperties(control)
 
     const timeValue = computed(() => control.value.data || '')
 
@@ -48,8 +50,8 @@ export default defineComponent({
         return null
       }
 
-      return h(QInput, {
-        ...options.value,
+      return h('div', { class: ['q-time-renderer', rootClass.value] }, [...renderHeader(), h(QInput, {
+        ...omitOptions(options.value, ['class']),
         modelValue: timeValue.value,
         'onUpdate:modelValue': onChange,
         mask: timeFormat.value,
@@ -60,8 +62,9 @@ export default defineComponent({
         required: control.value.required,
         disable: !isEnabled.value && !isReadonly.value,
         readonly: isReadonly.value,
-        hint: control.value.description ? t(control.value.description) : undefined,
-      }, isReadonly.value ? {} : {
+      }, {
+        ...hintSlot.value,
+        ...(isReadonly.value ? {} : {
         append: () => h(QIcon, {
           name: 'access_time',
           class: 'cursor-pointer',
@@ -91,7 +94,8 @@ export default defineComponent({
             }),
           }),
         }),
-      })
+        }),
+      })])
     }
   },
 })
