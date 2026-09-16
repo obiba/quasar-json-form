@@ -383,8 +383,9 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
 
   const validationMessage = (name: string, fallbackKey: string, named?: Record<string, unknown>): string => {
     const messages = options.value.validationMessage
-    // a single string applies to every check of the control (angular-schema-form convention)
-    const custom = typeof messages === 'string' ? messages : messages?.[name]
+    // a single string applies to every check of the control (angular-schema-form
+    // convention); in a map, `default` is the fallback of the named messages
+    const custom = typeof messages === 'string' ? messages : (messages?.[name] ?? messages?.default)
     if (typeof custom === 'string' && custom.length > 0) {
       return t(custom, named)
     }

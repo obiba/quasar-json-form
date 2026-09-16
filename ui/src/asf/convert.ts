@@ -503,7 +503,10 @@ class Converter {
     const { minDate, maxDate, minDateIsRef, maxDateIsRef, validationMessage, ...rest } = dateOptions
     if (Object.keys(rest).length > 0) options.dateOptions = this.resolveTokens(rest)
     if (isObject(validationMessage)) {
-      options.validationMessage = { ...(isObject(options.validationMessage) ? options.validationMessage : {}), ...this.resolveTokens(validationMessage) }
+      // a control-wide string message stays the fallback of the date-specific ones
+      const current = options.validationMessage
+      const base = isObject(current) ? current : typeof current === 'string' ? { default: current } : {}
+      options.validationMessage = { ...base, ...this.resolveTokens(validationMessage) }
     }
     if (minDate !== undefined) {
       if (minDateIsRef === true) rules.min = String(minDate)
@@ -532,7 +535,13 @@ class Converter {
       )
       return { type: 'VerticalLayout', elements }
     }
-    return { type: 'Control', scope: '#', label: false }
+    // the item itself is the control: it carries the converter-level control options too
+    const element: any = { type: 'Control', scope: '#', label: false }
+    const options: Record<string, any> = {}
+    if (this.options.readonly === true) options.readonly = true
+    if (this.options.languages && LOCALIZED_FORMATS.includes(itemsSchema.format)) options.languages = this.options.languages
+    if (Object.keys(options).length > 0) element.options = options
+    return element
   }
 }
 

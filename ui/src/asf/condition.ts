@@ -16,8 +16,9 @@
  *
  * JavaScript truthiness is preserved with the `truthy(value)` function where a
  * value is used as a boolean (`!model.b`, `model.a && ...`), and comparisons
- * with `null` / `undefined` become `isEmpty` / `isNotEmpty`, since filtrex has
- * neither boolean nor null literals and rejects `not undefined`.
+ * with `null` / `undefined` become `isNull(x)` (null or undefined, not the
+ * empty string), since filtrex has neither boolean nor null literals and
+ * rejects `not undefined`.
  */
 
 export class ConditionError extends Error {
@@ -322,11 +323,12 @@ function emitComparison(node: Extract<Node, { kind: 'cmp' }>, source: string): s
     throw new ConditionError(`unsupported operator '${node.op}'`, source)
   }
 
-  // x == null / undefined
+  // x == null / undefined (loose and strict: the accepted literals are both nullish)
   if (right.kind === 'nullish' || left.kind === 'nullish') {
     const other = right.kind === 'nullish' ? left : right
     if (other.kind === 'nullish') return negated ? FALSE : TRUE
-    return `${negated ? 'isNotEmpty' : 'isEmpty'}(${emitValue(other, source)})`
+    const isNull = `isNull(${emitValue(other, source)})`
+    return negated ? `not (${isNull})` : isNull
   }
 
   // x == true / false: JavaScript truthiness

@@ -114,13 +114,17 @@ describe('ASF converter', () => {
     expect(converted.properties.files.minItems).toBe(1)
     // the schema format already selects the localized string renderer
     expect(desc.options).toEqual({ rows: 5, marked: true })
-    expect(when.options).toEqual({ dateOptions: { dateFormat: 'yyyy-MM-dd' }, max: '2030-12-31', validationMessage: { invalidYMDate: 'bad-date' } })
+    expect(when.options).toEqual({ dateOptions: { dateFormat: 'yyyy-MM-dd' }, max: '2030-12-31', validationMessage: { default: 'date-error', invalidYMDate: 'bad-date' } })
     expect(when.rules).toEqual({ min: 'start' })
   })
 
-  it('keeps a string validationMessage and merges it with the dateOptions messages', () => {
-    const { uischema } = convert(schema, [{ key: 'when', validationMessage: 't(date-error)' }], quiet)
+  it('keeps a string validationMessage as the default of the dateOptions messages', () => {
+    const { uischema } = convert(schema, [
+      { key: 'when', validationMessage: 't(date-error)' },
+      { key: 'when', validationMessage: 't(date-error)', dateOptions: { validationMessage: { invalidYMDate: 't(bad-date)' } } },
+    ], quiet)
     expect(uischema.elements[0].options.validationMessage).toBe('date-error')
+    expect(uischema.elements[1].options.validationMessage).toEqual({ default: 'date-error', invalidYMDate: 'bad-date' })
   })
 
   it('turns titleMap into oneOf and renders enum arrays as checkboxes', () => {
@@ -249,10 +253,12 @@ describe('ASF converter', () => {
     })
   })
 
-  it('applies the readonly and languages options', () => {
-    const { uischema } = convert(schema, ['name', 'desc'], { ...quiet, readonly: true, languages: ['en', 'fr'] })
+  it('applies the readonly and languages options, also to array items', () => {
+    const { uischema } = convert(schema, ['name', 'desc', 'aliases', 'staff'], { ...quiet, readonly: true, languages: ['en', 'fr'] })
     expect(uischema.elements[0].options).toEqual({ readonly: true })
     expect(uischema.elements[1].options).toEqual({ readonly: true, languages: ['en', 'fr'] })
+    expect(uischema.elements[2].options.items).toEqual({ type: 'Control', scope: '#', label: false, options: { readonly: true, languages: ['en', 'fr'] } })
+    expect(uischema.elements[3].options.items.elements[0].options).toEqual({ readonly: true })
   })
 
   it('calls the logger with every diagnostic', () => {

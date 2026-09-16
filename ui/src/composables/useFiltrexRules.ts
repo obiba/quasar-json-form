@@ -18,6 +18,11 @@ export class FiltrexRuleEngine {
       return value !== null && value !== undefined && value !== ''
     })
 
+    // isNull(value): null or undefined (unlike isEmpty, an empty string is not null)
+    this.addFunction('isNull', (value: any) => {
+      return value === null || value === undefined
+    })
+
     this.addFunction('ifElse', (condition: boolean, trueVal: any, falseVal: any) => {
       return condition ? trueVal : falseVal
     })

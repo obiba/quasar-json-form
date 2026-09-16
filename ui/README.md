@@ -162,7 +162,8 @@ not applied.
 ## Renderer messages
 
 A renderer-level check reads its message from `options.validationMessage.<name>` on the control when
-defined (translated with `t()`; a single string applies to every check of the control), else from the built-in messages (`localized.completed`, `error.wordLimit`,
+defined (translated with `t()`; a single string applies to every check of the control, and in a map
+`default` is the fallback of the named messages), else from the built-in messages (`localized.completed`, `error.wordLimit`,
 `files.missing`...), which the application can override in its own vue-i18n bundles.
 
 ## Lists
@@ -315,7 +316,8 @@ Conditions (`transpileCondition`) accept the JavaScript subset found in form def
 `==` / `===` / `!=` / `!==` / `<` / `<=` / `>` / `>=`, `model.list.indexOf(v) >= 0` (or `> -1`,
 `!= -1`, and the negative forms), `model.list.includes(v)` and `model.list.length`. JavaScript
 truthiness is kept through the `truthy()` filtrex function (`!model.b` → `not (truthy(b))`),
-`indexOf` becomes `contains(list, v)` and comparisons with `null` become `isEmpty` / `isNotEmpty`.
+`indexOf` becomes `contains(list, v)` and comparisons with `null` / `undefined` become `isNull(x)`
+(null or undefined, not the empty string).
 
 The 13 default Mica forms are converted as acceptance fixtures (`test/fixtures/asf`, snapshots in
 `__snapshots__`), and the `ui/dev` page "test-asf-converter" renders any pasted pair.

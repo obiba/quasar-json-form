@@ -30,8 +30,10 @@ describe('ASF condition transpiler', () => {
   })
 
   it('handles null, booleans, numbers and length', () => {
-    expect(transpileCondition('model.a == null')).toBe('isEmpty(a)')
-    expect(transpileCondition('model.a !== undefined')).toBe('isNotEmpty(a)')
+    expect(transpileCondition('model.a == null')).toBe('isNull(a)')
+    expect(transpileCondition('model.a === null')).toBe('isNull(a)')
+    expect(transpileCondition('model.a != null')).toBe('not (isNull(a))')
+    expect(transpileCondition('model.a !== undefined')).toBe('not (isNull(a))')
     expect(transpileCondition('model.a === true')).toBe('truthy(a)')
     expect(transpileCondition('model.a == false')).toBe('not (truthy(a))')
     expect(transpileCondition('model.a.length > 0')).toBe('length(a) > 0')
@@ -67,6 +69,10 @@ describe('ASF condition transpiler', () => {
     expect(evaluate('model.n >= 3', {})).toBe(false)
     expect(evaluate('model.n >= 3', { n: 3 })).toBe(true)
     expect(evaluate('model.a == null', {})).toBe(true)
+    expect(evaluate('model.a == null', { a: null })).toBe(true)
+    expect(evaluate('model.a === null', { a: '' })).toBe(false)
+    expect(evaluate('model.a !== undefined', { a: '' })).toBe(true)
+    expect(evaluate('model.a !== undefined', {})).toBe(false)
     expect(evaluate('model.a.length > 0', { a: ['x'] })).toBe(true)
   })
 })
