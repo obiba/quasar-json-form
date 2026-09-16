@@ -4,7 +4,7 @@ title: Radio and checkbox
 
 # Radio and checkbox
 
-<p class="doc-lead">The <code>radio</code>, <code>checkbox</code> and <code>toggle</code> format options render the values of a <a href="/#/controls/select">selection</a> as a <a href="https://quasar.dev/vue-components/option-group">QOptionGroup</a>.</p>
+<p class="doc-lead">The <code>radio</code>, <code>checkbox</code> and <code>toggle</code> format options render the values of a <a href="#/controls/select">selection</a> as a <a href="https://quasar.dev/vue-components/option-group">QOptionGroup</a>.</p>
 
 `options.format: "radio"` on a single selection (`enum` or `oneOf`) renders radio buttons.
 

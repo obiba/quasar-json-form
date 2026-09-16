@@ -24,7 +24,7 @@ rules) disable the remove and add buttons.
 ## Primitives
 
 Arrays of strings, numbers, booleans, or of formatted objects such as localized strings, render the
-item itself. Enum arrays with `uniqueItems` render a [selection](/#/controls/select) instead.
+item itself. Enum arrays with `uniqueItems` render a [selection](#/controls/select) instead.
 
 <DocExample name="list/primitives" title="Strings and localized strings" />
 

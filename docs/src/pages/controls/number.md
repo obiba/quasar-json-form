@@ -9,7 +9,7 @@ title: Number
 The value is stored as a JavaScript number; an emptied input stores `undefined` so that `required`
 applies. `minimum`, `maximum`, `exclusiveMinimum`, `exclusiveMaximum`, `multipleOf` and the
 `integer` type are validated by AJV. An integer with `options.format` `slider` or `rating` renders
-a [slider](/#/controls/slider) or a [rating](/#/controls/rating) instead.
+a [slider](#/controls/slider) or a [rating](#/controls/rating) instead.
 
 <DocExample name="number/basic" title="Number and integer" source />
 

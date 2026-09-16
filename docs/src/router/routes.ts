@@ -16,7 +16,7 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     component: () => import('@/layouts/DocLayout.vue'),
     children: [
-      { path: '', redirect: menu[0]!.pages[0]!.path },
+      { path: '', redirect: '/' + menu[0]!.pages[0]!.path },
       ...children,
     ],
   },

@@ -16,13 +16,13 @@ also allows non-string values.
 
 An array with `uniqueItems: true` whose `items` have `enum` or `oneOf` values is a multiple
 selection. `minItems` and `maxItems` are validated by AJV. Add `options.format: "checkbox"` to
-render [checkboxes](/#/controls/options) instead.
+render [checkboxes](#/controls/options) instead.
 
 <DocExample name="select/multiple" title="Multiple" />
 
 ## Dynamic options
 
-A `oneOf` entry accepts its own `rules.visible` [filtrex rule](/#/start/rules): the option is
+A `oneOf` entry accepts its own `rules.visible` [filtrex rule](#/start/rules): the option is
 listed only when the rule is true, and a selected value that becomes hidden is cleared. This is
 how dependent selects are expressed within the schema.
 

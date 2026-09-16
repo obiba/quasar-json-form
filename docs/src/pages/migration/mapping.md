@@ -14,7 +14,7 @@ title: Mapping
 | `help` + `helpvalue` | `Label` (`text`, HTML allowed) |
 | `tabs` | `Categorization` / `Category` |
 | `htmlClass` | `options.class`, with `col-xs-N` to `col-N`, `col-*-offset-N` to `offset-*-N`, `row` to `rowClass` |
-| `condition` | `rules.visible` (filtrex, see [Conditions](/#/migration/conditions)) |
+| `condition` | `rules.visible` (filtrex, see [Conditions](#/migration/conditions)) |
 | `notitle` | `label: false` |
 | `title`, `description` | written on the schema property |
 | `titleMap` | `oneOf` (`{ const, title }`) on the property or its items; enum arrays get `uniqueItems` |
@@ -39,8 +39,8 @@ or written by hand:
 
 - `validationMessage` as a single string or a map, with `default` as fallback;
 - `dateOptions` nested options and angular-strap date masks (`yyyy-MM-dd`);
-- `items` and `values` of a [radio matrix](/#/controls/radio-matrix) on the schema property;
-- `acceptedFileTypes` on a [file upload](/#/controls/file-upload), and the `obibaFiles` data shape;
+- `items` and `values` of a [radio matrix](#/controls/radio-matrix) on the schema property;
+- `acceptedFileTypes` on a [file upload](#/controls/file-upload), and the `obibaFiles` data shape;
 - the `localizedstring`, `obibaSimpleMde`, `obibaCountriesUiSelect` and `ymdatepicker` formats.
 
 ## Translations

@@ -8,7 +8,7 @@ title: Group
 
 The `label` (JSON Forms convention, `title` is accepted too), `description` and `hint` are
 translated with vue-i18n and rendered as markdown. A `Category` inside a
-[Categorization](/#/layouts/tabs) renders the same way, without the title.
+[Categorization](#/layouts/tabs) renders the same way, without the title.
 
 <DocExample name="layouts/group" title="Groups" source />
 

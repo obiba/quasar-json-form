@@ -18,7 +18,7 @@ of `QJsonForm`, either `['en', 'fr']` or `{ en: 'English', fr: 'Français' }`.
 ## Textarea and markdown
 
 `options.rows` renders a textarea. `options.marked: true` (or `format: "obibaSimpleMde"`) renders
-the [markdown editor](/#/controls/markdown) with a preview; read-only, the markdown is rendered.
+the [markdown editor](#/controls/markdown) with a preview; read-only, the markdown is rendered.
 
 <DocExample name="localized-string/markdown" title="Textarea with its own languages, markdown editor" />
 

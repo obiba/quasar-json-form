@@ -22,7 +22,7 @@ const { schema, uischema, diagnostics } = convert(asfSchema, asfDefinition, { tr
 ```
 
 The converter is pure TypeScript, also exported by the main entry as `convertAsf` and
-`toJsonForms`. Try it on the [converter playground](/#/migration/playground) with the default
+`toJsonForms`. Try it on the [converter playground](#/migration/playground) with the default
 Mica forms.
 
 ## Either dialect

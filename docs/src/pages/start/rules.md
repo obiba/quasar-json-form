@@ -19,8 +19,8 @@ and sections.
 | `visible` | boolean | Hide the element when false; the data of a hidden control is cleared |
 | `enabled` | boolean | Disable the control when false |
 | `validation` | `[{ expr, message }]` | Each expression must be true, else `message` (translated) is displayed and reported with the `validation` keyword |
-| `min` / `max` | value | Bounds for [dates](/#/controls/date), [lists](/#/controls/list) and [file uploads](/#/controls/file-upload) |
-| `compute` | value | Value of a [computed](/#/controls/computed) control |
+| `min` / `max` | value | Bounds for [dates](#/controls/date), [lists](#/controls/list) and [file uploads](#/controls/file-upload) |
+| `compute` | value | Value of a [computed](#/controls/computed) control |
 
 <DocExample name="rules/visible-enabled" title="visible and enabled" source />
 
@@ -58,5 +58,5 @@ The `filtrexEngine` export lets the application register more functions with `ad
 
 ## Options visibility
 
-A `oneOf` entry of a [select](/#/controls/select) or [radio](/#/controls/options) control can carry
+A `oneOf` entry of a [select](#/controls/select) or [radio](#/controls/options) control can carry
 its own `rules.visible`; a selected value that becomes hidden is cleared.
