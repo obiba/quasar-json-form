@@ -27,6 +27,7 @@
     "autoprefixer": "^10.4.27",
     "markdown-it-anchor": "^9.2.0",
     "postcss": "^8.5.8",
+    "sass": "^1.104.1",
     "typescript": "^5.8.3",
     "unplugin-vue-markdown": "^29.1.0",
     "vitest": "^3.2.7",
