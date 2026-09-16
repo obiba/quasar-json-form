@@ -142,3 +142,16 @@ describe('conditional layouts and labels', () => {
     wrapper.unmount()
   })
 })
+
+describe('label: false on input-like controls', () => {
+  it('hides the title of a toggle', async () => {
+    const wrapper = mountForm({
+      schema: { type: 'object', properties: { b: { type: 'boolean', title: 'Agree' } } },
+      uischema: { type: 'Control', scope: '#/properties/b', label: false },
+    })
+    await flush()
+    expect(wrapper.find('.q-toggle').exists()).toBe(true)
+    expect(wrapper.text()).not.toContain('Agree')
+    wrapper.unmount()
+  })
+})

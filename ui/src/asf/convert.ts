@@ -103,6 +103,8 @@ const PASSTHROUGH_OPTIONS = ['rows', 'marked', 'wordLimit', 'wordMin', 'wordMax'
 interface KeyContext {
   /** ASF key segments of the enclosing array item (`['staff', '[]']`), the scopes are relative to it */
   prefix: string[]
+  /** the enclosing array definition is read-only */
+  readonly?: boolean
 }
 
 interface ResolvedKey {
@@ -267,14 +269,25 @@ class Converter {
     return { type: 'VerticalLayout', elements: this.convertItems(items, { prefix: [] }) }
   }
 
-  private collectExplicitKeys(items: any[]): void {
+  /**
+   * Root property names listed in the definition (for `"*"`). Inside a keyed
+   * element (object fieldset or array), only keys under that same root property
+   * count: a relative key there is rejected by `resolveKey`.
+   */
+  private collectExplicitKeys(items: any[], root?: string): void {
+    const add = (key: unknown): string | undefined => {
+      const first = parseKey(key as string)[0]
+      if (first === undefined || (root !== undefined && first !== root)) return undefined
+      this.explicitKeys.add(first)
+      return first
+    }
     items.forEach((item) => {
       if (typeof item === 'string') {
-        if (item !== '*') this.explicitKeys.add(parseKey(item)[0]!)
+        if (item !== '*') add(item)
       } else if (isObject(item)) {
-        if (item.key !== undefined) this.explicitKeys.add(parseKey(item.key)[0]!)
-        if (Array.isArray(item.items)) this.collectExplicitKeys(item.items)
-        if (Array.isArray(item.tabs)) item.tabs.forEach((tab: any) => Array.isArray(tab?.items) && this.collectExplicitKeys(tab.items))
+        const itemRoot = item.key !== undefined ? add(item.key) ?? root : root
+        if (Array.isArray(item.items)) this.collectExplicitKeys(item.items, itemRoot)
+        if (Array.isArray(item.tabs)) item.tabs.forEach((tab: any) => Array.isArray(tab?.items) && this.collectExplicitKeys(tab.items, itemRoot))
       }
     })
   }
@@ -387,7 +400,7 @@ class Converter {
     if (isObjectLayout) {
       return this.convertObject(merged, resolved, ctx)
     }
-    return this.convertControl(merged, resolved)
+    return this.convertControl(merged, resolved, ctx)
   }
 
   private markRequired(resolved: ResolvedKey): void {
@@ -408,7 +421,7 @@ class Converter {
     return this.withCommon(item, element)
   }
 
-  private convertControl(item: any, resolved: ResolvedKey): any {
+  private convertControl(item: any, resolved: ResolvedKey, ctx: KeyContext): any {
     const { node, scope } = resolved
     const type = typeof item.type === 'string' ? item.type : undefined
     const element: any = { type: 'Control', scope }
@@ -456,7 +469,8 @@ class Converter {
       options.validationMessage = this.resolveTokens(item.validationMessage)
     }
     if (typeof item.add === 'string') options.addLabel = this.text(item.add)
-    if (item.readonly === true || this.options.readonly === true) options.readonly = true
+    const readonly = item.readonly === true || ctx.readonly === true || this.options.readonly === true
+    if (readonly) options.readonly = true
     if (this.options.languages && (LOCALIZED_FORMATS.includes(node.format) || LOCALIZED_FORMATS.includes(options.format))) {
       options.languages = this.options.languages
     }
@@ -466,7 +480,7 @@ class Converter {
 
     // array items
     if (hasType(node, 'array') && !isWidgetSchema(node, options)) {
-      const itemsElement = this.convertArrayItems(item, resolved)
+      const itemsElement = this.convertArrayItems(item, resolved, readonly)
       if (itemsElement) options.items = itemsElement
     }
 
@@ -519,9 +533,9 @@ class Converter {
   }
 
   /** UI schema of the items of an array control (relative to the item schema) */
-  private convertArrayItems(item: any, resolved: ResolvedKey): any | undefined {
+  private convertArrayItems(item: any, resolved: ResolvedKey, readonly: boolean): any | undefined {
     const itemsSchema = resolved.node.items
-    const itemContext: KeyContext = { prefix: [...resolved.segments, '[]'] }
+    const itemContext: KeyContext = { prefix: [...resolved.segments, '[]'], readonly }
     if (Array.isArray(item.items)) {
       const elements = this.convertItems(item.items, itemContext)
       // a single control of the item itself (`key[]`) needs no layout
@@ -538,7 +552,7 @@ class Converter {
     // the item itself is the control: it carries the converter-level control options too
     const element: any = { type: 'Control', scope: '#', label: false }
     const options: Record<string, any> = {}
-    if (this.options.readonly === true) options.readonly = true
+    if (readonly) options.readonly = true
     if (this.options.languages && LOCALIZED_FORMATS.includes(itemsSchema.format)) options.languages = this.options.languages
     if (Object.keys(options).length > 0) element.options = options
     return element

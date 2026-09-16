@@ -36,3 +36,24 @@ describe('QListRenderer', () => {
     wrapper.unmount()
   })
 })
+
+describe('QListRenderer bounds', () => {
+  it('reads maxItems and minItems from the schema', async () => {
+    const wrapper = mountForm({
+      schema: { type: 'object', properties: { tags: { type: 'array', minItems: 1, maxItems: 2, items: { type: 'string' } } } },
+      uischema: { type: 'Control', scope: '#/properties/tags' },
+      modelValue: { tags: ['a', 'b'] },
+    })
+    await flush()
+    const buttons = wrapper.findAll('.q-list-renderer button')
+    const add = buttons[buttons.length - 1]!
+    expect(add.attributes('disabled')).toBeDefined()
+    await wrapper.setProps({ modelValue: { tags: ['a'] } })
+    await flush()
+    const after = wrapper.findAll('.q-list-renderer button')
+    expect(after[after.length - 1]!.attributes('disabled')).toBeUndefined()
+    // one item left: it cannot be removed
+    expect(after[0]!.attributes('disabled')).toBeDefined()
+    wrapper.unmount()
+  })
+})

@@ -231,7 +231,8 @@ The date renderer (`format: date`, `datepicker`) accepts, directly or under `dat
   is validated by AJV as an ISO date and keeps `YYYY-MM-DD`. `format: "year-month"` uses `YYYY-MM`
   with a month picker.
 - `min` / `max`: bounds (ISO or mask format; the filtrex `min` / `max` rules work too), with
-  `validationMessage.dateRange` / `dateMin` / `dateMax`.
+  `validationMessage.dateRange` / `dateMin` / `dateMax`; a value that does not match the mask reports
+  `validationMessage.dateInvalid`.
 - `yearRef` / `monthRef` (`format: "ymdatepicker"`): names of the year and month fields (siblings of
   the control, or root fields) the date must belong to. The input is disabled until both are set, the
   value defaults to the first day of that month (`lastDay: true`: the last one) and follows them;
@@ -299,7 +300,8 @@ strings, `rowClass` replaces the Bootstrap `row` class (`row q-col-gutter-md` by
 | `radios`, `checkboxes` | `options.format: "radio"` / `"checkbox"`; enum arrays default to checkboxes |
 | `textarea`, `rows` | `options.rows` |
 | `localizedstring`, `obibaSimpleMde` (`marked`), `obibaFileUpload`, `radioGroupCollection`, `obibaCountriesUiSelect`, `sf-typeahead`, `datepicker` | `options.format` when the schema `format` does not already select the renderer |
-| `wordLimit`, `emptyMessage`, `validationMessage` (object or string), `placeholder`, `readonly`, `marked` | same option |
+| `wordLimit`, `emptyMessage`, `validationMessage` (object or string), `placeholder`, `marked` | same option |
+| `readonly` | `options.readonly`, also on the item controls of an array |
 | `add` | `options.addLabel` |
 | `minItems`, `maxItems`, `required: true` | written on the schema |
 | `dateOptions` (`dateFormat`, `yearRef`, `monthRef`, `lastDay`, `validationMessage`) | `options.dateOptions` / `options.validationMessage` |
@@ -308,8 +310,9 @@ strings, `rowClass` replaces the Bootstrap `row` class (`row q-col-gutter-md` by
 | `x-schema-form` on a schema property | definition defaults for that key |
 | `actions`, `submit`, `button`, `template`, `hidden`, `sf-obiba-selection-tree` | skipped (info diagnostic) |
 
-Unknown keys, unknown types and conditions that cannot be translated are skipped and reported in
-`diagnostics` (`{ level, message, key?, element? }`).
+Unknown keys and unsupported elements without a key are skipped, a keyed control of an unknown type
+is rendered from its schema, and a condition that cannot be translated leaves its element visible; all
+of these are reported in `diagnostics` (`{ level, message, key?, element? }`).
 
 Conditions (`transpileCondition`) accept the JavaScript subset found in form definitions:
 `model.a.b` paths, string / number / boolean / null literals, `!`, `&&`, `||`, parentheses,
@@ -319,7 +322,10 @@ truthiness is kept through the `truthy()` filtrex function (`!model.b` → `not 
 `indexOf` becomes `contains(list, v)`, and comparisons with `true` / `false` / `null` / `undefined` use
 the `isBoolean` / `isNull` / `isUndefined` functions with the strict / loose distinction of JavaScript
 (`model.a == null` → `isNull(a)`, `model.a === null` → `(isNull(a) and not (isUndefined(a)))`,
-`model.a === true` → `(isBoolean(a) and truthy(a))`).
+`model.a === true` → `(isBoolean(a) and truthy(a))`). Known deviations from JavaScript: a loose
+`model.a == true` is JavaScript truthiness (`2 == true` is true here, false in JavaScript), filtrex `==`
+is strict (`'1' == 1` is false), and an ordering comparison is false when the value is null, undefined
+or an empty string. Ordering comparisons with a boolean or null literal are rejected.
 
 The 13 default Mica forms are converted as acceptance fixtures (`test/fixtures/asf`, snapshots in
 `__snapshots__`), and the `ui/dev` page "test-asf-converter" renders any pasted pair.

@@ -27,6 +27,9 @@ describe('ASF condition transpiler', () => {
     expect(transpileCondition('model.a.includes("x")')).toBe('contains(a, "x")')
     expect(transpileCondition('!model.a.includes("x")')).toBe('not (contains(a, "x"))')
     expect(() => transpileCondition('model.a.indexOf("x") > 2')).toThrow(ConditionError)
+    expect(() => transpileCondition('model.a > true')).toThrow(/ordering comparison/)
+    expect(() => transpileCondition('model.a >= null')).toThrow(/ordering comparison/)
+    expect(() => transpileCondition('undefined < model.a')).toThrow(/ordering comparison/)
   })
 
   it('handles null, booleans, numbers and length', () => {
@@ -47,6 +50,11 @@ describe('ASF condition transpiler', () => {
     expect(transpileCondition('model.n >= 3')).toBe('(isNotEmpty(n) and n >= 3)')
     expect(transpileCondition('model.n == -1')).toBe('n == -1')
     expect(transpileCondition('true')).toBe('1 == 1')
+    // `!` binds tighter than the comparisons
+    expect(transpileCondition('!model.a == false')).toBe('not (not (truthy(a)))')
+    expect(transpileCondition('(model.a == 1) === true')).toBe('a == 1')
+    expect(transpileCondition('!(model.a == 1)')).toBe('not (a == 1)')
+    expect(transpileCondition('!model.a && !model.b')).toBe('not (truthy(a)) and not (truthy(b))')
   })
 
   it('rejects what it cannot translate', () => {
@@ -90,6 +98,11 @@ describe('ASF condition transpiler', () => {
     expect(evaluate('model.a === false', { a: false })).toBe(true)
     expect(evaluate('model.a === false', {})).toBe(false)
     expect(evaluate('model.a == true', { a: 1 })).toBe(true)
+    // filtrex equality is strict
+    expect(evaluate('model.a === model.b', { a: '1', b: 1 })).toBe(false)
+    expect(evaluate('model.a === model.b', { a: 1, b: 1 })).toBe(true)
+    expect(evaluate('!model.a == false', { a: false })).toBe(false)
+    expect(evaluate('!model.a == false', { a: true })).toBe(true)
     expect(evaluate('model.a.length > 0', { a: ['x'] })).toBe(true)
   })
 })

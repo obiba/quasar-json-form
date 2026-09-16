@@ -162,18 +162,11 @@ class Parser {
   }
 
   private parseAnd(): Node {
-    let left = this.parseNot()
+    let left = this.parseComparison()
     while (this.accept('op', '&&')) {
-      left = { kind: 'and', left, right: this.parseNot() }
+      left = { kind: 'and', left, right: this.parseComparison() }
     }
     return left
-  }
-
-  private parseNot(): Node {
-    if (this.accept('op', '!')) {
-      return { kind: 'not', operand: this.parseNot() }
-    }
-    return this.parseComparison()
   }
 
   private parseComparison(): Node {
@@ -188,6 +181,10 @@ class Parser {
   }
 
   private parseUnary(): Node {
+    // `!` binds tighter than the comparisons, as in JavaScript
+    if (this.accept('op', '!')) {
+      return { kind: 'not', operand: this.parseUnary() }
+    }
     if (this.accept('op', '-')) {
       const token = this.expect('number')
       return { kind: 'number', value: -Number(token.value) }
@@ -325,6 +322,9 @@ function emitComparison(node: Extract<Node, { kind: 'cmp' }>, source: string): s
   if (op !== '==' && op !== '!=' && !isRelational(op)) {
     throw new ConditionError(`unsupported operator '${node.op}'`, source)
   }
+  if (isRelational(op) && [left, right].some((operand) => operand.kind === 'bool' || operand.kind === 'nullish')) {
+    throw new ConditionError(`ordering comparison with a boolean or null literal is not supported ('${node.op}')`, source)
+  }
 
   // x == null / undefined: loosely, null and undefined are equal to each other only;
   // strictly, `=== null` and `=== undefined` are distinct
@@ -346,11 +346,18 @@ function emitComparison(node: Extract<Node, { kind: 'cmp' }>, source: string): s
     const other = right.kind === 'bool' ? left : right
     const expected = (right.kind === 'bool' ? right : (left as Extract<Node, { kind: 'bool' }>)).value
     if (other.kind === 'bool') return (other.value === expected) !== negated ? TRUE : FALSE
-    const value = emitValue(other, source)
-    const truthy = `truthy(${value})`
-    const test = strict
-      ? `(isBoolean(${value}) and ${expected ? truthy : `not (${truthy})`})`
-      : expected ? truthy : `not (${truthy})`
+    let test: string
+    if (['not', 'and', 'or', 'cmp', 'contains'].includes(other.kind)) {
+      // already a boolean
+      const bool = emitBool(other, source)
+      test = expected ? bool : `not (${bool})`
+    } else {
+      const value = emitValue(other, source)
+      const truthy = `truthy(${value})`
+      test = strict
+        ? `(isBoolean(${value}) and ${expected ? truthy : `not (${truthy})`})`
+        : expected ? truthy : `not (${truthy})`
+    }
     return negated ? `not (${test})` : test
   }
 

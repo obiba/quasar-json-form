@@ -42,9 +42,20 @@ export default defineComponent({
       return control.value.uischema.options?.confirmation ?? false
     })
 
+    // bounds: filtrex `max` / `min` rules, else the schema `maxItems` / `minItems`
+    const maxItems = computed<number | undefined>(() => {
+      const value = maxValue.value ?? control.value.schema.maxItems
+      return typeof value === 'number' ? value : undefined
+    })
+
+    const minItems = computed<number | undefined>(() => {
+      const value = minValue.value ?? control.value.schema.minItems
+      return typeof value === 'number' ? value : undefined
+    })
+
     const canAddItem = computed(() => {
-      if (maxValue.value === undefined) return true
-      return items.value.length < maxValue.value
+      if (maxItems.value === undefined) return true
+      return items.value.length < maxItems.value
     })
 
     const addItem = () => {
@@ -57,8 +68,8 @@ export default defineComponent({
     }
 
     const canRemoveItem = computed(() => {
-      if (minValue.value === undefined) return true
-      return items.value.length > minValue.value
+      if (minItems.value === undefined) return true
+      return items.value.length > minItems.value
     })
 
     const confirmRemoveItem = (index: number) => {

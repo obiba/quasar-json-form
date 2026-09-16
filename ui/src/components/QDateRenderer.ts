@@ -132,7 +132,7 @@ export default defineComponent({
       const value = control.value.data
       if (value === undefined || value === null || value === '') return []
       const parsed = parseValue(value)
-      if (!parsed) return [translate('error.dateInvalid', { format: mask.value })]
+      if (!parsed) return [dateMessage('dateInvalid', 'error.dateInvalid', { format: mask.value })]
       const { min, max } = bounds.value
       const below = min !== undefined && parsed < startOfDay(min)
       const above = max !== undefined && parsed > endOfDay(max)

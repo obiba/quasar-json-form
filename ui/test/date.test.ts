@@ -141,3 +141,25 @@ describe('date renderer', () => {
     })
   })
 })
+
+describe('invalid date message', () => {
+  it('uses validationMessage.dateInvalid, then a string validationMessage', async () => {
+    const schema = { type: 'object', properties: { d: { type: 'string', format: 'datepicker', title: 'Date' } } }
+    const wrapper = mountForm({
+      schema,
+      uischema: { type: 'Control', scope: '#/properties/d', options: { validationMessage: { dateInvalid: 'Not a date' } } },
+      modelValue: { d: 'nope' },
+    })
+    await flush()
+    expect(wrapper.text()).toContain('Not a date')
+    wrapper.unmount()
+    const wrapper2 = mountForm({
+      schema,
+      uischema: { type: 'Control', scope: '#/properties/d', options: { validationMessage: 'Date error' } },
+      modelValue: { d: 'nope' },
+    })
+    await flush()
+    expect(wrapper2.text()).toContain('Date error')
+    wrapper2.unmount()
+  })
+})

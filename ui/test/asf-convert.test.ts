@@ -224,6 +224,11 @@ describe('ASF converter', () => {
   it('expands "*" to the properties not listed elsewhere', () => {
     const { uischema } = convert({ type: 'object', properties: { a: { type: 'string' }, b: { type: 'string' }, c: { type: 'string' } } }, ['b', '*'], quiet)
     expect(uischema.elements.map((e: any) => e.scope)).toEqual(['#/properties/b', '#/properties/a', '#/properties/c'])
+    // a rejected relative key inside an array item does not hide the root property of that name
+    const { uischema: nested } = convert(schema, [{ key: 'staff', items: ['name'] }, { key: 'address', items: [{ type: 'section', items: ['address.city'] }] }, '*'], quiet)
+    const scopes = nested.elements.map((e: any) => e.scope)
+    expect(scopes).toContain('#/properties/name')
+    expect(scopes).not.toContain('#/properties/address')
   })
 
   it('skips and reports unknown keys, buttons and unsupported types', () => {
@@ -259,6 +264,16 @@ describe('ASF converter', () => {
     expect(uischema.elements[1].options).toEqual({ readonly: true, languages: ['en', 'fr'] })
     expect(uischema.elements[2].options.items).toEqual({ type: 'Control', scope: '#', label: false, options: { readonly: true, languages: ['en', 'fr'] } })
     expect(uischema.elements[3].options.items.elements[0].options).toEqual({ readonly: true })
+    // a read-only array definition makes its items read-only too
+    const { uischema: lists } = convert(schema, [
+      { key: 'staff', readonly: true, items: ['staff[].name', { type: 'section', items: ['staff[].role'] }] },
+      { key: 'aliases', readonly: true },
+      { key: 'staff', readonly: true },
+    ], quiet)
+    expect(lists.elements[0].options.items.elements[0].options).toEqual({ readonly: true })
+    expect(lists.elements[0].options.items.elements[1].elements[0].options).toEqual({ readonly: true })
+    expect(lists.elements[1].options.items.options).toEqual({ readonly: true })
+    expect(lists.elements[2].options.items.elements.every((e: any) => e.options?.readonly === true)).toBe(true)
   })
 
   it('calls the logger with every diagnostic', () => {
