@@ -117,3 +117,16 @@ describe('schema validation', () => {
     wrapper.unmount()
   })
 })
+
+describe('validationMessage default fallback', () => {
+  it('uses options.validationMessage.default when the named message is missing', async () => {
+    const wrapper = mountForm({
+      schema: { type: 'object', properties: { text: { type: 'string', title: 'Text' } } },
+      uischema: { type: 'Control', scope: '#/properties/text', options: { wordLimit: '0:2', validationMessage: { default: 'Custom message' } } },
+      modelValue: { text: 'one two three' },
+    })
+    await flush()
+    expect(wrapper.text()).toContain('Custom message')
+    wrapper.unmount()
+  })
+})

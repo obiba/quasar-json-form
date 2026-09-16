@@ -1,0 +1,240 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "version": {
+        "type": "string",
+        "title": "harmonization-protocol.version",
+        "description": "harmonization-protocol.version-help"
+      },
+      "participants": {
+        "type": "integer",
+        "title": "harmonization-protocol.participants"
+      },
+      "qualitativeQuantitative": {
+        "type": "string",
+        "title": "harmonization-protocol.qualitative-quantitative.title",
+        "description": "harmonization-protocol.qualitative-quantitative.help",
+        "oneOf": [
+          {
+            "const": "qualitative",
+            "title": "harmonization-protocol.qualitative-quantitative.enum.qualitative"
+          },
+          {
+            "const": "quantitative",
+            "title": "harmonization-protocol.qualitative-quantitative.enum.quantitative"
+          }
+        ]
+      },
+      "prospectiveRetrospective": {
+        "type": "string",
+        "title": "harmonization-protocol.prospective-retrospective.title",
+        "description": "harmonization-protocol.prospective-retrospective.help",
+        "oneOf": [
+          {
+            "const": "prospective",
+            "title": "harmonization-protocol.prospective-retrospective.enum.prospective"
+          },
+          {
+            "const": "retrospective",
+            "title": "harmonization-protocol.prospective-retrospective.enum.retrospective"
+          }
+        ]
+      },
+      "informationContent": {
+        "type": "object",
+        "title": "harmonization-protocol.information-content",
+        "description": "harmonization-protocol.information-content-help",
+        "format": "obibaSimpleMde"
+      },
+      "procedures": {
+        "type": "object",
+        "title": "harmonization-protocol.procedures",
+        "description": "harmonization-protocol.procedures-help",
+        "format": "localizedString"
+      },
+      "participantsInclusion": {
+        "type": "object",
+        "title": "harmonization-protocol.participants-inclusion",
+        "description": "harmonization-protocol.participants-inclusion-help",
+        "format": "localizedString"
+      },
+      "infrastructure": {
+        "type": "object",
+        "title": "harmonization-protocol.infrastructure",
+        "description": "harmonization-protocol.infrastructure-help",
+        "format": "localizedString"
+      },
+      "additionalInformation": {
+        "type": "object",
+        "title": "global.additional-information",
+        "format": "obibaSimpleMde"
+      },
+      "_name": {
+        "title": "dataset.name",
+        "type": "object",
+        "format": "localizedString"
+      },
+      "_acronym": {
+        "title": "dataset.acronym",
+        "type": "object",
+        "format": "localizedString"
+      },
+      "_description": {
+        "title": "dataset.description",
+        "type": "object",
+        "format": "obibaSimpleMde"
+      },
+      "_entityType": {
+        "title": "dataset.entity-type",
+        "type": "string",
+        "default": "Participant"
+      }
+    },
+    "required": [
+      "_name",
+      "_acronym",
+      "_entityType"
+    ]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Label",
+        "text": "dataset.general-info"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/_name"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/_acronym"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/_description",
+        "options": {
+          "marked": true,
+          "rows": 5
+        }
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/_entityType"
+      },
+      {
+        "type": "Group",
+        "elements": [
+          {
+            "type": "VerticalLayout",
+            "elements": [
+              {
+                "type": "VerticalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/version"
+                  }
+                ],
+                "options": {
+                  "class": "col-12 col-md-6"
+                }
+              },
+              {
+                "type": "VerticalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/participants"
+                  }
+                ],
+                "options": {
+                  "class": "col-12 col-md-6"
+                }
+              }
+            ],
+            "options": {
+              "class": "row q-col-gutter-md"
+            }
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "elements": [
+          {
+            "type": "VerticalLayout",
+            "elements": [
+              {
+                "type": "VerticalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/qualitativeQuantitative",
+                    "options": {
+                      "format": "radio"
+                    }
+                  }
+                ],
+                "options": {
+                  "class": "col-12 col-md-6"
+                }
+              },
+              {
+                "type": "VerticalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/prospectiveRetrospective",
+                    "options": {
+                      "format": "radio"
+                    }
+                  }
+                ],
+                "options": {
+                  "class": "col-12 col-md-6"
+                }
+              }
+            ],
+            "options": {
+              "class": "row q-col-gutter-md"
+            }
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/informationContent",
+            "options": {
+              "marked": true
+            }
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/procedures"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/participantsInclusion"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/infrastructure"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/additionalInformation",
+            "options": {
+              "marked": true
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

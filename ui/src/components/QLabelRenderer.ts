@@ -1,4 +1,4 @@
-import { h, watch, defineComponent } from 'vue'
+import { h, defineComponent } from 'vue'
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
 import { useControlProperties } from '../composables/useControlProperties'
 import { useFormI18n } from '../composables/useFormI18n'
@@ -22,18 +22,6 @@ export default defineComponent({
     const { isVisible, rootClass } =
       useControlProperties(control)
 
-    watch(
-      () => isVisible.value,
-      (newValue) => {
-        if (newValue === false) {
-          onChange(undefined)
-        }
-      },
-    )
-
-    const onChange = (value: any) => {
-      controlResult.handleChange(control.value.path, value)
-    }
 
     return () => {
       if (!isVisible.value) {

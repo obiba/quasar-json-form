@@ -39,6 +39,9 @@ export const RENDERER_OPTION_KEYS = [
   'acceptedFileTypes',
   'ordering',
   'confirmation',
+  'addLabel',
+  'addIcon',
+  'items',
 ]
 
 /** Copy of `options` without the given keys (defaults to `RENDERER_OPTION_KEYS`). */

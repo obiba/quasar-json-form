@@ -5,6 +5,10 @@ import { QList, QItem, QItemSection, QBtn, QDialog, QCard, QCardSection, QCardAc
 import { useControlProperties } from '../composables/useControlProperties'
 import { renderMarkdown } from '../utils/markdown'
 import { useFormI18n } from '../composables/useFormI18n'
+import { omitOptions, RENDERER_OPTION_KEYS } from '../utils/options'
+
+/** options interpreted by the list renderer, not passed to QList */
+const LIST_OPTION_KEYS = [...RENDERER_OPTION_KEYS, 'addLabel', 'addIcon', 'class']
 
 export default defineComponent({
   name: 'QListRenderer',
@@ -38,9 +42,20 @@ export default defineComponent({
       return control.value.uischema.options?.confirmation ?? false
     })
 
+    // bounds: filtrex `max` / `min` rules, else the schema `maxItems` / `minItems`
+    const maxItems = computed<number | undefined>(() => {
+      const value = maxValue.value ?? control.value.schema.maxItems
+      return typeof value === 'number' ? value : undefined
+    })
+
+    const minItems = computed<number | undefined>(() => {
+      const value = minValue.value ?? control.value.schema.minItems
+      return typeof value === 'number' ? value : undefined
+    })
+
     const canAddItem = computed(() => {
-      if (maxValue.value === undefined) return true
-      return items.value.length < maxValue.value
+      if (maxItems.value === undefined) return true
+      return items.value.length < maxItems.value
     })
 
     const addItem = () => {
@@ -53,8 +68,8 @@ export default defineComponent({
     }
 
     const canRemoveItem = computed(() => {
-      if (minValue.value === undefined) return true
-      return items.value.length > minValue.value
+      if (minItems.value === undefined) return true
+      return items.value.length > minItems.value
     })
 
     const confirmRemoveItem = (index: number) => {
@@ -107,14 +122,26 @@ export default defineComponent({
     }
 
     const itemsSchema = computed(() => control.value.schema.items)
+    // UI schema of one item (`options.items`, scopes relative to the item schema): by
+    // default one control per property of an object item, or the item itself
     const itemsUiSchema = computed(() => {
-      return control.value.uischema.options?.items || {
-        type: 'VerticalLayout',
-        elements: Object.keys((itemsSchema.value as any)?.properties || {}).map((key) => ({
-          type: 'Control',
-          scope: `#/properties/${key}`,
-        }))
+      if (control.value.uischema.options?.items) return control.value.uischema.options.items
+      const properties = (itemsSchema.value as any)?.properties
+      if (properties && typeof properties === 'object' && !(itemsSchema.value as any)?.format) {
+        return {
+          type: 'VerticalLayout',
+          elements: Object.keys(properties).map((key) => ({
+            type: 'Control',
+            scope: `#/properties/${key}`,
+          }))
+        }
       }
+      return { type: 'Control', scope: '#', label: false }
+    })
+
+    const addLabel = computed(() => {
+      const label = options.value.addLabel || (control.value as any).addLabel
+      return label ? t(String(label)) : t('add-item')
     })
 
     watch(
@@ -159,7 +186,7 @@ export default defineComponent({
           class: 'q-mb-sm',
           bordered: true,
           separator: true,
-          ...options.value,
+          ...omitOptions(options.value, LIST_OPTION_KEYS),
         }, () => items.value.map((_item: any, index: number) =>
           h(QItem, { key: index }, () => [
             h(QItemSection, { class: 'q-pa-sm' }, () => [
@@ -227,9 +254,9 @@ export default defineComponent({
         listItems,
         confirmDialog,
         isReadonly.value ? null : h(QBtn, {
-          label: (control.value as any).addLabel ? t((control.value as any).addLabel) : t('add-item'),
+          label: addLabel.value,
           color: 'primary',
-          icon: (control.value as any).addIcon || 'add',
+          icon: options.value.addIcon || (control.value as any).addIcon || 'add',
           size: (control.value as any).addSize || 'sm',
           disabled: !isEnabled.value || !canAddItem.value,
           onClick: addItem,

@@ -1,0 +1,140 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "research-project.default.contact.name",
+        "type": "string"
+      },
+      "institution": {
+        "title": "research-project.default.contact.institution",
+        "type": "string"
+      },
+      "startDate": {
+        "title": "research-project.default.status.start",
+        "type": "string",
+        "format": "datepicker",
+        "description": "research-project.default.status.start-help"
+      },
+      "endDate": {
+        "title": "research-project.default.status.end",
+        "type": "string",
+        "format": "datepicker",
+        "description": "research-project.default.status.end-help"
+      },
+      "_title": {
+        "title": "research-project.title",
+        "type": "object",
+        "format": "localizedString"
+      },
+      "_summary": {
+        "title": "research-project.summary",
+        "type": "object",
+        "format": "obibaSimpleMde"
+      }
+    },
+    "required": [
+      "name",
+      "startDate",
+      "endDate",
+      "_title"
+    ]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Label",
+        "text": "research-project.main-section"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/_title"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/_summary",
+        "options": {
+          "marked": true,
+          "rows": 5
+        }
+      },
+      {
+        "type": "Group",
+        "elements": [
+          {
+            "type": "Label",
+            "text": "<h3>research-project.default.status.title</h3><p class='help-block'>research-project.default.status.help</p>"
+          },
+          {
+            "type": "VerticalLayout",
+            "elements": [
+              {
+                "type": "VerticalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/startDate",
+                    "options": {
+                      "validationMessage": "research-project.default.status.date-error",
+                      "dateOptions": {
+                        "dateFormat": "yyyy-MM-dd"
+                      }
+                    }
+                  }
+                ],
+                "options": {
+                  "class": "col-6"
+                }
+              },
+              {
+                "type": "VerticalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/endDate",
+                    "options": {
+                      "validationMessage": "research-project.default.status.date-error",
+                      "dateOptions": {
+                        "dateFormat": "yyyy-MM-dd"
+                      }
+                    },
+                    "rules": {
+                      "min": "startDate"
+                    }
+                  }
+                ],
+                "options": {
+                  "class": "col-6"
+                }
+              }
+            ],
+            "options": {
+              "class": "row q-col-gutter-md"
+            }
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "elements": [
+          {
+            "type": "Label",
+            "text": "<h3>research-project.default.contact.title</h3><p class='help-block'>research-project.default.contact.help</p>"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/name"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/institution",
+            "options": {
+              "rows": 3
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -136,7 +136,8 @@ createI18n({ messages: { en: { ...messages.en, ...appEn } } })
 ## Layout classes
 
 `options.class` sets CSS classes on the root element of any layout, group, section, label or
-control. `VerticalLayout` / `HorizontalLayout` render their elements as direct children, so Quasar
+control. A `Group` displays its `label` (or `title`) as a heading; `label: false` on a control hides
+its title. `VerticalLayout` / `HorizontalLayout` render their elements as direct children, so Quasar
 grid classes work as in Bootstrap:
 
 ```json
@@ -161,8 +162,18 @@ not applied.
 ## Renderer messages
 
 A renderer-level check reads its message from `options.validationMessage.<name>` on the control when
-defined (translated with `t()`), else from the built-in messages (`localized.completed`, `error.wordLimit`,
+defined (translated with `t()`; a single string applies to every check of the control, and in a map
+`default` is the fallback of the named messages), else from the built-in messages (`localized.completed`, `error.wordLimit`,
 `files.missing`...), which the application can override in its own vue-i18n bundles.
+
+## Lists
+
+Arrays of objects and arrays of primitives (strings, numbers, booleans, or objects with a `format`
+such as localized strings) render as a list with add / remove / reorder buttons. The UI schema of
+one item comes from `options.items` (`Control` scopes relative to the item schema, `#` for the item
+itself), by default one control per property of an object item, or the item itself. Options:
+`addLabel`, `addIcon`, `ordering` (default true), `confirmation` (confirm before removing);
+`minItems` / `maxItems` from the schema (or the filtrex `min` / `max` rules) bound the list.
 
 ## Localized strings
 
@@ -220,7 +231,8 @@ The date renderer (`format: date`, `datepicker`) accepts, directly or under `dat
   is validated by AJV as an ISO date and keeps `YYYY-MM-DD`. `format: "year-month"` uses `YYYY-MM`
   with a month picker.
 - `min` / `max`: bounds (ISO or mask format; the filtrex `min` / `max` rules work too), with
-  `validationMessage.dateRange` / `dateMin` / `dateMax`.
+  `validationMessage.dateRange` / `dateMin` / `dateMax`; a value that does not match the mask reports
+  `validationMessage.dateInvalid`.
 - `yearRef` / `monthRef` (`format: "ymdatepicker"`): names of the year and month fields (siblings of
   the control, or root fields) the date must belong to. The input is disabled until both are set, the
   value defaults to the first day of that month (`lastDay: true`: the last one) and follows them;
@@ -248,6 +260,75 @@ import { countryCodes } from '@obiba/quasar-ui-json-form'
 
 `format: "typeahead"` on a string is an input with suggestions from `options.values` (strings or
 `{ label, value }`), or the schema `examples` / `enum`; `options.editable: true` accepts any text.
+
+## angular-schema-form compatibility
+
+`@obiba/quasar-ui-json-form/asf` converts a form of the
+[angular-schema-form](https://github.com/json-schema-form/angular-schema-form) dialect (a JSON
+schema and a `definition` array, as stored by Mica) into a `(schema, uischema)` pair for `QJsonForm`.
+It is pure TypeScript (also exported by the main entry as `convertAsf` / `toJsonForms`):
+
+```js
+import { convert, toJsonForms } from '@obiba/quasar-ui-json-form/asf'
+
+const { schema, uischema, diagnostics } = convert(asfSchema, asfDefinition, { translate: t })
+// <QJsonForm :schema="schema" :uischema="uischema" ... />
+
+// either dialect, detected by shape (array: ASF definition, object: JSON Forms UI schema)
+const result = toJsonForms(schema, definitionOrUischema)
+```
+
+Options: `translate(key)` resolves the `t(key)` tokens of the schema and the definition (titles,
+help blocks, option labels, messages); without it the `t()` wrapper is removed and the key kept, so
+that strings made of a single token are still translated by the renderers with vue-i18n. `readonly`
+sets `options.readonly` on every control, `languages` sets `options.languages` on the localized
+strings, `rowClass` replaces the Bootstrap `row` class (`row q-col-gutter-md` by default),
+`textareaRows` (3), `logger` receives the diagnostics (`console.warn` by default, `false` to silence).
+
+| ASF | JSON Forms |
+|---|---|
+| `"a.b"`, `{ key: "a.b" }`, `"*"` (the properties not listed elsewhere) | `Control` with scope `#/properties/a/properties/b` |
+| `section` (+ `htmlClass`), object key with `items` | `VerticalLayout` (+ `options.class`) |
+| `fieldset` (+ `title`), object key without `items` | `Group` (+ `label`), one control per property |
+| `help` + `helpvalue` | `Label` (`text`, HTML allowed) |
+| `tabs` | `Categorization` / `Category` |
+| `htmlClass` | `options.class`, with `col-xs-N` → `col-N`, `col-*-offset-N` → `offset-*-N`, `row` → `rowClass` |
+| `condition` | `rules.visible` (filtrex, see below) |
+| `notitle` | `label: false` |
+| `title`, `description` | written on the schema property |
+| `titleMap` | `oneOf` (`{ const, title }`) on the property or its items; enum arrays get `uniqueItems` |
+| `radios`, `checkboxes` | `options.format: "radio"` / `"checkbox"`; enum arrays default to checkboxes |
+| `textarea`, `rows` | `options.rows` |
+| `localizedstring`, `obibaSimpleMde` (`marked`), `obibaFileUpload`, `radioGroupCollection`, `obibaCountriesUiSelect`, `sf-typeahead`, `datepicker` | `options.format` when the schema `format` does not already select the renderer |
+| `wordLimit`, `emptyMessage`, `validationMessage` (object or string), `placeholder`, `marked` | same option |
+| `readonly` | `options.readonly`, also on the item controls of an array |
+| `add` | `options.addLabel` |
+| `minItems`, `maxItems`, `required: true` | written on the schema |
+| `dateOptions` (`dateFormat`, `yearRef`, `monthRef`, `lastDay`, `validationMessage`) | `options.dateOptions` / `options.validationMessage` |
+| `dateOptions.minDate` / `maxDate` (+ `minDateIsRef` / `maxDateIsRef`) | `options.min` / `max`, or `rules.min` / `max` when it names a field |
+| array key with `items` (`"arr[].x"` keys) | `options.items` (item UI schema, scopes relative to the item) |
+| `x-schema-form` on a schema property | definition defaults for that key |
+| `actions`, `submit`, `button`, `template`, `hidden`, `sf-obiba-selection-tree` | skipped (info diagnostic) |
+
+Unknown keys and unsupported elements without a key are skipped, a keyed control of an unknown type
+is rendered from its schema, and a condition that cannot be translated leaves its element visible; all
+of these are reported in `diagnostics` (`{ level, message, key?, element? }`).
+
+Conditions (`transpileCondition`) accept the JavaScript subset found in form definitions:
+`model.a.b` paths, string / number / boolean / null literals, `!`, `&&`, `||`, parentheses,
+`==` / `===` / `!=` / `!==` / `<` / `<=` / `>` / `>=`, `model.list.indexOf(v) >= 0` (or `> -1`,
+`!= -1`, and the negative forms), `model.list.includes(v)` and `model.list.length`. JavaScript
+truthiness is kept through the `truthy()` filtrex function (`!model.b` → `not (truthy(b))`),
+`indexOf` becomes `contains(list, v)`, and comparisons with `true` / `false` / `null` / `undefined` use
+the `isBoolean` / `isNull` / `isUndefined` functions with the strict / loose distinction of JavaScript
+(`model.a == null` → `isNull(a)`, `model.a === null` → `(isNull(a) and not (isUndefined(a)))`,
+`model.a === true` → `(isBoolean(a) and truthy(a))`). Known deviations from JavaScript: a loose
+`model.a == true` is JavaScript truthiness (`2 == true` is true here, false in JavaScript), filtrex `==`
+is strict (`'1' == 1` is false), and an ordering comparison is false when the value is null, undefined
+or an empty string. Ordering comparisons with a boolean or null literal are rejected.
+
+The 13 default Mica forms are converted as acceptance fixtures (`test/fixtures/asf`, snapshots in
+`__snapshots__`), and the `ui/dev` page "test-asf-converter" renders any pasted pair.
 
 # Setup
 ```bash

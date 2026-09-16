@@ -15,6 +15,21 @@
   "module": "dist/index.esm.js",
   "main": "dist/index.common.js",
   "types": "dist/index.esm.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.esm.d.ts",
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.common.js"
+    },
+    "./asf": {
+      "types": "./dist/asf/index.d.ts",
+      "import": "./dist/asf.esm.js",
+      "require": "./dist/asf.common.js"
+    },
+    "./dist/*": "./dist/*",
+    "./src/*": "./src/*",
+    "./package.json": "./package.json"
+  },
   "scripts": {
     "dev": "cd dev && npm run dev && cd ..",
     "dev:umd": "npm run build && node build/script.open-umd.js",

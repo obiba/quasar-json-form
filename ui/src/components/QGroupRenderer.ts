@@ -1,4 +1,4 @@
-import { h, watch, defineComponent } from 'vue'
+import { h, defineComponent } from 'vue'
 import { DispatchRenderer, rendererProps, useJsonFormsControl } from '@jsonforms/vue'
 import { useControlProperties } from '../composables/useControlProperties'
 import { useFormI18n } from '../composables/useFormI18n'
@@ -21,18 +21,6 @@ export default defineComponent({
     // Use the generic control rules composable
     const { isVisible, isEnabled, rootClass } = useControlProperties(control)
 
-    watch(
-      () => isVisible.value,
-      (newValue) => {
-        if (newValue === false) {
-          onChange(undefined)
-        }
-      },
-    )
-
-    const onChange = (value: any) => {
-      controlResult.handleChange(control.value.path, value)
-    }
 
     return () => {
       if (!isVisible.value) {
@@ -41,8 +29,11 @@ export default defineComponent({
 
       const children = []
 
-      if ((control.value as any).title || (control.value.uischema as any).title) {
-        let title = t(String((control.value as any).title || (control.value.uischema as any).title))
+      // `title` (this library) or the JSON Forms `label` of the group
+      const groupTitle = (control.value as any).title || (control.value.uischema as any).title
+        || (typeof (control.value.uischema as any).label === 'string' ? (control.value.uischema as any).label : undefined)
+      if (groupTitle) {
+        let title = t(String(groupTitle))
         title = renderMarkdown(title)
         children.push(h('div', {
           class: 'q-form-title' + ((control.value.uischema as any).titleClass ? ` ${(control.value.uischema as any).titleClass}` : ''),

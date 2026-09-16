@@ -1,0 +1,203 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "version": {
+        "type": "string",
+        "title": "t(harmonization-protocol.version)",
+        "description": "t(harmonization-protocol.version-help)"
+      },
+      "participants": {
+        "type": "integer",
+        "title": "t(harmonization-protocol.participants)"
+      },
+      "qualitativeQuantitative": {
+        "type": "string",
+        "title": "t(harmonization-protocol.qualitative-quantitative.title)",
+        "description": "t(harmonization-protocol.qualitative-quantitative.help)",
+        "enum": [
+          "qualitative",
+          "quantitative"
+        ]
+      },
+      "prospectiveRetrospective": {
+        "type": "string",
+        "title": "t(harmonization-protocol.prospective-retrospective.title)",
+        "description": "t(harmonization-protocol.prospective-retrospective.help)",
+        "enum": [
+          "prospective",
+          "retrospective"
+        ]
+      },
+      "informationContent": {
+        "type": "object",
+        "title": "t(harmonization-protocol.information-content)",
+        "description": "t(harmonization-protocol.information-content-help)",
+        "format": "obibaSimpleMde"
+      },
+      "procedures": {
+        "type": "object",
+        "title": "t(harmonization-protocol.procedures)",
+        "description": "t(harmonization-protocol.procedures-help)",
+        "format": "localizedString"
+      },
+      "participantsInclusion": {
+        "type": "object",
+        "title": "t(harmonization-protocol.participants-inclusion)",
+        "description": "t(harmonization-protocol.participants-inclusion-help)",
+        "format": "localizedString"
+      },
+      "infrastructure": {
+        "type": "object",
+        "title": "t(harmonization-protocol.infrastructure)",
+        "description": "t(harmonization-protocol.infrastructure-help)",
+        "format": "localizedString"
+      },
+      "additionalInformation": {
+        "type": "object",
+        "title": "t(global.additional-information)",
+        "format": "obibaSimpleMde"
+      },
+      "_name": {
+        "title": "t(dataset.name)",
+        "type": "object",
+        "format": "localizedString"
+      },
+      "_acronym": {
+        "title": "t(dataset.acronym)",
+        "type": "object",
+        "format": "localizedString"
+      },
+      "_description": {
+        "title": "t(dataset.description)",
+        "type": "object",
+        "format": "obibaSimpleMde"
+      },
+      "_entityType": {
+        "title": "t(dataset.entity-type)",
+        "type": "string",
+        "default": "Participant"
+      }
+    },
+    "required": [
+      "_name",
+      "_acronym",
+      "_entityType"
+    ]
+  },
+  "definition": [
+    {
+      "type": "help",
+      "helpvalue": "t(dataset.general-info)"
+    },
+    {
+      "key": "_name",
+      "type": "localizedstring"
+    },
+    {
+      "key": "_acronym",
+      "type": "localizedstring"
+    },
+    {
+      "key": "_description",
+      "type": "obibaSimpleMde",
+      "rows": 5,
+      "marked": true
+    },
+    {
+      "key": "_entityType"
+    },
+    {
+      "type": "fieldset",
+      "items": [
+        {
+          "type": "section",
+          "htmlClass": "row",
+          "items": [
+            {
+              "type": "section",
+              "htmlClass": "col-xs-12 col-md-6",
+              "items": [
+                "version"
+              ]
+            },
+            {
+              "type": "section",
+              "htmlClass": "col-xs-12 col-md-6",
+              "items": [
+                "participants"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "fieldset",
+      "items": [
+        {
+          "type": "section",
+          "htmlClass": "row",
+          "items": [
+            {
+              "type": "section",
+              "htmlClass": "col-xs-12 col-md-6",
+              "items": [
+                {
+                  "key": "qualitativeQuantitative",
+                  "type": "radios",
+                  "titleMap": [
+                    {
+                      "value": "qualitative",
+                      "name": "t(harmonization-protocol.qualitative-quantitative.enum.qualitative)"
+                    },
+                    {
+                      "value": "quantitative",
+                      "name": "t(harmonization-protocol.qualitative-quantitative.enum.quantitative)"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "htmlClass": "col-xs-12 col-md-6",
+              "items": [
+                {
+                  "key": "prospectiveRetrospective",
+                  "type": "radios",
+                  "titleMap": [
+                    {
+                      "value": "prospective",
+                      "name": "t(harmonization-protocol.prospective-retrospective.enum.prospective)"
+                    },
+                    {
+                      "value": "retrospective",
+                      "name": "t(harmonization-protocol.prospective-retrospective.enum.retrospective)"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "fieldset",
+      "items": [
+        {
+          "key": "informationContent",
+          "type": "obibaSimpleMde"
+        },
+        "procedures",
+        "participantsInclusion",
+        "infrastructure",
+        {
+          "key": "additionalInformation",
+          "type": "obibaSimpleMde"
+        }
+      ]
+    }
+  ]
+}

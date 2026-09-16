@@ -86,6 +86,34 @@ const builds = [
   {
     rollup: {
       input: {
+        input: pathResolve('../src/asf/index.ts')
+      },
+      output: {
+        file: pathResolve('../dist/asf.esm.js'),
+        format: 'es'
+      }
+    },
+    build: {
+      minified: true
+    }
+  },
+  {
+    rollup: {
+      input: {
+        input: pathResolve('../src/asf/index.ts')
+      },
+      output: {
+        file: pathResolve('../dist/asf.common.js'),
+        format: 'cjs'
+      }
+    },
+    build: {
+      minified: true
+    }
+  },
+  {
+    rollup: {
+      input: {
         input: pathResolve('../src/index.umd.ts')
       },
       output: {

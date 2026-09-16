@@ -1,0 +1,26 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "signature": {
+        "title": "t(data-access-agreement.default.signature.check)",
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "signature"
+    ]
+  },
+  "definition": [
+    {
+      "type": "fieldset",
+      "items": [
+        {
+          "type": "help",
+          "helpvalue": "<h3>t(data-access-agreement.default.signature.title)</h3>"
+        },
+        "signature"
+      ]
+    }
+  ]
+}

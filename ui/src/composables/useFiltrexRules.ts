@@ -18,6 +18,19 @@ export class FiltrexRuleEngine {
       return value !== null && value !== undefined && value !== ''
     })
 
+    // isNull(value): null or undefined (unlike isEmpty, an empty string is not null)
+    this.addFunction('isNull', (value: any) => {
+      return value === null || value === undefined
+    })
+
+    this.addFunction('isUndefined', (value: any) => {
+      return value === undefined
+    })
+
+    this.addFunction('isBoolean', (value: any) => {
+      return typeof value === 'boolean'
+    })
+
     this.addFunction('ifElse', (condition: boolean, trueVal: any, falseVal: any) => {
       return condition ? trueVal : falseVal
     })
@@ -86,6 +99,9 @@ export class FiltrexRuleEngine {
 
     // number of whitespace-separated words in a string
     this.addFunction('wordCount', (value: any) => countWords(value))
+
+    // truthy(value): JavaScript truthiness (used by the transpiled ASF conditions)
+    this.addFunction('truthy', (value: any) => !!value)
   }
 
   addFunction(name: string, fn: (...args: any[]) => any): void {

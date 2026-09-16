@@ -1,0 +1,32 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "signature": {
+        "title": "data-access-agreement.default.signature.check",
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "signature"
+    ]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Group",
+        "elements": [
+          {
+            "type": "Label",
+            "text": "<h3>data-access-agreement.default.signature.title</h3>"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/signature"
+          }
+        ]
+      }
+    ]
+  }
+}
