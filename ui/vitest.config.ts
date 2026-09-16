@@ -17,5 +17,13 @@ export default defineConfig({
     include: ['test/**/*.test.ts'],
     setupFiles: ['test/setup.ts'],
     css: false,
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.ts'],
+      // build entry points, not exercised by the tests
+      exclude: ['src/index.common.ts', 'src/index.umd.ts'],
+      reporter: ['text', 'html'],
+      reportsDirectory: 'coverage',
+    },
   },
 })

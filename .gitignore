@@ -17,3 +17,6 @@ yarn-error.log*
 
 # compiled TypeScript output must not be committed
 ui/src/**/*.js
+
+# test coverage reports
+ui/coverage

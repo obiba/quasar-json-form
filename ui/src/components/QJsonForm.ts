@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { h, provide, toRef, defineComponent, computed, ref, watch, inject, unref } from 'vue'
+import { h, provide, toRef, defineComponent, computed, ref, watch, inject, unref, markRaw, toRaw } from 'vue'
 import type { PropType } from 'vue'
 import { JsonForms } from '@jsonforms/vue'
 import { createAjv } from '@jsonforms/core'
@@ -31,10 +31,51 @@ export const CUSTOM_FORMATS = [
   'computed', 'textarea', 'password', 'search', 'tel',
 ]
 
+const daysInMonth = (year: number, month: number): number => new Date(year, month, 0).getDate()
+
+const isValidTime = (hours: string, minutes: string, seconds?: string): boolean =>
+  Number(hours) < 24 && Number(minutes) < 60 && (seconds === undefined || Number(seconds) < 60)
+
+/**
+ * `time` as produced by the time picker: `HH:mm`, with optional seconds
+ * (`HH:mm:ss`), fraction and timezone (the ISO form is still accepted).
+ */
+export function isPickerTime(value: string): boolean {
+  const match = /^(\d{2}):(\d{2})(?::(\d{2})(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2})?$/.exec(value)
+  return match !== null && isValidTime(match[1]!, match[2]!, match[3])
+}
+
+/**
+ * `date-time` as produced by the date-time picker: `YYYY-MM-DD HH:mm`, with
+ * optional seconds, fraction and timezone; a `T` separator (the ISO form) is
+ * also accepted.
+ */
+export function isPickerDateTime(value: string): boolean {
+  const match = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2})(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2})?$/.exec(value)
+  if (match === null) return false
+  const [, year, month, day, hours, minutes, seconds] = match
+  const m = Number(month)
+  const d = Number(day)
+  return m >= 1 && m <= 12 && d >= 1 && d <= daysInMonth(Number(year), m) && isValidTime(hours!, minutes!, seconds)
+}
+
+/**
+ * Standard formats redefined to match what the pickers produce: AJV would
+ * otherwise require seconds and a timezone (`HH:mm:ssZ`), which the time and
+ * date-time controls never store.
+ */
+export const PICKER_FORMATS: Record<string, (value: string) => boolean> = {
+  time: isPickerTime,
+  'date-time': isPickerDateTime,
+}
+
 export function createDefaultAjv(): Ajv {
   const ajv = createAjv()
   CUSTOM_FORMATS.forEach((format) => {
     if (!ajv.formats[format]) ajv.addFormat(format, true)
+  })
+  Object.entries(PICKER_FORMATS).forEach(([format, validate]) => {
+    ajv.addFormat(format, validate)
   })
   return ajv
 }
@@ -127,9 +168,11 @@ export default defineComponent({
   setup(props: any, { emit }: any) {
     const { t, te, locale, fallbackLocale } = useFormI18n()
 
-    // AJV instance: the given one, or a default knowing the custom formats
-    const defaultAjv = createDefaultAjv()
-    const ajv = computed<Ajv>(() => props.ajv ?? defaultAjv)
+    // AJV instance: the given one, or a default knowing the custom formats.
+    // Never a reactive proxy (an application may keep it in reactive state):
+    // AJV's code generation breaks when its internals are proxied.
+    const defaultAjv = markRaw(createDefaultAjv())
+    const ajv = computed<Ajv>(() => (props.ajv ? markRaw(toRaw(props.ajv)) : defaultAjv))
 
     // Provide form data and readonly state to all child renderers
     provide('jsonforms-data', toRef(props, 'modelValue'))

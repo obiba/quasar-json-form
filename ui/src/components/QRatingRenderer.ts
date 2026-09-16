@@ -10,10 +10,7 @@ export default defineComponent({
   setup(props: any) {
     const { t } = useFormI18n()
 
-    const controlResult = useJsonFormsControl({
-      ...props,
-      uischema: props.uischema,
-    })
+    const controlResult = useJsonFormsControl(props)
 
     const control = controlResult.control
 
@@ -31,7 +28,8 @@ export default defineComponent({
     )
 
     const onChange = (value: any) => {
-      controlResult.handleChange(control.value.path, Number(value))
+      const isEmpty = value === undefined || value === null || value === ''
+      controlResult.handleChange(control.value.path, isEmpty ? undefined : Number(value))
     }
 
     return () => {
@@ -55,7 +53,8 @@ export default defineComponent({
 
       children.push(h(QRating, {
         ...options.value,
-        modelValue: control.value.data,
+        // QRating requires a number: no value displays no selected icon
+        modelValue: control.value.data ?? 0,
         type: 'number',
         'onUpdate:modelValue': onChange,
         error: hasError.value,
