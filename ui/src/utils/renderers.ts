@@ -31,6 +31,7 @@ import QFileUploadRenderer from '../components/QFileUploadRenderer'
 import QNumRenderer from '../components/QNumberRenderer'
 import QRatingRenderer from '../components/QRatingRenderer'
 import QSliderRenderer from '../components/QSliderRenderer'
+import QRangeRenderer from '../components/QRangeRenderer'
 import QToggleRenderer from '../components/QToggleRenderer'
 import QSelectRenderer from '../components/QSelectRenderer'
 import QOptionsRenderer from '../components/QOptionsRenderer'
@@ -86,6 +87,12 @@ const isLocalizedStringControl = and(
   uiTypeIs('Control'),
   schemaTypeIs('object'),
   hasFormat('localizedString', 'localizedstring', 'obibaSimpleMde')
+)
+
+const isRangeControl = and(
+  uiTypeIs('Control'),
+  schemaTypeIs('object'),
+  hasFormat('range')
 )
 
 const isMarkdownControl = and(
@@ -211,6 +218,10 @@ const qRenderers = [
   {
     renderer: QSliderRenderer,
     tester: rankWith(3, and(isIntegerControl, optionIs('format', 'slider'))),
+  },
+  {
+    renderer: QRangeRenderer,
+    tester: rankWith(6, isRangeControl),
   },
   {
     renderer: QNumRenderer,

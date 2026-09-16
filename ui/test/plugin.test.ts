@@ -7,7 +7,7 @@ import { countryCodes } from '../src/data/countries'
 
 const COMPONENTS = [
   'QDateRenderer', 'QTimeRenderer', 'QDateTimeRenderer', 'QSelectRenderer', 'QOptionsRenderer',
-  'QNumberRenderer', 'QRatingRenderer', 'QSliderRenderer', 'QStringRenderer', 'QFileUploadRenderer',
+  'QNumberRenderer', 'QRatingRenderer', 'QSliderRenderer', 'QRangeRenderer', 'QStringRenderer', 'QFileUploadRenderer',
   'QToggleRenderer', 'QSectionRenderer', 'QListRenderer', 'QLabelRenderer', 'QTabsLayout',
   'QStepperLayout', 'QGroupRenderer', 'QLayoutRenderer', 'QComputedRenderer', 'QLocalizedStringRenderer',
   'QMarkdownRenderer', 'QMarkdownEditor', 'QRadioMatrixRenderer', 'QCountriesRenderer',

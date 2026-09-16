@@ -66,6 +66,15 @@ const schema = {
       title: 'renderers.slider.label',
       description: 'renderers.slider.description',
     },
+    range: {
+      type: 'object',
+      title: 'renderers.range.label',
+      description: 'renderers.range.description',
+      properties: {
+        min: { type: 'integer' },
+        max: { type: 'integer' },
+      },
+    },
     date: {
       type: 'string',
       format: 'date',
@@ -342,6 +351,18 @@ const uischema = {
                 step: 1,
                 color: 'blue',
                 size: 'md',
+              },
+            },
+            {
+              type: 'Control',
+              scope: '#/properties/range',
+              options: {
+                format: 'range',
+                min: 0,
+                max: 100,
+                step: 5,
+                label: true,
+                color: 'blue',
               },
             },
             {

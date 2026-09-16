@@ -1,0 +1,17 @@
+{
+  "name": "QRangeRenderer",
+  "inherits": "control",
+  "triggers": [
+    { "schema": "{ \"type\": \"object\" } + format: \"range\"", "rank": 6, "desc": "An object property with the `range` format, in the schema or in `options.format`." }
+  ],
+  "element": {
+    "hint": { "type": "String", "desc": "Text displayed under the range when there is no error, translated with `t()`." }
+  },
+  "options": {
+    "…": { "type": "any", "desc": "Every option is passed as a prop to [QRange](https://quasar.dev/vue-components/range#qrange-api): `min`, `max`, `step`, `minRange`, `maxRange`, `dragRange`, `dragOnlyRange`, `label`, `labelAlways`, `markers`, `markerLabels`, `snap`, `color`, `dense`..." }
+  },
+  "data": {
+    "desc": "An object `{ min, max }` of two numbers (the QRange model), `undefined` when neither end is set. The schema `title` is displayed above the range, the `description` under it. The `min` and `max` sub-properties are validated by AJV like any number.",
+    "example": "{ \"ages\": { \"min\": 20, \"max\": 60 } }"
+  }
+}

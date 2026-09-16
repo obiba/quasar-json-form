@@ -54,6 +54,10 @@ export default {
       label: 'Slider Selector',
       description: 'Please select a value using the slider',
     },
+    range: {
+      label: 'Range Selector',
+      description: 'Please select a range using the two thumbs',
+    },
     date: {
       label: 'Date Picker',
       description: 'Please select a date',
