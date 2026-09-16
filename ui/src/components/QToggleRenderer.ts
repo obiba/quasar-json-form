@@ -18,7 +18,7 @@ export default defineComponent({
     const control = controlResult.control
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, requiredMark, rootClass, hasError, errorMessage, options } =
+    const { isVisible, isEnabled, isReadonly, requiredMark, rootClass, hasError, errorMessage, options } =
       useControlProperties(control)
 
     watch(
@@ -42,14 +42,16 @@ export default defineComponent({
       const children = []
 
       children.push(h(QToggle, {
+        ...options.value,
+        class: isReadonly.value ? 'q-form-readonly' : undefined,
         modelValue: control.value.data,
-        'onUpdate:modelValue': onChange,
+        // read-only: no change handler, the toggle keeps its value
+        'onUpdate:modelValue': isReadonly.value ? undefined : onChange,
         label: control.value.label ? t(control.value.label) + requiredMark.value : undefined,
         error: hasError.value,
         errorMessage: errorMessage.value,
         required: control.value.required,
-        disable: !isEnabled.value,
-        ...options.value,
+        disable: !isEnabled.value && !isReadonly.value,
       }))
 
       if (control.value.description) {

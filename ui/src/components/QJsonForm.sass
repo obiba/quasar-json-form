@@ -26,3 +26,34 @@
   font-size: smaller
 .text-markdown > p:last-child
   margin-bottom: 0
+
+// Read-only toggles and option groups (no readonly prop on these components)
+.q-form-readonly
+  pointer-events: none
+
+// Markdown editor (QMarkdownEditor): rendered preview / read-only display
+.q-markdown-editor__toolbar
+  min-height: 28px
+.q-markdown-editor__preview
+  border: 1px solid rgba(0, 0, 0, 0.12)
+  border-radius: 4px
+  padding: 8px 12px
+  min-height: 40px
+.body--dark .q-markdown-editor__preview
+  border-color: rgba(255, 255, 255, 0.28)
+
+// Localized string: language selector
+.q-localized-toggle
+  align-self: center
+
+// Radio matrix (QRadioMatrixRenderer)
+.q-radio-matrix
+  th, td
+    white-space: normal
+  td.q-radio-matrix__item
+    width: 50%
+
+// File upload list
+.q-file-list
+  .q-file-item__name
+    word-break: break-all

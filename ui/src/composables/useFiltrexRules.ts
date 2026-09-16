@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { compileExpression, useDotAccessOperatorAndOptionalChaining } from 'filtrex'
 import { computed } from 'vue'
+import { countWords } from '../utils/words'
 
 export class FiltrexRuleEngine {
   customFunctions: Record<string, (...args: any[]) => any>
@@ -74,6 +75,17 @@ export class FiltrexRuleEngine {
     this.addFunction('inArray', (value: any, ...items: any[]) => {
       return items.includes(value)
     })
+
+    // contains(list, value): true when an array (or a string) contains the value
+    this.addFunction('contains', (container: any, value: any) => {
+      if (Array.isArray(container) || typeof container === 'string') {
+        return container.includes(value)
+      }
+      return false
+    })
+
+    // number of whitespace-separated words in a string
+    this.addFunction('wordCount', (value: any) => countWords(value))
   }
 
   addFunction(name: string, fn: (...args: any[]) => any): void {

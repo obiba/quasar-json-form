@@ -8,7 +8,8 @@
  *
  * Error keys follow the JSON Forms convention: `error.<ajv keyword>`, with the
  * AJV error params available for interpolation (e.g. `{limit}`), plus
- * `error.default` when no keyword-specific message exists.
+ * `error.default` when no keyword-specific message exists. The other keys are
+ * the messages of the renderers (file upload, localized strings...).
  */
 export interface FormMessages {
   error: Record<string, string>
@@ -16,6 +17,7 @@ export interface FormMessages {
 }
 
 const en: FormMessages = {
+  close: 'Close',
   error: {
     default: 'This value is not valid',
     required: 'This field is required',
@@ -36,10 +38,45 @@ const en: FormMessages = {
     uniqueItems: 'Must not contain duplicate items',
     minProperties: 'Must have at least {limit} properties',
     maxProperties: 'Must have at most {limit} properties',
+    wordLimit: 'Must have between {min} and {max} words',
+    wordMin: 'Must have at least {limit} words',
+    wordMax: 'Must have at most {limit} words',
+    dateRange: 'Must be between {min} and {max}',
+    dateMin: 'Must be on or after {limit}',
+    dateMax: 'Must be on or before {limit}',
+    dateInvalid: 'Must be a valid date ({format})',
+  },
+  words: '{count} / {limit} words',
+  localized: {
+    completed: 'Must be completed in all languages',
+  },
+  markdown: {
+    bold: 'Bold',
+    italic: 'Italic',
+    heading: 'Heading',
+    list: 'List',
+    link: 'Link',
+    preview: 'Preview',
+    edit: 'Edit',
+  },
+  files: {
+    upload: 'Upload',
+    empty: 'No file',
+    missing: 'At least one file is required',
+    minItems: 'Must have at least {limit} files',
+    maxItems: 'Must have at most {limit} files',
+    uploadUrlMissing: 'No upload URL is configured',
+    uploadFailed: 'Upload failed: {message}',
+    remove: 'Remove',
+    download: 'Download',
+  },
+  radioMatrix: {
+    allItemsSelected: 'All options must be selected',
   },
 }
 
 const fr: FormMessages = {
+  close: 'Fermer',
   error: {
     default: 'Cette valeur est invalide',
     required: 'Ce champ est requis',
@@ -60,6 +97,40 @@ const fr: FormMessages = {
     uniqueItems: 'Ne doit pas contenir de doublons',
     minProperties: 'Doit avoir au moins {limit} propriétés',
     maxProperties: 'Doit avoir au plus {limit} propriétés',
+    wordLimit: 'Doit contenir entre {min} et {max} mots',
+    wordMin: 'Doit contenir au moins {limit} mots',
+    wordMax: 'Doit contenir au plus {limit} mots',
+    dateRange: 'Doit être entre {min} et {max}',
+    dateMin: 'Doit être le {limit} ou après',
+    dateMax: 'Doit être le {limit} ou avant',
+    dateInvalid: 'Doit être une date valide ({format})',
+  },
+  words: '{count} / {limit} mots',
+  localized: {
+    completed: 'Doit être complété dans toutes les langues',
+  },
+  markdown: {
+    bold: 'Gras',
+    italic: 'Italique',
+    heading: 'Titre',
+    list: 'Liste',
+    link: 'Lien',
+    preview: 'Aperçu',
+    edit: 'Éditer',
+  },
+  files: {
+    upload: 'Téléverser',
+    empty: 'Aucun fichier',
+    missing: 'Au moins un fichier est requis',
+    minItems: 'Doit contenir au moins {limit} fichiers',
+    maxItems: 'Doit contenir au plus {limit} fichiers',
+    uploadUrlMissing: "Aucune URL de téléversement n'est configurée",
+    uploadFailed: 'Échec du téléversement : {message}',
+    remove: 'Retirer',
+    download: 'Télécharger',
+  },
+  radioMatrix: {
+    allItemsSelected: 'Toutes les options doivent être sélectionnées',
   },
 }
 

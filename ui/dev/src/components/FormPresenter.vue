@@ -53,6 +53,8 @@
             :uischema="props.uischema"
             :readonly="props.formReadonly"
             :validation-mode="props.validationMode"
+            :languages="props.languages"
+            :config="props.config"
             @update:modelValue="onDataUpdate"
           />
           <pre class="bg-grey-10 text-white q-pa-md"><code>{{ formData }}</code></pre>
@@ -84,6 +86,8 @@ interface FormPresenterProps {
   readonly?: boolean;
   formReadonly?: boolean;
   validationMode?: 'ValidateAndShow' | 'ValidateAndHide' | 'NoValidation';
+  languages?: string[] | Record<string, string>;
+  config?: Record<string, unknown>;
 }
 
 const props = withDefaults(defineProps<FormPresenterProps>(), {
@@ -92,6 +96,8 @@ const props = withDefaults(defineProps<FormPresenterProps>(), {
   readonly: false,
   formReadonly: false,
   validationMode: 'ValidateAndShow',
+  languages: undefined,
+  config: undefined,
 });
 
 const emit = defineEmits<{

@@ -20,10 +20,26 @@ import QStepperLayout from './components/QStepperLayout'
 import QGroupRenderer from './components/QGroupRenderer'
 import QLayoutRenderer from './components/QLayoutRenderer'
 import QComputedRenderer from './components/QComputedRenderer'
+import QLocalizedStringRenderer from './components/QLocalizedStringRenderer'
+import QMarkdownRenderer from './components/QMarkdownRenderer'
+import QMarkdownEditor from './components/QMarkdownEditor'
+import QRadioMatrixRenderer from './components/QRadioMatrixRenderer'
+import QCountriesRenderer from './components/QCountriesRenderer'
+import QTypeaheadRenderer from './components/QTypeaheadRenderer'
 import QJsonForm from './components/QJsonForm'
 import { messages } from './i18n/messages'
+import { countryCodes } from './data/countries'
+import type { CountryCode } from './data/countries'
 import { createJsonFormsI18n, createTranslator, errorTranslator } from './utils/i18n'
 import { renderMarkdown, renderMarkdownInline } from './utils/markdown'
+import { countWords, parseWordLimit } from './utils/words'
+import { filtrexEngine, FiltrexRuleEngine } from './composables/useFiltrexRules'
+import { createFormErrorRegistry, toInstancePath } from './composables/useFormErrors'
+import type { FormErrorRegistry } from './composables/useFormErrors'
+import { normalizeLanguages } from './composables/useControlProperties'
+import type { Language, LanguagesInput } from './composables/useControlProperties'
+import type { FileItem, FileUploadHooks, FileUploadContext } from './components/QFileUploadRenderer'
+import { DATA_KEY, READONLY_KEY, LANGUAGES_KEY, LOCALE_KEY, COUNTRIES_KEY, FORM_ERRORS_KEY } from './composables/keys'
 
 const version = __UI_VERSION__
 
@@ -47,6 +63,12 @@ function install(app: App): void {
   app.component(QGroupRenderer.name!, QGroupRenderer)
   app.component(QLayoutRenderer.name!, QLayoutRenderer)
   app.component(QComputedRenderer.name!, QComputedRenderer)
+  app.component(QLocalizedStringRenderer.name!, QLocalizedStringRenderer)
+  app.component(QMarkdownRenderer.name!, QMarkdownRenderer)
+  app.component(QMarkdownEditor.name!, QMarkdownEditor)
+  app.component(QRadioMatrixRenderer.name!, QRadioMatrixRenderer)
+  app.component(QCountriesRenderer.name!, QCountriesRenderer)
+  app.component(QTypeaheadRenderer.name!, QTypeaheadRenderer)
   app.component(QJsonForm.name!, QJsonForm)
 }
 
@@ -71,12 +93,42 @@ export {
   QGroupRenderer,
   QLayoutRenderer,
   QComputedRenderer,
+  QLocalizedStringRenderer,
+  QMarkdownRenderer,
+  QMarkdownEditor,
+  QRadioMatrixRenderer,
+  QCountriesRenderer,
+  QTypeaheadRenderer,
   QJsonForm,
   messages,
+  countryCodes,
   createJsonFormsI18n,
   createTranslator,
   errorTranslator,
   renderMarkdown,
   renderMarkdownInline,
+  countWords,
+  parseWordLimit,
+  filtrexEngine,
+  FiltrexRuleEngine,
+  createFormErrorRegistry,
+  toInstancePath,
+  normalizeLanguages,
+  DATA_KEY,
+  READONLY_KEY,
+  LANGUAGES_KEY,
+  LOCALE_KEY,
+  COUNTRIES_KEY,
+  FORM_ERRORS_KEY,
   install
+}
+
+export type {
+  CountryCode,
+  FormErrorRegistry,
+  Language,
+  LanguagesInput,
+  FileItem,
+  FileUploadHooks,
+  FileUploadContext,
 }

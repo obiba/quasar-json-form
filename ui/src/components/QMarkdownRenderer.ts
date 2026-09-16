@@ -1,11 +1,17 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { h, watch, defineComponent } from 'vue'
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
-import { QInput } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
 import { useFormI18n } from '../composables/useFormI18n'
+import { omitOptions, RENDERER_OPTION_KEYS } from '../utils/options'
+import QMarkdownEditor from './QMarkdownEditor'
 
+/**
+ * String control with `format: "markdown"`: markdown editor with preview,
+ * rendered markdown when read-only.
+ */
 export default defineComponent({
-  name: 'QNumberRenderer',
+  name: 'QMarkdownRenderer',
   props: rendererProps(),
   setup(props: any) {
     const { t } = useFormI18n()
@@ -17,8 +23,7 @@ export default defineComponent({
 
     const control = controlResult.control
 
-    // Use the generic control rules composable
-    const { isVisible, isEnabled, isReadonly, inputLabel, hasError, errorMessage, options } =
+    const { isVisible, isEnabled, isReadonly, inputLabel, hasError, errorMessage, rootClass, options } =
       useControlProperties(control)
 
     watch(
@@ -31,9 +36,7 @@ export default defineComponent({
     )
 
     const onChange = (value: any) => {
-      // an emptied input means "no value", so that `required` applies
-      const isEmpty = value === '' || value === null || value === undefined
-      controlResult.handleChange(control.value.path, isEmpty ? undefined : Number(value))
+      controlResult.handleChange(control.value.path, value === '' || value === null ? undefined : value)
     }
 
     return () => {
@@ -41,18 +44,18 @@ export default defineComponent({
         return null
       }
 
-      return h(QInput, {
-        ...options.value,
+      return h(QMarkdownEditor, {
+        class: rootClass.value,
         modelValue: control.value.data,
-        type: 'number',
         'onUpdate:modelValue': onChange,
         label: inputLabel.value,
+        hint: control.value.description ? t(control.value.description) : undefined,
+        rows: options.value.rows || 5,
+        readonly: isReadonly.value,
+        disable: !isEnabled.value && !isReadonly.value,
         error: hasError.value,
         errorMessage: errorMessage.value,
-        required: control.value.required,
-        disable: !isEnabled.value && !isReadonly.value,
-        readonly: isReadonly.value,
-        hint: control.value.description ? t(control.value.description) : undefined,
+        inputProps: omitOptions(options.value, [...RENDERER_OPTION_KEYS, 'class', 'rows']),
       })
     }
   },

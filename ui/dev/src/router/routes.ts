@@ -12,6 +12,9 @@ const pages = [
   { path: 'test-stepper-layout', file: 'TestStepperLayout' },
   { path: 'test-categorization-layout', file: 'TestCategorizationLayout' },
   { path: 'test-dynamic-renderers', file: 'TestDynamicRenderers' },
+  { path: 'test-localized-string', file: 'TestLocalizedString' },
+  { path: 'test-file-upload', file: 'TestFileUpload' },
+  { path: 'test-mica-widgets', file: 'TestMicaWidgets' },
 ]
 
 const children = pages.map(page => ({
