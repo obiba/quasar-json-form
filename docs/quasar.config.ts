@@ -103,7 +103,7 @@ export default defineConfig(() => {
 
     framework: {
       config: {},
-      plugins: ['Notify']
+      plugins: ['Notify', 'Dark']
     },
 
     animations: []

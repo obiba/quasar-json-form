@@ -12,7 +12,7 @@ export default {
   uischema: {
     type: 'VerticalLayout',
     elements: [
-      { type: 'Control', scope: '#/properties/abstract', options: { rows: 2, wordLimit: '5:20', validationMessage: { wordLimitError: 'Please write between {min} and {max} words' } } },
+      { type: 'Control', scope: '#/properties/abstract', options: { rows: 2, wordLimit: '5:20', validationMessage: { wordLimitError: 'examples.messages.wordLimit' } } },
       { type: 'Control', scope: '#/properties/title', options: { validationMessage: 'Both languages are needed' } },
     ],
   },

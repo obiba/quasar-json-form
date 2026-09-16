@@ -1,6 +1,6 @@
 <template>
   <q-card flat bordered class="doc-api q-my-md">
-    <q-card-section class="row items-center q-py-sm bg-grey-2">
+    <q-card-section class="row items-center q-py-sm doc-card-header">
       <div class="text-subtitle2">{{ api?.name ?? name }} API</div>
       <q-space />
       <q-input v-model="filter" dense outlined debounce="200" placeholder="Filter" clearable style="width: 200px">

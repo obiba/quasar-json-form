@@ -39,7 +39,9 @@ after the AJV errors, with their own `keyword` (`validation`, `wordLimit`, `date
 
 Their message comes from `options.validationMessage.<name>` on the control when defined (a single
 string applies to every check of the control; `default` is the fallback of the named messages), and
-otherwise from the built-in i18n keys. The AJV error params are available for interpolation.
+otherwise from the built-in i18n keys. The message is translated with `t()`: when it is a key of
+the application bundles, the check params (`{min}`, `{max}`, `{limit}`...) are interpolated; a
+literal string is displayed as-is.
 
 <DocExample name="validation/messages" title="Custom messages" />
 

@@ -48,7 +48,7 @@
         </q-tab-panels>
         <div v-if="parseError" class="text-negative q-mt-sm">{{ parseError }}</div>
         <q-card v-if="result" flat bordered class="q-mt-md">
-          <q-card-section class="q-py-sm bg-grey-2 text-subtitle2">
+          <q-card-section class="q-py-sm doc-card-header text-subtitle2">
             Diagnostics
             <q-badge :color="diagnostics.length ? 'warning' : 'positive'" class="q-ml-sm">{{ diagnostics.length }}</q-badge>
           </q-card-section>

@@ -9,7 +9,7 @@
       </div>
     </q-card-section>
     <q-separator />
-    <q-card-section class="q-py-sm bg-grey-2 text-subtitle2">filtrex rule</q-card-section>
+    <q-card-section class="q-py-sm doc-card-header text-subtitle2">filtrex rule</q-card-section>
     <DocCode :code="output" lang="javascript" />
   </q-card>
 </template>

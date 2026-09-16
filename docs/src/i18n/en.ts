@@ -18,6 +18,11 @@ export default {
   'confirm-remove-item': 'Remove this item?',
   cancel: 'Cancel',
   remove: 'Remove',
+  search: 'Search',
+  no_results: 'No result',
+  dark_mode: 'Dark mode',
+  edit_page: 'Edit this page on GitHub',
+  on_this_page: 'On this page',
   api: {
     schema: 'Schema',
     element: 'Element',
@@ -38,6 +43,9 @@ export default {
     example: 'Example',
   },
   examples: {
+    messages: {
+      wordLimit: 'Please write between {min} and {max} words',
+    },
     contact: {
       name: 'Name',
       name_hint: 'First and last name',

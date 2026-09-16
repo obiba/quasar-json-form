@@ -1,6 +1,6 @@
 <template>
   <q-card flat bordered class="doc-example q-my-md">
-    <q-card-section v-if="title" class="row items-center q-py-sm bg-grey-2">
+    <q-card-section v-if="title" class="row items-center q-py-sm doc-card-header">
       <div class="text-subtitle2">{{ title }}</div>
       <q-space />
       <q-btn flat dense round size="sm" :icon="showSource ? 'code_off' : 'code'" @click="showSource = !showSource">

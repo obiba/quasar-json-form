@@ -1,6 +1,9 @@
 // app global css in Sass form
 @use '../../../ui/src/index.sass'
 
+.doc-content
+  min-width: 0
+
 .doc-page
   max-width: 960px
 
@@ -66,12 +69,6 @@
     color: $grey-8
     margin-bottom: 24px
 
-.doc-code
-  margin: 0
-  border-radius: 0
-  code
-    font-size: .85rem
-
 // playgrounds take the full width
 .doc-page:has(.doc-wide)
   max-width: none
@@ -80,3 +77,73 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace
   font-size: 12px
   line-height: 1.5
+
+.doc-code
+  margin: 0
+  border-radius: 0
+  code
+    font-size: .85rem
+
+.doc-card-header
+  background: $grey-2
+
+.doc-footer
+  border-top: 1px solid rgba(0, 0, 0, .12)
+  a
+    color: inherit
+
+// table of contents
+.doc-toc
+  width: 220px
+  flex: 0 0 220px
+  margin-left: 32px
+  &__inner
+    position: sticky
+    top: 66px
+    max-height: calc(100vh - 90px)
+    overflow-y: auto
+    border-left: 1px solid rgba(0, 0, 0, .12)
+    padding-left: 12px
+  &__link
+    display: block
+    font-size: .85rem
+    line-height: 1.4
+    padding: 3px 0
+    color: $grey-8
+    text-decoration: none
+    &--sub
+      padding-left: 12px
+      font-size: .8rem
+    &--active, &:hover
+      color: $primary
+
+.doc-search
+  width: 260px
+
+// dark mode
+.body--dark
+  .doc-page
+    h2
+      border-bottom-color: rgba(255, 255, 255, .2)
+    code
+      background: rgba(255, 255, 255, .12)
+    pre code
+      background: transparent
+    table
+      th, td
+        border-color: rgba(255, 255, 255, .2)
+      th
+        background: rgba(255, 255, 255, .06)
+    .doc-lead
+      color: $grey-5
+  .doc-card-header
+    background: rgba(255, 255, 255, .07)
+  .doc-footer
+    border-top-color: rgba(255, 255, 255, .2)
+  .doc-toc
+    &__inner
+      border-left-color: rgba(255, 255, 255, .2)
+    &__link
+      color: $grey-5
+      &--active, &:hover
+        color: $primary

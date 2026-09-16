@@ -18,7 +18,16 @@ export default defineRouter(function (/* { store, ssrContext } */) {
     : (import.meta.env.QUASAR_VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory)
 
   const Router = createRouter({
-    scrollBehavior: () => ({ left: 0, top: 0 }),
+    scrollBehavior: (to, from, savedPosition) => {
+      // a heading anchor: scroll to it once the page has rendered (70px header)
+      if (to.hash) {
+        return new Promise((resolve) => {
+          setTimeout(() => resolve({ el: to.hash, top: 70, behavior: to.path === from.path ? 'smooth' : 'auto' }), 150)
+        })
+      }
+      if (to.path === from.path) return false
+      return savedPosition ?? { left: 0, top: 0 }
+    },
     routes,
 
     // Leave this as is and make changes in quasar.conf.js instead!
