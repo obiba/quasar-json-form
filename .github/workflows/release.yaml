@@ -42,18 +42,12 @@ jobs:
         run: npm publish --access public
 
       - name: Create GitHub Release for UI
-        uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: UI Package Release ${{ github.ref_name }}
-          body: |
-            Release of @obiba/quasar-ui-json-form
-            
-            Version: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title "UI Package Release $GITHUB_REF_NAME" \
+            --notes "$(printf 'Release of @obiba/quasar-ui-json-form\n\nVersion: %s' "$GITHUB_REF_NAME")"
 
   release-app-extension:
     if: startsWith(github.ref, 'refs/tags/app-ext-v')
@@ -90,15 +84,9 @@ jobs:
         run: npm publish --access public
 
       - name: Create GitHub Release for App Extension
-        uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: App Extension Release ${{ github.ref_name }}
-          body: |
-            Release of @obiba/quasar-app-extension-json-form
-            
-            Version: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title "App Extension Release $GITHUB_REF_NAME" \
+            --notes "$(printf 'Release of @obiba/quasar-app-extension-json-form\n\nVersion: %s' "$GITHUB_REF_NAME")"
