@@ -7,6 +7,11 @@ const lastData = (wrapper: any) => {
   return emitted[emitted.length - 1]![0] as any
 }
 
+const lastErrors = (wrapper: any) => {
+  const emitted = wrapper.emitted('update:errors')!
+  return emitted[emitted.length - 1]![0] as any[]
+}
+
 const openPopup = async (wrapper: any, index = 0) => {
   await wrapper.findAll('.q-field__append .q-icon.cursor-pointer')[index]!.trigger('click')
   await flush()
@@ -29,9 +34,7 @@ describe('time renderer', () => {
   }
 
   it('renders an input with a time mask and the hint', async () => {
-    // AJV validates `format: time` as HH:mm:ss with a timezone, which the picker
-    // does not produce: schema validation is off to check the hint
-    const wrapper = mountForm({ schema, modelValue: { t: '10:30', full: '10:30:15' }, validationMode: 'NoValidation' })
+    const wrapper = mountForm({ schema, modelValue: { t: '10:30', full: '10:30:15' } })
     await flush()
     const fields = wrapper.findAll('.q-field')
     expect(fields[0]!.find('.q-field__label').text()).toBe('Time')
@@ -98,6 +101,21 @@ describe('time renderer', () => {
     wrapper.unmount()
   })
 
+  it('validates the picker value without seconds or timezone', async () => {
+    let wrapper = mountForm({ schema, modelValue: { t: '10:30', full: '23:59:59' } })
+    await flush()
+    expect(wrapper.findAll('.q-field').every((f) => !f.classes().includes('q-field--error'))).toBe(true)
+    expect(lastErrors(wrapper)).toEqual([])
+    wrapper.unmount()
+
+    wrapper = mountForm({ schema, modelValue: { t: '24:30' } })
+    await flush()
+    expect(wrapper.find('.q-field').classes()).toContain('q-field--error')
+    expect(wrapper.find('.q-field__messages').text()).toBe('Must be a valid time')
+    expect(lastErrors(wrapper).map((e) => e.keyword)).toEqual(['format'])
+    wrapper.unmount()
+  })
+
   it('is disabled by an enabled rule', async () => {
     const wrapper = mountForm({
       schema,
@@ -121,9 +139,7 @@ describe('date-time renderer', () => {
   }
 
   it('renders the value and the hint, and updates the data', async () => {
-    // AJV validates `format: date-time` as an ISO timestamp, which the picker
-    // does not produce: schema validation is off to check the hint
-    const wrapper = mountForm({ schema, modelValue: { dt: '2020-01-15 10:30' }, validationMode: 'NoValidation' })
+    const wrapper = mountForm({ schema, modelValue: { dt: '2020-01-15 10:30' } })
     await flush()
     const field = wrapper.find('.q-field')
     expect(field.find('.q-field__label').text()).toBe('When')
@@ -136,6 +152,20 @@ describe('date-time renderer', () => {
     await input.setValue('')
     await flush()
     expect(lastData(wrapper).dt).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it('validates the picker value without seconds or timezone', async () => {
+    let wrapper = mountForm({ schema, modelValue: { dt: '2020-01-15 10:30' } })
+    await flush()
+    expect(wrapper.find('.q-field').classes()).not.toContain('q-field--error')
+    expect(lastErrors(wrapper)).toEqual([])
+    wrapper.unmount()
+
+    wrapper = mountForm({ schema, modelValue: { dt: '2020-02-30 10:30' } })
+    await flush()
+    expect(wrapper.find('.q-field__messages').text()).toBe('Must be a valid date-time')
+    expect(lastErrors(wrapper).map((e) => e.keyword)).toEqual(['format'])
     wrapper.unmount()
   })
 

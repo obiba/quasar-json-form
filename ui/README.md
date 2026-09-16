@@ -105,7 +105,7 @@ export default {
 | `uischema` | generated | JSON Forms UI schema; when omitted, one `Control` per property |
 | `readonly` | `false` | Render every control read-only (inputs are not editable, list/upload buttons are hidden) |
 | `validationMode` | `ValidateAndShow` | `ValidateAndShow`: validate against the schema and show errors on the controls; `ValidateAndHide`: validate, do not show; `NoValidation`: skip schema validation. Filtrex `validation` rules are always evaluated |
-| `ajv` | | Custom AJV instance (`createAjv` from `@jsonforms/core`) |
+| `ajv` | | Custom AJV instance (`createAjv` from `@jsonforms/core`). The default one knows the custom formats of the renderers and validates `time` and `date-time` as the pickers store them (`HH:mm`, `YYYY-MM-DD HH:mm`, seconds and timezone optional) |
 | `additionalErrors` | `[]` | AJV-shaped errors to display in addition to validation errors (e.g. from a server) |
 | `config` | | JSON Forms config passed to renderers (`languages`, `countries`, `fileUpload`, see below) |
 | `languages` | | Languages of the localized strings: `['en', 'fr']` or `{ en: 'English', fr: 'Français' }` |

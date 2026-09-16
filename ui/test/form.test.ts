@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { createAjv } from '@jsonforms/core'
 import { mountForm, flush } from './utils'
-import { createDefaultAjv, CUSTOM_FORMATS } from '../src/components/QJsonForm'
+import { createDefaultAjv, CUSTOM_FORMATS, isPickerTime, isPickerDateTime } from '../src/components/QJsonForm'
 
 const lastData = (wrapper: any) => {
   const emitted = wrapper.emitted('update:modelValue')!
@@ -45,6 +45,33 @@ describe('QJsonForm', () => {
     const validate = ajv.compile({ type: 'string', format: 'date' })
     expect(validate('2020-01-01')).toBe(true)
     expect(validate('nope')).toBe(false)
+  })
+
+  it('validates time and date-time as the pickers produce them', () => {
+    const ajv = createDefaultAjv()
+    const time = ajv.compile({ type: 'string', format: 'time' })
+    expect(time('10:30')).toBe(true)
+    expect(time('23:59:59')).toBe(true)
+    expect(time('10:30:00.123Z')).toBe(true)
+    expect(time('10:30:00+02:00')).toBe(true)
+    expect(time('24:00')).toBe(false)
+    expect(time('10:60')).toBe(false)
+    expect(time('10:30:60')).toBe(false)
+    expect(time('1030')).toBe(false)
+    expect(time('10:30 ')).toBe(false)
+    const dateTime = ajv.compile({ type: 'string', format: 'date-time' })
+    expect(dateTime('2020-01-15 10:30')).toBe(true)
+    expect(dateTime('2020-02-29 10:30:15')).toBe(true)
+    expect(dateTime('2020-01-15T10:30:00Z')).toBe(true)
+    expect(dateTime('2020-01-15T10:30:00.5-05:00')).toBe(true)
+    expect(dateTime('2021-02-29 10:30')).toBe(false)
+    expect(dateTime('2020-13-01 10:30')).toBe(false)
+    expect(dateTime('2020-01-00 10:30')).toBe(false)
+    expect(dateTime('2020-01-15 24:00')).toBe(false)
+    expect(dateTime('2020-01-15')).toBe(false)
+    expect(dateTime('2020-01-15 10:30 ')).toBe(false)
+    expect(isPickerTime('00:00')).toBe(true)
+    expect(isPickerDateTime('2020-01-31 00:00')).toBe(true)
   })
 
   it('accepts a custom AJV instance', async () => {
