@@ -124,6 +124,41 @@ describe('GridLayout', () => {
     wrapper.unmount()
   })
 
+  it('does not forward the placement option to renderers spreading their options', async () => {
+    const wrapper = mountForm({
+      schema: {
+        type: 'object',
+        properties: {
+          n: { type: 'number', title: 'N' },
+          s: { type: 'string', title: 'S', enum: ['a', 'b'] },
+          t: { type: 'boolean', title: 'T' },
+          r: { type: 'integer', title: 'R' },
+        },
+      },
+      uischema: {
+        type: 'GridLayout',
+        options: { columns: 2 },
+        elements: [
+          { type: 'Control', scope: '#/properties/n', options: { grid: { colSpan: 2 } } },
+          { type: 'Control', scope: '#/properties/s', options: { grid: { column: 1 } } },
+          { type: 'Control', scope: '#/properties/s', options: { grid: { column: 2 }, format: 'radio' } },
+          { type: 'Control', scope: '#/properties/t', options: { grid: { row: 3 } } },
+          { type: 'Control', scope: '#/properties/r', options: { grid: { row: 4 }, format: 'rating' } },
+        ],
+      },
+    })
+    await flush()
+    const cells = wrapper.findAll('.q-grid-layout__cell')
+    expect(cells.length).toBe(5)
+    expect(cells[0]!.find('.q-field input[type=number]').exists()).toBe(true)
+    expect(cells[1]!.find('.q-select').exists()).toBe(true)
+    expect(cells[2]!.find('.q-radio').exists()).toBe(true)
+    expect(cells[3]!.find('.q-toggle').exists()).toBe(true)
+    expect(cells[4]!.find('.q-rating').exists()).toBe(true)
+    expect(wrapper.find('[grid]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
   it('places elements in named areas', async () => {
     const wrapper = mountForm({
       schema,

@@ -5,6 +5,7 @@ import { useFiltrexRules } from './useFiltrexRules'
 import { useFormI18n } from './useFormI18n'
 import { useReportedErrors } from './useFormErrors'
 import { DATA_KEY, READONLY_KEY, LANGUAGES_KEY } from './keys'
+import { omitOptions } from '../utils/options'
 
 export interface SelectOption {
   label: string
@@ -241,9 +242,12 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
     return allErrors.join('; ')
   })
 
-  // Extract options from ui schema or schema
+  // Extract options from ui schema or schema. `grid` is the placement of the
+  // element in a GridLayout, read by the layout: not a renderer option, and
+  // not to be forwarded to the Quasar components.
   const options = computed(() => {
-    return control.value.uischema?.options || control.value.schema?.options || {}
+    const opts = control.value.uischema?.options || control.value.schema?.options || {}
+    return 'grid' in opts ? omitOptions(opts, ['grid']) : opts
   })
 
   // JSON Forms config (`config` prop of QJsonForm)

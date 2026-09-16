@@ -42,7 +42,6 @@ export const RENDERER_OPTION_KEYS = [
   'addLabel',
   'addIcon',
   'items',
-  'grid',
 ]
 
 /** Copy of `options` without the given keys (defaults to `RENDERER_OPTION_KEYS`). */

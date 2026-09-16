@@ -9,7 +9,7 @@ const COMPONENTS = [
   'QDateRenderer', 'QTimeRenderer', 'QDateTimeRenderer', 'QSelectRenderer', 'QOptionsRenderer',
   'QNumberRenderer', 'QRatingRenderer', 'QSliderRenderer', 'QRangeRenderer', 'QStringRenderer', 'QFileUploadRenderer',
   'QToggleRenderer', 'QSectionRenderer', 'QListRenderer', 'QLabelRenderer', 'QTabsLayout',
-  'QStepperLayout', 'QGroupRenderer', 'QLayoutRenderer', 'QComputedRenderer', 'QLocalizedStringRenderer',
+  'QStepperLayout', 'QGridLayout', 'QGroupRenderer', 'QLayoutRenderer', 'QComputedRenderer', 'QLocalizedStringRenderer',
   'QMarkdownRenderer', 'QMarkdownEditor', 'QRadioMatrixRenderer', 'QCountriesRenderer',
   'QTypeaheadRenderer', 'QJsonForm',
 ]
