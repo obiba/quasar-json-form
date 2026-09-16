@@ -1,7 +1,9 @@
 <template>
   <q-page class="q-pa-md">
     <div class="text-h5 q-mb-md">{{ t('json_form') }}</div>
-    <FormPresenter :data="formData" :schema="schema" :uischema="uischema" readonly @update:data="onDataUpdate"/>
+    <!-- NoValidation: the region and city enums start empty, which is not a valid JSON Schema
+         (an enum needs at least one item) and AJV would refuse to compile it. -->
+    <FormPresenter :data="formData" :schema="schema" :uischema="uischema" readonly validation-mode="NoValidation" @update:data="onDataUpdate"/>
   </q-page>
 </template>
 
@@ -20,20 +22,20 @@ const schema = {
     country: {
       type: 'string',
       enum: ['Canada', 'France', 'Switzerland'],
-      title: 'Country',
-      description: '1. Select a country from the list.',
+      label: 'Country',
+      title: '1. Select a country from the list.',
     },
     region: {
       type: 'string',
       enum: [] as string[],
-      title: 'Region',
-      description: '2. Select a region from the selected country.',
+      label: 'Region',
+      title: '2. Select a region from the selected country.',
     },
     city: {
       type: 'string',
       enum: [] as string[],
-      title: 'City',
-      description: '3. Select a city from the selected region.',
+      label: 'City',
+      title: '3. Select a city from the selected region.',
     },
     oneOfCountry: {
       type: 'string',
@@ -47,7 +49,7 @@ const schema = {
           title: 'Switzerland',
         },
       ],
-      title: 'Country (oneOf)',
+      label: 'Country (oneOf)',
     },
     oneOfRegion: {
       type: 'string',
@@ -81,7 +83,7 @@ const schema = {
           },
         },
       ],
-      title: 'Region (oneOf)',
+      label: 'Region (oneOf)',
       rules: {
         visible: 'isNotEmpty(oneOfCountry)',
       },
@@ -146,7 +148,7 @@ const schema = {
           },
         },
       ],
-      title: 'City (oneOf)',
+      label: 'City (oneOf)',
       rules: {
         visible: 'isNotEmpty(oneOfRegion)',
       },
@@ -160,7 +162,7 @@ const uischema = {
   elements: [
     {
       type: 'Label',
-      label: 'Selection logic is outside of the JSON Schema using update:data event.',
+      label: 'Selection logic is outside of the JSON Schema using update:data event (the empty enums are not a valid schema, hence NoValidation).',
       labelClass: 'text-bold',
     },
     {
