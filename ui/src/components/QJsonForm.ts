@@ -3,7 +3,7 @@ import { h, provide, toRef, defineComponent, computed, ref, watch, inject, unref
 import type { PropType } from 'vue'
 import { JsonForms } from '@jsonforms/vue'
 import { createAjv } from '@jsonforms/core'
-import type { ValidationMode } from '@jsonforms/core'
+import type { ValidationMode, JsonFormsRendererRegistryEntry } from '@jsonforms/core'
 import type Ajv from 'ajv'
 import type { ErrorObject } from 'ajv'
 import { vanillaRenderers } from '@jsonforms/vue-vanilla'
@@ -15,8 +15,8 @@ import type { LanguagesInput } from '../composables/useControlProperties'
 import qRenderers from '../utils/renderers'
 import { createJsonFormsI18n } from '../utils/i18n'
 
-// Combine custom renderers with default vanilla renderers
-const renderers = Object.freeze([...vanillaRenderers, ...qRenderers])
+// The Quasar renderers, with the vanilla ones as a fallback
+const builtinRenderers = Object.freeze([...vanillaRenderers, ...qRenderers])
 
 /**
  * Custom `format` values understood by the renderers: registered on the
@@ -155,6 +155,17 @@ export default defineComponent({
       default: undefined,
     },
     /**
+     * Renderers of the application (`{ renderer, tester }` entries, see
+     * `rankWith` from `@jsonforms/core`), tried before the built-in ones: a
+     * control is rendered by the entry whose tester returns the highest rank,
+     * the application entry winning a tie.
+     */
+    renderers: {
+      type: Array as PropType<JsonFormsRendererRegistryEntry[]>,
+      required: false,
+      default: () => [],
+    },
+    /**
      * Output only: accepted so that `v-model:errors` is a declared binding;
      * the emitted `update:errors` is the source of truth.
      */
@@ -224,6 +235,12 @@ export default defineComponent({
       t,
     }))
 
+    // Frozen, so that JSON Forms does not make the array (and the components
+    // in it) reactive; the raw prop for the same reason
+    const renderers = computed<readonly JsonFormsRendererRegistryEntry[]>(
+      () => Object.freeze([...toRaw(props.renderers), ...builtinRenderers]),
+    )
+
     return () => h('div', {
       class: 'json-form-wrapper',
     }, [
@@ -231,7 +248,7 @@ export default defineComponent({
         data: props.modelValue,
         schema: props.schema,
         uischema: generatedUischema.value,
-        renderers,
+        renderers: renderers.value,
         readonly: props.readonly,
         validationMode: props.validationMode,
         ajv: ajv.value,

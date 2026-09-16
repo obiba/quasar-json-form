@@ -19,6 +19,7 @@
         :validation-mode="example.validationMode"
         :languages="example.languages"
         :config="example.config"
+        :renderers="example.renderers"
         @update:model-value="onDataUpdate"
       />
     </q-card-section>

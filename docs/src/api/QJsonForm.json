@@ -9,6 +9,7 @@
     "ajv": { "type": "Ajv", "desc": "Custom AJV instance (`createAjv` from `@jsonforms/core`). The default one knows the custom formats of the renderers and validates `time` and `date-time` as the pickers store them." },
     "additionalErrors": { "type": "Array", "default": "[]", "desc": "AJV-shaped errors displayed in addition to the validation errors, for instance from a server." },
     "config": { "type": "Object", "desc": "JSON Forms config passed to every renderer: `languages`, `countries`, `fileUpload` hooks." },
+    "renderers": { "type": "Array", "default": "[]", "desc": "Renderers of the application, `{ renderer, tester }` entries tried before the built-in ones (see [custom controls](#/start/custom-controls))." },
     "languages": { "type": "Array | Object", "desc": "Languages of the localized strings, `['en', 'fr']` or `{ en: 'English', fr: 'Français' }`." },
     "errors": { "type": "Array", "default": "[]", "desc": "Validation errors (`v-model:errors`), AJV-shaped `ErrorObject[]`." }
   },

@@ -26,6 +26,8 @@ controls out, pick a specific renderer, or set the props of the underlying Quasa
   UI schema.
 - **i18n**: every title, description, option label, hint and message goes through vue-i18n `t()`,
   so it can be an i18n key or a literal string.
+- **Extensible**: the application can add its own [controls](#/start/custom-controls), written
+  with the same composables as the built-in ones.
 
 ## Packages
 

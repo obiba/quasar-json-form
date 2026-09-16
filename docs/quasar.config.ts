@@ -60,7 +60,10 @@ export default defineConfig(() => {
       vueOptionsAPI: true,
 
       alias: {
-        ui: path.resolve(__dirname, '../ui/src/index.esm.ts')
+        ui: path.resolve(__dirname, '../ui/src/index.esm.ts'),
+        // the JSON Forms packages of the library, for the custom renderers of the examples
+        '@jsonforms/core': path.resolve(__dirname, '../ui/node_modules/@jsonforms/core'),
+        '@jsonforms/vue': path.resolve(__dirname, '../ui/node_modules/@jsonforms/vue')
       },
 
       // The library sources are consumed from ../ui/src, whose imports would otherwise
@@ -78,7 +81,9 @@ export default defineConfig(() => {
             ...(tsConfig.compilerOptions.paths || {}),
             vue: [path.resolve(__dirname, 'node_modules/vue')],
             quasar: [path.resolve(__dirname, 'node_modules/quasar')],
-            'vue-i18n': [path.resolve(__dirname, 'node_modules/vue-i18n')]
+            'vue-i18n': [path.resolve(__dirname, 'node_modules/vue-i18n')],
+            '@jsonforms/core': [path.resolve(__dirname, '../ui/node_modules/@jsonforms/core')],
+            '@jsonforms/vue': [path.resolve(__dirname, '../ui/node_modules/@jsonforms/vue')]
           }
         }
       },
