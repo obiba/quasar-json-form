@@ -1,3 +1,5 @@
+import type { JsonFormsRendererRegistryEntry } from '@jsonforms/core'
+
 /** A live example: the inputs of `QJsonForm`. */
 export interface DocExampleDef {
   schema: Record<string, unknown>
@@ -6,6 +8,8 @@ export interface DocExampleDef {
   config?: Record<string, unknown>
   /** JavaScript source displayed in the Config tab, when `config` is not plain JSON */
   configCode?: string
+  /** renderers of the application, passed to the `renderers` prop */
+  renderers?: JsonFormsRendererRegistryEntry[]
   languages?: string[] | Record<string, string>
   readonly?: boolean
   /**

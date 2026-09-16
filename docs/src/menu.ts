@@ -23,6 +23,7 @@ const menu: MenuSection[] = [
       { title: 'Internationalization', path: 'start/i18n' },
       { title: 'Validation', path: 'start/validation' },
       { title: 'Rules', path: 'start/rules' },
+      { title: 'Custom controls', path: 'start/custom-controls' },
     ],
   },
   {

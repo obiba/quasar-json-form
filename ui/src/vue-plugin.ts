@@ -36,10 +36,13 @@ import { createJsonFormsI18n, createTranslator, errorTranslator } from './utils/
 import { renderMarkdown, renderMarkdownInline } from './utils/markdown'
 import { countWords, parseWordLimit } from './utils/words'
 import { filtrexEngine, FiltrexRuleEngine } from './composables/useFiltrexRules'
-import { createFormErrorRegistry, toInstancePath } from './composables/useFormErrors'
+import { createFormErrorRegistry, toInstancePath, useReportedErrors } from './composables/useFormErrors'
 import type { FormErrorRegistry } from './composables/useFormErrors'
-import { normalizeLanguages } from './composables/useControlProperties'
-import type { Language, LanguagesInput } from './composables/useControlProperties'
+import { normalizeLanguages, useControlProperties } from './composables/useControlProperties'
+import type { Language, LanguagesInput, ControlPropertiesReturn, SelectOption } from './composables/useControlProperties'
+import { useFormI18n } from './composables/useFormI18n'
+import type { FormI18n } from './composables/useFormI18n'
+import { omitOptions, RENDERER_OPTION_KEYS } from './utils/options'
 import type { FileItem, FileUploadHooks, FileUploadContext } from './components/QFileUploadRenderer'
 import { DATA_KEY, READONLY_KEY, LANGUAGES_KEY, LOCALE_KEY, COUNTRIES_KEY, FORM_ERRORS_KEY } from './composables/keys'
 import { convert as convertAsf, toJsonForms, isAsfDefinition, transpileCondition as transpileAsfCondition, ConditionError as AsfConditionError } from './asf'
@@ -121,7 +124,12 @@ export {
   FiltrexRuleEngine,
   createFormErrorRegistry,
   toInstancePath,
+  useReportedErrors,
   normalizeLanguages,
+  useControlProperties,
+  useFormI18n,
+  omitOptions,
+  RENDERER_OPTION_KEYS,
   DATA_KEY,
   READONLY_KEY,
   LANGUAGES_KEY,
@@ -141,6 +149,9 @@ export type {
   FormErrorRegistry,
   Language,
   LanguagesInput,
+  ControlPropertiesReturn,
+  SelectOption,
+  FormI18n,
   FileItem,
   FileUploadHooks,
   FileUploadContext,
