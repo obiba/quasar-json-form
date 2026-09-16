@@ -48,6 +48,8 @@ export default {
     },
     contact: {
       name: 'Name',
+      name_label: 'Full name',
+      name_description: 'As it appears on your *ID card*',
       name_hint: 'First and last name',
       email: 'Email',
       website: 'Website',

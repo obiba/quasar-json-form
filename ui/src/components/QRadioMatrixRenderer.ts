@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { h, watch, computed, defineComponent } from 'vue'
+import type { VNode } from 'vue'
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
 import { QMarkupTable, QRadio, QCheckbox, QIcon } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
@@ -69,7 +70,7 @@ export default defineComponent({
     const control = controlResult.control
 
     const {
-      isVisible, isEnabled, isReadonly, requiredMark, rootClass, options, title, description, hasError, errorMessage, validationMessage,
+      isVisible, isEnabled, isReadonly, rootClass, options, hasError, errorMessage, validationMessage, renderHeader, renderHint,
     } = useControlProperties(control)
 
     const values = computed<MatrixValue[]>(() => normalizeValues(options.value.values ?? (control.value.schema as any).values))
@@ -117,19 +118,7 @@ export default defineComponent({
         return null
       }
 
-      const children = []
-
-      if (title.value) {
-        children.push(h('div', {
-          class: 'text-label text-grey-7 q-mb-xs',
-        }, t(title.value) + requiredMark.value))
-      }
-
-      if (description.value) {
-        children.push(h('div', {
-          class: 'text-description text-caption text-grey-7',
-        }, t(description.value)))
-      }
+      const children: (VNode | null)[] = [...renderHeader()]
 
       const header = checkboxMode.value ? null : h('thead', {}, [
         h('tr', {}, [
@@ -180,6 +169,8 @@ export default defineComponent({
       const errors = [errorMessage.value, ...selectionErrors.value].filter((e) => e && e.length > 0)
       if ((hasError.value || selectionErrors.value.length > 0) && errors.length > 0) {
         children.push(h('div', { class: 'text-negative text-caption q-mt-xs' }, errors.join('; ')))
+      } else {
+        children.push(renderHint())
       }
 
       return h('div', { class: ['q-radio-matrix-renderer', rootClass.value] }, children)

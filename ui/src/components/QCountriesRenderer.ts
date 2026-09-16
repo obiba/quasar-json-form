@@ -26,8 +26,9 @@ export default defineComponent({
 
     const control = controlResult.control
 
-    const { isVisible, isEnabled, isReadonly, inputLabel, hasError, errorMessage, options, config } =
-      useControlProperties(control)
+    const {
+      isVisible, isEnabled, isReadonly, inputLabel, rootClass, hasError, errorMessage, options, config, renderHeader, hintSlot,
+    } = useControlProperties(control)
 
     // raw value or ref
     const injected = inject<unknown>(COUNTRIES_KEY, undefined)
@@ -82,28 +83,32 @@ export default defineComponent({
         return null
       }
 
-      return h(QSelect, {
-        ...omitOptions(options.value, [...RENDERER_OPTION_KEYS, 'class']),
-        class: ['q-countries-select', options.value.class],
-        modelValue: control.value.data ?? (isMultiple.value ? [] : null),
-        'onUpdate:modelValue': onChange,
-        label: inputLabel.value,
-        options: filtered.value,
-        onFilter,
-        useInput: true,
-        inputDebounce: 0,
-        error: hasError.value,
-        errorMessage: errorMessage.value,
-        required: control.value.required,
-        disable: !isEnabled.value && !isReadonly.value,
-        readonly: isReadonly.value,
-        hint: control.value.description ? t(control.value.description) : undefined,
-        emitValue: true,
-        mapOptions: true,
-        multiple: isMultiple.value,
-        useChips: isMultiple.value,
-        clearable: !control.value.required && !isReadonly.value,
-      })
+      return h('div', { class: ['q-countries-renderer', rootClass.value] }, [
+        ...renderHeader(),
+        h(QSelect, {
+          ...omitOptions(options.value, [...RENDERER_OPTION_KEYS, 'class']),
+          class: 'q-countries-select',
+          modelValue: control.value.data ?? (isMultiple.value ? [] : null),
+          'onUpdate:modelValue': onChange,
+          label: inputLabel.value,
+          options: filtered.value,
+          onFilter,
+          useInput: true,
+          inputDebounce: 0,
+          error: hasError.value,
+          errorMessage: errorMessage.value,
+          required: control.value.required,
+          disable: !isEnabled.value && !isReadonly.value,
+          readonly: isReadonly.value,
+          emitValue: true,
+          mapOptions: true,
+          multiple: isMultiple.value,
+          useChips: isMultiple.value,
+          clearable: !control.value.required && !isReadonly.value,
+        }, {
+          ...hintSlot.value,
+        }),
+      ])
     }
   },
 })

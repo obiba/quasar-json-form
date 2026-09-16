@@ -114,9 +114,9 @@ describe('GridLayout', () => {
     const cells = root.findAll(':scope > .q-grid-layout__cell')
     expect(cells.length).toBe(3)
     expect(cells[0]!.attributes('style')).toContain('grid-column: 1 / -1')
-    expect(cells[0]!.find(':scope > .q-field').exists()).toBe(true)
+    expect(cells[0]!.find(':scope > .q-string-renderer').exists()).toBe(true)
     expect(cells[1]!.attributes('style')).toBeUndefined()
-    expect(cells[1]!.find(':scope > .q-field').exists()).toBe(true)
+    expect(cells[1]!.find(':scope > .q-string-renderer').exists()).toBe(true)
     expect(cells[2]!.attributes('style')).toContain('grid-column: span 2')
     expect(cells[2]!.find(':scope > .q-group-renderer').exists()).toBe(true)
     // the placement option is not forwarded to the Quasar component
@@ -225,7 +225,7 @@ describe('GridLayout', () => {
       },
     })
     await flush()
-    expect(wrapper.find('.q-horizontal-layout > .q-grid-layout > .q-grid-layout__cell > .q-field').exists()).toBe(true)
+    expect(wrapper.find('.q-horizontal-layout > .q-grid-layout > .q-grid-layout__cell > .q-string-renderer').exists()).toBe(true)
     wrapper.unmount()
   })
 })

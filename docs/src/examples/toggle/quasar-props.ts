@@ -12,7 +12,7 @@ export default {
     type: 'HorizontalLayout',
     elements: [
       { type: 'Control', scope: '#/properties/dark', options: { color: 'purple', checkedIcon: 'dark_mode', uncheckedIcon: 'light_mode', size: 'lg' } },
-      { type: 'Control', scope: '#/properties/notifications', options: { leftLabel: true, color: 'teal', hint: 'Push notifications on your phone' } },
+      { type: 'Control', scope: '#/properties/notifications', label: 'Enabled', hint: 'Push notifications on your *phone*', options: { leftLabel: true, color: 'teal' } },
     ],
   },
   data: { dark: true },

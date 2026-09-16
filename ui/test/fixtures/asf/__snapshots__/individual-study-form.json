@@ -24,7 +24,6 @@
           "design": {
             "type": "string",
             "title": "study_taxonomy.vocabulary.methods-design.title",
-            "description": "study_taxonomy.vocabulary.methods-design.description",
             "oneOf": [
               {
                 "const": "cohort_study",
@@ -60,8 +59,7 @@
           "followUpInfo": {
             "type": "object",
             "format": "localizedString",
-            "title": "study.follow-up",
-            "description": "study.follow-up-help"
+            "title": "study.follow-up"
           },
           "recruitments": {
             "type": "array",
@@ -83,7 +81,6 @@
               ]
             },
             "title": "study.recruitment-sources.label",
-            "description": "study_taxonomy.vocabulary.methods-recruitments.description",
             "uniqueItems": true
           },
           "otherRecruitment": {
@@ -481,26 +478,22 @@
       "_name": {
         "title": "study.name",
         "type": "object",
-        "format": "localizedString",
-        "description": "study.name-help"
+        "format": "localizedString"
       },
       "_acronym": {
         "title": "study.acronym",
         "type": "object",
-        "format": "localizedString",
-        "description": "study.acronym-help"
+        "format": "localizedString"
       },
       "_objectives": {
         "title": "study.objectives",
         "type": "object",
-        "format": "obibaSimpleMde",
-        "description": "study.objectives-help"
+        "format": "obibaSimpleMde"
       },
       "_opal": {
         "title": "study.opal",
         "type": "string",
-        "pattern": "^https?://[a-zA-Z0-9._/?&=:%-]+$",
-        "description": "study.opal-help"
+        "pattern": "^https?://[a-zA-Z0-9._/?&=:%-]+$"
       }
     },
     "required": [
@@ -524,15 +517,18 @@
             "elements": [
               {
                 "type": "Control",
-                "scope": "#/properties/_name"
+                "scope": "#/properties/_name",
+                "hint": "study.name-help"
               },
               {
                 "type": "Control",
-                "scope": "#/properties/_acronym"
+                "scope": "#/properties/_acronym",
+                "hint": "study.acronym-help"
               },
               {
                 "type": "Control",
-                "scope": "#/properties/_opal"
+                "scope": "#/properties/_opal",
+                "hint": "study.opal-help"
               }
             ],
             "options": {
@@ -545,6 +541,7 @@
               {
                 "type": "Control",
                 "scope": "#/properties/_objectives",
+                "hint": "study.objectives-help",
                 "options": {
                   "marked": true,
                   "rows": 3
@@ -633,6 +630,7 @@
                     "type": "Control",
                     "scope": "#/properties/methods/properties/design",
                     "label": false,
+                    "hint": "study_taxonomy.vocabulary.methods-design.description",
                     "options": {
                       "format": "radio"
                     }
@@ -655,6 +653,7 @@
                   {
                     "type": "Control",
                     "scope": "#/properties/methods/properties/followUpInfo",
+                    "hint": "study.follow-up-help",
                     "options": {
                       "rows": 3,
                       "marked": true
@@ -686,6 +685,7 @@
                 "type": "Control",
                 "scope": "#/properties/methods/properties/recruitments",
                 "label": false,
+                "hint": "study_taxonomy.vocabulary.methods-recruitments.description",
                 "options": {
                   "format": "checkbox"
                 }

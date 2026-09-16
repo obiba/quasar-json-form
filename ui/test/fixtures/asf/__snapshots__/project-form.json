@@ -13,14 +13,12 @@
       "startDate": {
         "title": "research-project.default.status.start",
         "type": "string",
-        "format": "datepicker",
-        "description": "research-project.default.status.start-help"
+        "format": "datepicker"
       },
       "endDate": {
         "title": "research-project.default.status.end",
         "type": "string",
-        "format": "datepicker",
-        "description": "research-project.default.status.end-help"
+        "format": "datepicker"
       },
       "_title": {
         "title": "research-project.title",
@@ -75,6 +73,7 @@
                   {
                     "type": "Control",
                     "scope": "#/properties/startDate",
+                    "hint": "research-project.default.status.start-help",
                     "options": {
                       "validationMessage": "research-project.default.status.date-error",
                       "dateOptions": {
@@ -93,6 +92,7 @@
                   {
                     "type": "Control",
                     "scope": "#/properties/endDate",
+                    "hint": "research-project.default.status.end-help",
                     "options": {
                       "validationMessage": "research-project.default.status.date-error",
                       "dateOptions": {

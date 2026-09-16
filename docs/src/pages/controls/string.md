@@ -6,8 +6,10 @@ title: String
 
 <p class="doc-lead">A <code>{ "type": "string" }</code> property renders a <a href="https://quasar.dev/vue-components/input">QInput</a>.</p>
 
-The schema `title` is the label and the `description` the hint; both are translated with vue-i18n
-when they are keys (switch the language in the header). `required` adds a `*` to the label, and
+The schema `title` is displayed above the input and the `description` under the title; `label` on
+the control element is the floating label of the input and `hint` the help text under it (see
+[QJsonForm](#/start/json-form#title-description-label-and-hint)). All are translated with vue-i18n
+when they are keys (switch the language in the header). `required` adds a `*` to the title, and
 `minLength`, `maxLength`, `pattern` and `format` are validated by AJV.
 
 <DocExample name="string/basic" title="Basic" source />

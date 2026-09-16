@@ -17,7 +17,8 @@ const elements = [
   { type: 'Control', scope: '#/properties/c' },
 ]
 
-const labelOf = (wrapper: any) => wrapper.find('.q-field__label').text()
+// title of the control displayed in the current panel (the group title of a Category is not rendered)
+const labelOf = (wrapper: any) => wrapper.find('.q-string-renderer .q-form-title').text()
 
 describe('tabs layout', () => {
   it('renders one tab per element with the given labels and shows the first panel', async () => {

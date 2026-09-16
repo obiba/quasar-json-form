@@ -14,8 +14,8 @@ title: File upload
 
 Files are uploaded as soon as they are picked, either through the `config.fileUpload` hooks of
 `QJsonForm` or through the declarative `uploadUrl` flow. This example simulates the uploads with
-hooks (see the Config tab); the description is rendered as markdown and `label` on the schema
-property sets the button label.
+hooks (see the Config tab); the title and description are displayed above the list, the hint under
+it, and `label` (on the control element or the schema property) sets the button label.
 
 <DocExample name="file-upload/hooks" title="Hooks: object, array and path controls" source />
 

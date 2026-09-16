@@ -25,7 +25,7 @@ export default defineComponent({
   name: 'QLocalizedStringRenderer',
   props: rendererProps(),
   setup(props: any) {
-    const { t, locale: appLocale } = useFormI18n()
+    const { locale: appLocale } = useFormI18n()
 
     const controlResult = useJsonFormsControl(props)
 
@@ -33,6 +33,7 @@ export default defineComponent({
 
     const {
       isVisible, isEnabled, isReadonly, inputLabel, hasError, errorMessage, rootClass, options, languages, validationMessage,
+      renderHeader, hintSlot,
     } = useControlProperties(control)
 
     // Language displayed, shared with the other localized controls of the form
@@ -113,8 +114,7 @@ export default defineComponent({
 
       const errors = [errorMessage.value, ...completedErrors.value].filter((e) => e && e.length > 0)
       const error = hasError.value || completedErrors.value.length > 0
-      const hint = control.value.description ? t(control.value.description) : undefined
-      const inputProps = omitOptions(options.value, [...RENDERER_OPTION_KEYS, 'rows'])
+      const inputProps = omitOptions(options.value, [...RENDERER_OPTION_KEYS, 'rows', 'class'])
 
       const toggle = languages.value.length > 1
         ? h(QBtnToggle, {
@@ -130,37 +130,41 @@ export default defineComponent({
         })
         : null
 
-      if (isMarked.value) {
-        return h(QMarkdownEditor, {
-          class: ['q-localized-string', rootClass.value],
+      const input = isMarked.value
+        ? h(QMarkdownEditor, {
+          class: 'q-localized-string',
           modelValue: currentValue.value,
           'onUpdate:modelValue': (value: any) => onInput(currentLocale.value, value),
           label: inputLabel.value,
-          hint,
           rows: rows.value > 1 ? rows.value : 5,
           readonly: isReadonly.value,
           disable: !isEnabled.value && !isReadonly.value,
           error,
           errorMessage: errors.join('; '),
-          inputProps: omitOptions(inputProps, ['class']),
-        }, toggle ? { toolbar: () => [toggle] } : {})
-      }
+          inputProps,
+        }, {
+          ...hintSlot.value,
+          ...(toggle ? { toolbar: () => [toggle] } : {}),
+        })
+        : h(QInput, {
+          ...inputProps,
+          class: 'q-localized-string',
+          modelValue: currentValue.value ?? '',
+          'onUpdate:modelValue': (value: any) => onInput(currentLocale.value, value),
+          label: inputLabel.value,
+          error,
+          errorMessage: errors.join('; '),
+          required: control.value.required,
+          disable: !isEnabled.value && !isReadonly.value,
+          readonly: isReadonly.value,
+          type: rows.value > 1 ? 'textarea' : 'text',
+          rows: rows.value > 1 ? rows.value : undefined,
+        }, {
+          ...hintSlot.value,
+          ...(toggle ? { append: () => toggle } : {}),
+        })
 
-      return h(QInput, {
-        ...omitOptions(inputProps, ['class']),
-        class: ['q-localized-string', inputProps.class],
-        modelValue: currentValue.value ?? '',
-        'onUpdate:modelValue': (value: any) => onInput(currentLocale.value, value),
-        label: inputLabel.value,
-        error,
-        errorMessage: errors.join('; '),
-        required: control.value.required,
-        disable: !isEnabled.value && !isReadonly.value,
-        readonly: isReadonly.value,
-        hint,
-        type: rows.value > 1 ? 'textarea' : 'text',
-        rows: rows.value > 1 ? rows.value : undefined,
-      }, toggle ? { append: () => toggle } : {})
+      return h('div', { class: ['q-localized-string-renderer', rootClass.value] }, [...renderHeader(), input])
     }
   },
 })

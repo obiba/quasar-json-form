@@ -55,7 +55,7 @@ describe('list renderer actions', () => {
     await lists[1]!.findAll('.q-btn').slice(-1)[0]!.trigger('click')
     await flush()
     expect(lastData(wrapper).people).toEqual([{}])
-    expect(lists[1]!.findAll('.q-field__label').map((l) => l.text())).toEqual(['Name', 'Age'])
+    expect(lists[1]!.findAll('.q-item .q-form-title').map((l) => l.text())).toEqual(['Name', 'Age'])
     wrapper.unmount()
   })
 

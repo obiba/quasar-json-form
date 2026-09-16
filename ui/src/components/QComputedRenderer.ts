@@ -1,8 +1,8 @@
 import { h, watch, defineComponent, onMounted } from 'vue'
+import type { VNode } from 'vue'
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
 import { useControlProperties } from '../composables/useControlProperties'
 import { useFormI18n } from '../composables/useFormI18n'
-import { renderMarkdown } from '../utils/markdown'
 
 
 export default defineComponent({
@@ -16,7 +16,7 @@ export default defineComponent({
     const control = controlResult.control
 
     // Use the generic control rules composable
-    const { isVisible, computeValue, rootClass } = useControlProperties(control)
+    const { isVisible, computeValue, rootClass, renderHeader, renderHint } = useControlProperties(control)
 
     onMounted(() => {
       // Initialize computed value on mount
@@ -53,25 +53,7 @@ export default defineComponent({
         return null
       }
 
-      const children = []
-
-      if (control.value.label || control.value.uischema.label) {
-        let label = t(String(control.value.label || control.value.uischema.label))
-        label = renderMarkdown(label)
-        children.push(h('div', {
-          class: (control.value.uischema as any).labelClass || 'text-bold q-mb-sm',
-          innerHTML: label,
-        }))
-      }
-
-      if (control.value.description || (control.value.uischema as any).description) {
-        let hint = t(String(control.value.description || (control.value.uischema as any).description))
-        hint = renderMarkdown(hint)
-        children.push(h('div', {
-          class: (control.value.uischema as any).descriptionClass || 'text-grey-7',
-          innerHTML: hint,
-        }))
-      }
+      const children: (VNode | null)[] = [...renderHeader()]
 
       // show computed value
       if (control.value.uischema.options?.show === true) {
@@ -81,6 +63,8 @@ export default defineComponent({
           ? String(computeValue.value)
           : t('noValue')))
       }
+
+      children.push(renderHint())
 
       return h('div', {
         class: ['q-computed-renderer', rootClass.value],

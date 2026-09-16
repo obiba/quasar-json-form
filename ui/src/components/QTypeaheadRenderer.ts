@@ -23,8 +23,9 @@ export default defineComponent({
 
     const control = controlResult.control
 
-    const { isVisible, isEnabled, isReadonly, inputLabel, hasError, errorMessage, options } =
-      useControlProperties(control)
+    const {
+      isVisible, isEnabled, isReadonly, inputLabel, rootClass, hasError, errorMessage, options, renderHeader, hintSlot,
+    } = useControlProperties(control)
 
     const allOptions = computed<SelectOption[]>(() => {
       const schema = control.value.schema as any
@@ -71,29 +72,33 @@ export default defineComponent({
         return null
       }
 
-      return h(QSelect, {
-        ...omitOptions(options.value, [...RENDERER_OPTION_KEYS, 'class']),
-        class: ['q-typeahead', options.value.class],
-        modelValue: control.value.data ?? null,
-        'onUpdate:modelValue': onChange,
-        label: inputLabel.value,
-        options: filtered.value,
-        onFilter,
-        useInput: true,
-        fillInput: true,
-        hideSelected: true,
-        inputDebounce: 0,
-        newValueMode: options.value.editable === true ? 'add-unique' : undefined,
-        error: hasError.value,
-        errorMessage: errorMessage.value,
-        required: control.value.required,
-        disable: !isEnabled.value && !isReadonly.value,
-        readonly: isReadonly.value,
-        hint: control.value.description ? t(control.value.description) : undefined,
-        emitValue: true,
-        mapOptions: true,
-        clearable: !control.value.required && !isReadonly.value,
-      })
+      return h('div', { class: ['q-typeahead-renderer', rootClass.value] }, [
+        ...renderHeader(),
+        h(QSelect, {
+          ...omitOptions(options.value, [...RENDERER_OPTION_KEYS, 'class']),
+          class: 'q-typeahead',
+          modelValue: control.value.data ?? null,
+          'onUpdate:modelValue': onChange,
+          label: inputLabel.value,
+          options: filtered.value,
+          onFilter,
+          useInput: true,
+          fillInput: true,
+          hideSelected: true,
+          inputDebounce: 0,
+          newValueMode: options.value.editable === true ? 'add-unique' : undefined,
+          error: hasError.value,
+          errorMessage: errorMessage.value,
+          required: control.value.required,
+          disable: !isEnabled.value && !isReadonly.value,
+          readonly: isReadonly.value,
+          emitValue: true,
+          mapOptions: true,
+          clearable: !control.value.required && !isReadonly.value,
+        }, {
+          ...hintSlot.value,
+        }),
+      ])
     }
   },
 })

@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { computed, inject, ref, watch, unref } from 'vue'
-import type { Ref, ComputedRef } from 'vue'
+import { computed, h, inject, ref, watch, unref } from 'vue'
+import type { Ref, ComputedRef, VNode } from 'vue'
 import { useFiltrexRules } from './useFiltrexRules'
 import { useFormI18n } from './useFormI18n'
 import { useReportedErrors } from './useFormErrors'
 import { DATA_KEY, READONLY_KEY, LANGUAGES_KEY } from './keys'
 import { omitOptions } from '../utils/options'
+import { renderMarkdown, renderMarkdownInline } from '../utils/markdown'
 
 export interface SelectOption {
   label: string
@@ -46,9 +47,12 @@ export interface ControlUISchema {
   rules?: ControlRules
   options?: Record<string, any>
   title?: string
-  label?: string
+  label?: string | false
   description?: string
   hint?: string
+  titleClass?: string
+  descriptionClass?: string
+  hintClass?: string
 }
 
 export interface Control {
@@ -102,10 +106,24 @@ export interface ControlPropertiesReturn {
   languages: ComputedRef<Language[]>
   selectOptions: ComputedRef<SelectOption[]>
   isValueValid: ComputedRef<boolean>
+  /** the `title` of the element or of the schema, displayed above the control (`label: false` hides it) */
   title: ComputedRef<string | undefined>
+  /** the `description`, displayed under the title */
   description: ComputedRef<string | undefined>
+  /** the `label`, displayed inside the input */
   label: ComputedRef<string | undefined>
+  /** the `hint`, displayed under the input */
   hint: ComputedRef<string | undefined>
+  /** the title (inline markdown, with the required mark) as a `div.q-form-title`, or null */
+  renderTitle: () => VNode | null
+  /** the description (markdown) as a `div.q-form-description`, or null */
+  renderDescription: () => VNode | null
+  /** the title and the description, to display above the control */
+  renderHeader: () => VNode[]
+  /** the hint (markdown) as a `div.q-form-hint`, or null, to display after the component */
+  renderHint: () => VNode | null
+  /** `{ hint }` slot of a Quasar field (QInput, QSelect...) rendering the hint, empty when there is none */
+  hintSlot: ComputedRef<Record<string, () => VNode | null>>
   /**
    * Message of a renderer-level validator: the control `options.validationMessage[name]`
    * (translated) when defined, else the built-in message `fallbackKey`.
@@ -275,12 +293,70 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
       || control.value.schema?.readOnly === true
   })
 
-  // Marker appended to the label of a required control
+  // Texts of the control. The title (and its description) is displayed above
+  // the control, questionnaire style; the label is the label of the input
+  // itself and the hint is displayed under it. Each one is read from the UI
+  // schema element first, then from the schema. `label: false` on the element
+  // hides the title (JSON Forms convention).
+  const title = computed(() => {
+    if (control.value.uischema.label === false) return undefined
+    return control.value.uischema.title || control.value.schema.title || undefined
+  })
+
+  const description = computed(() => {
+    return control.value.uischema.description || control.value.schema.description || undefined
+  })
+
+  const label = computed(() => {
+    const value = control.value.uischema.label || control.value.schema.label
+    return typeof value === 'string' && value.length > 0 ? value : undefined
+  })
+
+  const hint = computed(() => {
+    return control.value.uischema.hint || (control.value.schema as any).hint || undefined
+  })
+
+  // Marker appended to the title (or to the label when there is no title) of a required control
   const requiredMark = computed(() => (control.value.required ? ' *' : ''))
 
-  // Translated label with the required marker, for input-like components
+  // Translated label for input-like components, with the required marker when no title carries it
   const inputLabel = computed(() => {
-    return control.value.label ? t(control.value.label) + requiredMark.value : undefined
+    if (!label.value) return undefined
+    return t(label.value) + (title.value ? '' : requiredMark.value)
+  })
+
+  const renderTitle = (): VNode | null => {
+    if (!title.value) return null
+    return h('div', {
+      class: ['q-form-title', control.value.uischema.titleClass],
+      innerHTML: renderMarkdownInline(t(title.value)) + requiredMark.value,
+    })
+  }
+
+  const renderDescription = (): VNode | null => {
+    if (!description.value) return null
+    return h('div', {
+      class: ['q-form-description text-markdown', control.value.uischema.descriptionClass],
+      innerHTML: renderMarkdown(t(description.value)).trim(),
+    })
+  }
+
+  const renderHeader = (): VNode[] => {
+    return [renderTitle(), renderDescription()].filter((node): node is VNode => node !== null)
+  }
+
+  const renderHint = (): VNode | null => {
+    if (!hint.value) return null
+    return h('div', {
+      class: ['q-form-hint text-markdown', control.value.uischema.hintClass],
+      innerHTML: renderMarkdown(t(hint.value)).trim(),
+    })
+  }
+
+  const hintSlot = computed<Record<string, () => VNode | null>>(() => {
+    const slots: Record<string, () => VNode | null> = {}
+    if (hint.value) slots.hint = renderHint
+    return slots
   })
 
   // CSS classes applied to the root element of the renderer
@@ -367,24 +443,6 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
     return optionValues.has(currentValue)
   })
 
-  // `label: false` on the control hides the title (JSON Forms convention)
-  const title = computed(() => {
-    if ((control.value.uischema as any).label === false) return undefined
-    return control.value.uischema.title || control.value.schema.title || undefined
-  })
-
-  const description = computed(() => {
-    return control.value.uischema.description || control.value.schema.description || undefined
-  })
-
-  const label = computed(() => {
-    return control.value.uischema.label || control.value.schema.label || undefined
-  })
-
-  const hint = computed(() => {
-    return control.value.uischema.hint || control.value.schema.hint || undefined
-  })
-
   const validationMessage = (name: string, fallbackKey: string, named?: Record<string, unknown>): string => {
     const messages = options.value.validationMessage
     // a single string applies to every check of the control (angular-schema-form
@@ -439,6 +497,11 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
     description,
     label,
     hint,
+    renderTitle,
+    renderDescription,
+    renderHeader,
+    renderHint,
+    hintSlot,
     validationMessage,
     clearInvalidSelection,
   }

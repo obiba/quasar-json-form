@@ -35,7 +35,6 @@
           ]
         },
         "title": "data-collection-event.data-sources",
-        "description": "study_taxonomy.vocabulary.populations-dataCollectionEvents-dataSources.description",
         "uniqueItems": true
       },
       "administrativeDatabases": {
@@ -62,14 +61,12 @@
             }
           ]
         },
-        "description": "study_taxonomy.vocabulary.populations-dataCollectionEvents-dataSources.term.administratives_databases.description",
         "uniqueItems": true
       },
       "otherDataSources": {
         "type": "object",
         "format": "localizedString",
-        "title": "data-collection-event.other-data-sources",
-        "description": "study_taxonomy.vocabulary.populations-dataCollectionEvents-dataSources.term.others.description"
+        "title": "data-collection-event.other-data-sources"
       },
       "bioSamples": {
         "type": "array",
@@ -116,7 +113,6 @@
             }
           ]
         },
-        "description": "study_taxonomy.vocabulary.populations-dataCollectionEvents-dataSources.term.biological_samples.description",
         "uniqueItems": true
       },
       "tissueTypes": {
@@ -334,6 +330,7 @@
               {
                 "type": "Control",
                 "scope": "#/properties/dataSources",
+                "hint": "study_taxonomy.vocabulary.populations-dataCollectionEvents-dataSources.description",
                 "options": {
                   "format": "checkbox"
                 }
@@ -349,6 +346,7 @@
               {
                 "type": "Control",
                 "scope": "#/properties/bioSamples",
+                "hint": "study_taxonomy.vocabulary.populations-dataCollectionEvents-dataSources.term.biological_samples.description",
                 "options": {
                   "format": "checkbox"
                 },
@@ -381,6 +379,7 @@
               {
                 "type": "Control",
                 "scope": "#/properties/administrativeDatabases",
+                "hint": "study_taxonomy.vocabulary.populations-dataCollectionEvents-dataSources.term.administratives_databases.description",
                 "options": {
                   "format": "checkbox"
                 },
@@ -391,6 +390,7 @@
               {
                 "type": "Control",
                 "scope": "#/properties/otherDataSources",
+                "hint": "study_taxonomy.vocabulary.populations-dataCollectionEvents-dataSources.term.others.description",
                 "rules": {
                   "visible": "contains(dataSources, \"others\")"
                 }

@@ -28,11 +28,12 @@ describe('schema validation', () => {
     wrapper.unmount()
   })
 
-  it('marks required controls in their label', async () => {
+  it('marks required controls in their title', async () => {
     const wrapper = mountForm({ schema, modelValue: { name: 'abc' } })
     await flush()
-    expect(fieldOf(wrapper, 0).find('.q-field__label').text()).toBe('Name *')
-    expect(fieldOf(wrapper, 1).find('.q-field__label').text()).toBe('Age')
+    const titles = wrapper.findAll('.q-form-title')
+    expect(titles[0]!.text()).toBe('Name *')
+    expect(titles[1]!.text()).toBe('Age')
     wrapper.unmount()
   })
 

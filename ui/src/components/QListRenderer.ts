@@ -3,7 +3,6 @@ import { createDefaultValue, composePaths } from '@jsonforms/core'
 import { DispatchRenderer, rendererProps, useJsonFormsControl } from '@jsonforms/vue'
 import { QList, QItem, QItemSection, QBtn, QDialog, QCard, QCardSection, QCardActions } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
-import { renderMarkdown } from '../utils/markdown'
 import { useFormI18n } from '../composables/useFormI18n'
 import { omitOptions, RENDERER_OPTION_KEYS } from '../utils/options'
 
@@ -20,7 +19,7 @@ export default defineComponent({
     const control = controlResult.control
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, isReadonly, requiredMark, rootClass, maxValue, minValue, hasError, errorMessage, options, title, description } =
+    const { isVisible, isEnabled, isReadonly, rootClass, maxValue, minValue, hasError, errorMessage, options, renderHeader, renderHint } =
       useControlProperties(control)
 
     // Dialog state for confirming item removal
@@ -240,14 +239,7 @@ export default defineComponent({
       return h('div', {
         class: ['q-list-renderer', rootClass.value],
       }, [
-        title.value ? h('div', {
-          class: (control.value.uischema as any).titleClass || 'text-bold q-mb-sm',
-          innerHTML: t(title.value) + requiredMark.value
-        }) : null,
-        description.value ? h('div', {
-          class: ((control.value.uischema as any).descriptionClass || 'text-grey-7') + ' text-markdown q-mb-sm',
-          innerHTML: renderMarkdown(t(description.value))
-        }) : null,
+        ...renderHeader(),
         listItems,
         confirmDialog,
         isReadonly.value ? null : h(QBtn, {
@@ -258,7 +250,7 @@ export default defineComponent({
           disabled: !isEnabled.value || !canAddItem.value,
           onClick: addItem,
         }),
-        hasError.value ? h('div', { class: 'text-negative q-mt-sm' }, errorMessage.value) : null,
+        hasError.value ? h('div', { class: 'text-negative q-mt-sm' }, errorMessage.value) : renderHint(),
       ])
     }
   },

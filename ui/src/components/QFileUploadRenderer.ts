@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { h, watch, defineComponent, ref, computed, reactive } from 'vue'
+import type { VNode } from 'vue'
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
 import { QBtn, QList, QItem, QItemSection, QIcon, QLinearProgress } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
 import { useFormI18n } from '../composables/useFormI18n'
 import { useReportedErrors } from '../composables/useFormErrors'
-import { renderMarkdown } from '../utils/markdown'
 import { getByPath, formatFileSize } from '../utils/options'
 
 /** A file in the form data (any extra property returned by the server is kept) */
@@ -66,8 +66,8 @@ export default defineComponent({
     const control = controlResult.control
 
     const {
-      isVisible, isEnabled, isReadonly, requiredMark, rootClass, options, config, title, description, label,
-      minValue, maxValue, hasError, errorMessage, validationMessage,
+      isVisible, isEnabled, isReadonly, rootClass, options, config, label,
+      minValue, maxValue, hasError, errorMessage, validationMessage, renderHeader, renderHint,
     } = useControlProperties(control)
 
     const fileInputRef = ref<HTMLInputElement | null>(null)
@@ -341,21 +341,7 @@ export default defineComponent({
         return null
       }
 
-      const children = []
-
-      if (title.value) {
-        children.push(h('div', {
-          class: (control.value.uischema as any).titleClass || 'text-bold',
-          innerHTML: t(title.value) + requiredMark.value,
-        }))
-      }
-
-      if (description.value) {
-        children.push(h('div', {
-          class: ((control.value.uischema as any).descriptionClass || 'text-grey-7') + ' text-markdown q-mb-sm',
-          innerHTML: renderMarkdown(t(description.value)),
-        }))
-      }
+      const children: (VNode | null)[] = [...renderHeader()]
 
       const items = files.value.map((item, index) => {
         const url = downloadUrl(item)
@@ -432,6 +418,8 @@ export default defineComponent({
       const errors = [errorMessage.value, ...fileErrors.value].filter((e) => e && e.length > 0)
       if ((hasError.value || fileErrors.value.length > 0) && errors.length > 0) {
         children.push(h('div', { class: 'text-negative text-caption q-mt-xs q-file-errors' }, errors.join('; ')))
+      } else {
+        children.push(renderHint())
       }
 
       return h('div', { class: ['q-file-upload-renderer', rootClass.value] }, children)

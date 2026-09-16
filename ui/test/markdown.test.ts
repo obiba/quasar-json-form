@@ -12,14 +12,14 @@ const lastData = (wrapper: any) => {
 const schema = {
   type: 'object',
   properties: {
-    body: { type: 'string', format: 'markdown', title: 'Body', description: 'Some help' },
+    body: { type: 'string', format: 'markdown', title: 'Body', description: 'Some help', hint: 'Be *brief*' },
     show: { type: 'boolean' },
   },
   required: ['body'],
 }
 
 describe('markdown renderer', () => {
-  it('renders a markdown editor with the label, hint and rows option', async () => {
+  it('renders a markdown editor with the title, description, hint and rows option', async () => {
     const wrapper = mountForm({
       schema,
       uischema: { type: 'Control', scope: '#/properties/body', options: { rows: 8, class: 'my-md', dense: true } },
@@ -28,12 +28,14 @@ describe('markdown renderer', () => {
     await flush()
     const editor = wrapper.find('.q-markdown-editor')
     expect(editor.exists()).toBe(true)
-    expect(editor.classes()).toContain('my-md')
+    expect(wrapper.find('.q-markdown-renderer').classes()).toContain('my-md')
     const textarea = editor.find('textarea')
     expect((textarea.element as HTMLTextAreaElement).value).toBe('hello')
     expect(textarea.attributes('rows')).toBe('8')
-    expect(editor.find('.q-field__label').text()).toBe('Body *')
-    expect(editor.find('.q-field__messages').text()).toBe('Some help')
+    expect(wrapper.find('.q-markdown-renderer .q-form-title').text()).toBe('Body *')
+    expect(wrapper.find('.q-markdown-renderer .q-form-description').text()).toBe('Some help')
+    expect(editor.find('.q-field__label').exists()).toBe(false)
+    expect(editor.find('.q-field__messages .q-form-hint').html()).toContain('Be <em>brief</em>')
     expect(editor.find('.q-field').classes()).toContain('q-field--dense')
     wrapper.unmount()
   })
@@ -52,15 +54,16 @@ describe('markdown renderer', () => {
     wrapper.unmount()
   })
 
-  it('renders the markdown read-only with the label and hint', async () => {
+  it('renders the markdown read-only with the title and hint', async () => {
     const wrapper = mountForm({ schema, readonly: true, modelValue: { body: 'a **bold** word' } })
     await flush()
     const editor = wrapper.find('.q-markdown-editor--readonly')
     expect(editor.exists()).toBe(true)
     expect(editor.find('textarea').exists()).toBe(false)
-    expect(editor.find('.q-markdown-editor__toolbar').text()).toBe('Body *')
+    expect(wrapper.find('.q-markdown-renderer .q-form-title').text()).toBe('Body *')
+    expect(editor.find('.q-markdown-editor__toolbar').exists()).toBe(false)
     expect(editor.find('.q-markdown-editor__preview').html()).toContain('<strong>bold</strong>')
-    expect(editor.text()).toContain('Some help')
+    expect(editor.find('.q-markdown-editor__hint .q-form-hint').html()).toContain('Be <em>brief</em>')
     wrapper.unmount()
   })
 
@@ -69,7 +72,7 @@ describe('markdown renderer', () => {
     await flush()
     const editor = wrapper.find('.q-markdown-editor--readonly')
     expect(editor.find('.text-negative').text()).toBe('This field is required')
-    expect(editor.text()).not.toContain('Some help')
+    expect(editor.find('.q-form-hint').exists()).toBe(false)
     wrapper.unmount()
   })
 

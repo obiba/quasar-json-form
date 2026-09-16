@@ -4,7 +4,7 @@ export default {
   schema: {
     type: 'object',
     properties: {
-      subscribed: { type: 'boolean', title: 'Subscribe to the newsletter', description: 'One email per month, no spam' },
+      subscribed: { type: 'boolean', title: 'Subscribe to the newsletter', description: 'One email per month, no spam', label: 'I do subscribe'  },
       terms: { type: 'boolean', title: 'I accept the terms', const: true },
     },
     required: ['terms'],

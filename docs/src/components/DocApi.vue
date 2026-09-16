@@ -103,6 +103,7 @@ function toEntries (map?: Record<string, Omit<ApiEntry, 'name'>>): ApiEntry[] {
 
 function entries (group: string): ApiEntry[] {
   if (group === 'common') return toEntries(common.value?.options)
+  if (group === 'element') return [...toEntries(api.value?.element), ...toEntries(common.value?.element)]
   return toEntries((api.value as unknown as Record<string, Record<string, Omit<ApiEntry, 'name'>>>)[group])
 }
 

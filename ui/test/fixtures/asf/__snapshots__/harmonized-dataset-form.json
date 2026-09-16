@@ -4,8 +4,7 @@
     "properties": {
       "version": {
         "type": "string",
-        "title": "harmonization-protocol.version",
-        "description": "harmonization-protocol.version-help"
+        "title": "harmonization-protocol.version"
       },
       "participants": {
         "type": "integer",
@@ -14,7 +13,6 @@
       "qualitativeQuantitative": {
         "type": "string",
         "title": "harmonization-protocol.qualitative-quantitative.title",
-        "description": "harmonization-protocol.qualitative-quantitative.help",
         "oneOf": [
           {
             "const": "qualitative",
@@ -29,7 +27,6 @@
       "prospectiveRetrospective": {
         "type": "string",
         "title": "harmonization-protocol.prospective-retrospective.title",
-        "description": "harmonization-protocol.prospective-retrospective.help",
         "oneOf": [
           {
             "const": "prospective",
@@ -44,25 +41,21 @@
       "informationContent": {
         "type": "object",
         "title": "harmonization-protocol.information-content",
-        "description": "harmonization-protocol.information-content-help",
         "format": "obibaSimpleMde"
       },
       "procedures": {
         "type": "object",
         "title": "harmonization-protocol.procedures",
-        "description": "harmonization-protocol.procedures-help",
         "format": "localizedString"
       },
       "participantsInclusion": {
         "type": "object",
         "title": "harmonization-protocol.participants-inclusion",
-        "description": "harmonization-protocol.participants-inclusion-help",
         "format": "localizedString"
       },
       "infrastructure": {
         "type": "object",
         "title": "harmonization-protocol.infrastructure",
-        "description": "harmonization-protocol.infrastructure-help",
         "format": "localizedString"
       },
       "additionalInformation": {
@@ -135,7 +128,8 @@
                 "elements": [
                   {
                     "type": "Control",
-                    "scope": "#/properties/version"
+                    "scope": "#/properties/version",
+                    "hint": "harmonization-protocol.version-help"
                   }
                 ],
                 "options": {
@@ -173,6 +167,7 @@
                   {
                     "type": "Control",
                     "scope": "#/properties/qualitativeQuantitative",
+                    "hint": "harmonization-protocol.qualitative-quantitative.help",
                     "options": {
                       "format": "radio"
                     }
@@ -188,6 +183,7 @@
                   {
                     "type": "Control",
                     "scope": "#/properties/prospectiveRetrospective",
+                    "hint": "harmonization-protocol.prospective-retrospective.help",
                     "options": {
                       "format": "radio"
                     }
@@ -210,21 +206,25 @@
           {
             "type": "Control",
             "scope": "#/properties/informationContent",
+            "hint": "harmonization-protocol.information-content-help",
             "options": {
               "marked": true
             }
           },
           {
             "type": "Control",
-            "scope": "#/properties/procedures"
+            "scope": "#/properties/procedures",
+            "hint": "harmonization-protocol.procedures-help"
           },
           {
             "type": "Control",
-            "scope": "#/properties/participantsInclusion"
+            "scope": "#/properties/participantsInclusion",
+            "hint": "harmonization-protocol.participants-inclusion-help"
           },
           {
             "type": "Control",
-            "scope": "#/properties/infrastructure"
+            "scope": "#/properties/infrastructure",
+            "hint": "harmonization-protocol.infrastructure-help"
           },
           {
             "type": "Control",

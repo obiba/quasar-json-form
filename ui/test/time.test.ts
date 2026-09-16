@@ -33,13 +33,13 @@ describe('time renderer', () => {
     },
   }
 
-  it('renders an input with a time mask and the hint', async () => {
+  it('renders an input with a time mask, the title and the description', async () => {
     const wrapper = mountForm({ schema, modelValue: { t: '10:30', full: '10:30:15' } })
     await flush()
     const fields = wrapper.findAll('.q-field')
-    expect(fields[0]!.find('.q-field__label').text()).toBe('Time')
+    expect(fields[0]!.element.parentElement!.querySelector('.q-form-title')!.textContent).toBe('Time')
     expect((fields[0]!.find('input').element as HTMLInputElement).value).toBe('10:30')
-    expect(fields[0]!.find('.q-field__messages').text()).toBe('When')
+    expect(fields[0]!.element.parentElement!.querySelector('.q-form-description')!.textContent).toBe('When')
     expect((fields[1]!.find('input').element as HTMLInputElement).value).toBe('10:30:15')
     wrapper.unmount()
   })
@@ -138,12 +138,12 @@ describe('date-time renderer', () => {
     },
   }
 
-  it('renders the value and the hint, and updates the data', async () => {
+  it('renders the value, the title and the description, and updates the data', async () => {
     const wrapper = mountForm({ schema, modelValue: { dt: '2020-01-15 10:30' } })
     await flush()
     const field = wrapper.find('.q-field')
-    expect(field.find('.q-field__label').text()).toBe('When')
-    expect(field.find('.q-field__messages').text()).toBe('Date and time')
+    expect(field.element.parentElement!.querySelector('.q-form-title')!.textContent).toBe('When')
+    expect(field.element.parentElement!.querySelector('.q-form-description')!.textContent).toBe('Date and time')
     const input = field.find('input')
     expect((input.element as HTMLInputElement).value).toBe('2020-01-15 10:30')
     await input.setValue('2021-02-03 04:05')
