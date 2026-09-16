@@ -3,6 +3,9 @@ import Plugin from 'ui'
 import DocExample from '@/components/DocExample.vue'
 import DocApi from '@/components/DocApi.vue'
 import DocCode from '@/components/DocCode.vue'
+import DocPlayground from '@/components/DocPlayground.vue'
+import DocAsfPlayground from '@/components/DocAsfPlayground.vue'
+import DocConditionTranspiler from '@/components/DocConditionTranspiler.vue'
 
 export default defineBoot(({ app }) => {
   app.use(Plugin)
@@ -10,4 +13,7 @@ export default defineBoot(({ app }) => {
   app.component('DocExample', DocExample)
   app.component('DocApi', DocApi)
   app.component('DocCode', DocCode)
+  app.component('DocPlayground', DocPlayground)
+  app.component('DocAsfPlayground', DocAsfPlayground)
+  app.component('DocConditionTranspiler', DocConditionTranspiler)
 })

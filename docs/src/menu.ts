@@ -60,6 +60,23 @@ const menu: MenuSection[] = [
       { title: 'Computed', path: 'controls/computed' },
     ],
   },
+  {
+    title: 'Migration',
+    icon: 'swap_horiz',
+    pages: [
+      { title: 'From angular-schema-form', path: 'migration/overview' },
+      { title: 'Mapping', path: 'migration/mapping' },
+      { title: 'Conditions', path: 'migration/conditions' },
+      { title: 'Converter playground', path: 'migration/playground' },
+    ],
+  },
+  {
+    title: 'Playground',
+    icon: 'science',
+    pages: [
+      { title: 'Playground', path: 'playground/index' },
+    ],
+  },
 ]
 
 export default menu
