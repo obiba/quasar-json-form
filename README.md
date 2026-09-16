@@ -90,7 +90,14 @@ npm view @obiba/quasar-ui-json-form version
 # 3. Release App Extension
 make release-app-ext-patch
 git push origin master && git push origin app-ext-vX.X.X
+
+# 4. Check the documentation site
+# The push of the UI version bump to master redeploys https://www.obiba.org/quasar-json-form/
+# (docs.yaml); its header shows the released UI version once the "Publish Docs" workflow is done.
 ```
+
+The documentation site is not tied to the releases: any push to `master` touching `docs/` or
+`ui/src/` republishes it.
 
 # Donate
 If you appreciate the work that went into this project, please consider [donating to Quasar](https://donate.quasar.dev).
