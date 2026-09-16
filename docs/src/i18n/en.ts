@@ -11,6 +11,7 @@ export default {
   no_errors: 'No error',
   readonly: 'Read-only',
   config: 'Config',
+  code: 'Code',
   continue: 'Continue',
   back: 'Back',
   noValue: 'No value',

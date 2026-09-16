@@ -8,5 +8,13 @@ export interface DocExampleDef {
   configCode?: string
   languages?: string[] | Record<string, string>
   readonly?: boolean
+  /**
+   * Called with the new data on every change, before it is applied, with the
+   * live schema: the application-side logic of the example (the handler of
+   * the `update:modelValue` event), which may rewrite both.
+   */
+  onUpdate?: (data: Record<string, unknown>, schema: Record<string, unknown>) => void
+  /** JavaScript source displayed in the Code tab (the `onUpdate` handler) */
+  code?: string
   validationMode?: 'ValidateAndShow' | 'ValidateAndHide' | 'NoValidation'
 }

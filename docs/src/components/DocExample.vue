@@ -11,7 +11,7 @@
 
     <q-card-section v-if="example">
       <QJsonForm
-        v-model="data"
+        :model-value="data"
         v-model:errors="errors"
         :schema="schema"
         :uischema="uischema"
@@ -19,6 +19,7 @@
         :validation-mode="example.validationMode"
         :languages="example.languages"
         :config="example.config"
+        @update:model-value="onDataUpdate"
       />
     </q-card-section>
     <q-card-section v-else class="text-negative">Example not found: {{ name }}</q-card-section>
@@ -37,6 +38,7 @@
             </div>
           </q-tab>
           <q-tab v-if="example?.configCode" name="config" :label="t('config')" />
+          <q-tab v-if="example?.code" name="code" :label="t('code')" />
           <q-space />
           <q-toggle v-model="readonly" :label="t('readonly')" dense size="sm" class="q-mr-md" />
           <q-toggle v-model="editing" :label="t('edit')" dense size="sm" class="q-mr-sm" />
@@ -45,17 +47,20 @@
         <q-tab-panels v-model="tab" animated class="bg-transparent">
           <q-tab-panel name="schema" class="q-pa-none">
             <q-input v-if="editing" v-model="schemaStr" type="textarea" filled autogrow square :error="!!schemaError" :error-message="schemaError" />
-            <DocCode v-else :code="schemaStr" />
+            <DocCode v-else :code="schemaCode" />
           </q-tab-panel>
           <q-tab-panel name="uischema" class="q-pa-none">
             <q-input v-if="editing" v-model="uischemaStr" type="textarea" filled autogrow square :error="!!uischemaError" :error-message="uischemaError" />
-            <DocCode v-else :code="uischemaStr" />
+            <DocCode v-else :code="uischemaCode" />
           </q-tab-panel>
           <q-tab-panel name="data" class="q-pa-none">
             <DocCode :code="JSON.stringify(data, null, 2)" />
           </q-tab-panel>
           <q-tab-panel name="config" class="q-pa-none">
             <DocCode :code="example?.configCode ?? ''" lang="javascript" />
+          </q-tab-panel>
+          <q-tab-panel name="code" class="q-pa-none">
+            <DocCode :code="example?.code ?? ''" lang="javascript" />
           </q-tab-panel>
           <q-tab-panel name="errors" class="q-pa-none">
             <DocCode v-if="errors.length" :code="JSON.stringify(errors, null, 2)" />
@@ -89,13 +94,35 @@ const readonly = ref(example.value?.readonly ?? false)
 const editing = ref(false)
 const tab = ref('schema')
 
-const schemaStr = ref(JSON.stringify(example.value?.schema ?? {}, null, 2))
-const uischemaStr = ref(example.value?.uischema ? JSON.stringify(example.value.uischema, null, 2) : '')
-const schemaError = ref('')
-const uischemaError = ref('')
-
 const schema = ref<Record<string, unknown>>(example.value?.schema ?? {})
 const uischema = ref<Record<string, unknown> | undefined>(example.value?.uischema)
+// displayed sources: live, since the example's `onUpdate` may rewrite the schema
+const schemaCode = computed(() => JSON.stringify(schema.value, null, 2))
+const uischemaCode = computed(() => uischema.value ? JSON.stringify(uischema.value, null, 2) : '')
+
+// edit buffers, refreshed from the live sources when editing starts
+const schemaStr = ref(schemaCode.value)
+const uischemaStr = ref(uischemaCode.value)
+const schemaError = ref('')
+const uischemaError = ref('')
+watch(editing, (on) => {
+  if (!on) return
+  schemaStr.value = schemaCode.value
+  uischemaStr.value = uischemaCode.value
+})
+
+function onDataUpdate (value: Record<string, unknown>) {
+  const onUpdate = example.value?.onUpdate
+  if (!onUpdate) {
+    data.value = value
+    return
+  }
+  const next = { ...value }
+  onUpdate(next, schema.value)
+  // the form emits its data on every change of its inputs, including the one
+  // caused by this assignment: apply it only when the hook produced new data
+  if (JSON.stringify(next) !== JSON.stringify(data.value)) data.value = next
+}
 
 function parse (text: string, error: { value: string }): Record<string, unknown> | undefined | null {
   if (!text.trim()) {

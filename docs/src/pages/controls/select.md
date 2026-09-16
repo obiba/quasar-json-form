@@ -28,6 +28,16 @@ how dependent selects are expressed within the schema.
 
 <DocExample name="select/dynamic" title="Dependent options" />
 
+## Options from the application
+
+When the values come from elsewhere (a server, a lookup table too large for the schema), the
+application rewrites the `enum` of a property in its `update:modelValue` handler, and resets the
+data that is no longer among the values: the select is rendered again with the new values. An
+empty `enum` is not a valid JSON Schema and AJV refuses to compile it, so a form whose enums
+start empty needs `validation-mode="NoValidation"`, or a placeholder value.
+
+<DocExample name="select/dynamic-app" title="Values rewritten by the application" source />
+
 ## API
 
 <DocApi name="QSelectRenderer" />
