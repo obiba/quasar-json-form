@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { h, provide, toRef, defineComponent, computed, ref, watch, inject, unref } from 'vue'
+import { h, provide, toRef, defineComponent, computed, ref, watch, inject, unref, markRaw, toRaw } from 'vue'
 import type { PropType } from 'vue'
 import { JsonForms } from '@jsonforms/vue'
 import { createAjv } from '@jsonforms/core'
@@ -127,9 +127,11 @@ export default defineComponent({
   setup(props: any, { emit }: any) {
     const { t, te, locale, fallbackLocale } = useFormI18n()
 
-    // AJV instance: the given one, or a default knowing the custom formats
-    const defaultAjv = createDefaultAjv()
-    const ajv = computed<Ajv>(() => props.ajv ?? defaultAjv)
+    // AJV instance: the given one, or a default knowing the custom formats.
+    // Never a reactive proxy (an application may keep it in reactive state):
+    // AJV's code generation breaks when its internals are proxied.
+    const defaultAjv = markRaw(createDefaultAjv())
+    const ajv = computed<Ajv>(() => (props.ajv ? markRaw(toRaw(props.ajv)) : defaultAjv))
 
     // Provide form data and readonly state to all child renderers
     provide('jsonforms-data', toRef(props, 'modelValue'))

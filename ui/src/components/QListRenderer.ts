@@ -15,10 +15,7 @@ export default defineComponent({
   props: rendererProps(),
   setup(props: any) {
     const { t } = useFormI18n()
-    const controlResult = useJsonFormsControl({
-      ...props,
-      uischema: props.uischema,
-    })
+    const controlResult = useJsonFormsControl(props)
 
     const control = controlResult.control
 
@@ -194,7 +191,7 @@ export default defineComponent({
                 schema: itemsSchema.value as any,
                 uischema: itemsUiSchema.value,
                 path: composePaths(control.value.path, `${index}`),
-                enabled: props.enabled && isEnabled.value,
+                enabled: props.enabled !== false && isEnabled.value,
                 renderers: props.renderers,
                 cells: props.cells,
                 config: props.config,

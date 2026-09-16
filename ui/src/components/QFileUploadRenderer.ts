@@ -61,10 +61,7 @@ export default defineComponent({
   setup(props: any) {
     const { t, translate } = useFormI18n()
 
-    const controlResult = useJsonFormsControl({
-      ...props,
-      uischema: props.uischema,
-    })
+    const controlResult = useJsonFormsControl(props)
 
     const control = controlResult.control
 
