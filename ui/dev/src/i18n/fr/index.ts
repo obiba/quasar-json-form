@@ -54,6 +54,10 @@ export default {
       label: 'Sélecteur de Curseur',
       description: 'Veuillez sélectionner une valeur à l\'aide du curseur',
     },
+    range: {
+      label: 'Sélecteur de Plage',
+      description: 'Veuillez sélectionner une plage à l\'aide des deux curseurs',
+    },
     date: {
       label: 'Sélecteur de Date',
       description: 'Veuillez sélectionner une date',

@@ -12,7 +12,7 @@
     },
     "format": {
       "type": "String",
-      "desc": "Select a renderer when the schema `format` is not set (`radio`, `checkbox`, `slider`, `rating`, `typeahead`, `markdown`, `datepicker`...)."
+      "desc": "Select a renderer when the schema `format` is not set (`radio`, `checkbox`, `slider`, `range`, `rating`, `typeahead`, `markdown`, `datepicker`...)."
     },
     "validationMessage": {
       "type": "String | Object",
