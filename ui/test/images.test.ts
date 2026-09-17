@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { QImg } from 'quasar'
 import { mountForm, flush } from './utils'
-import { isSupportedImage, IMAGE_MIME_TYPES } from '../src/components/QImagesRenderer'
+import { isSupportedImage, ratioPadding, IMAGE_MIME_TYPES } from '../src/components/QImagesRenderer'
 
 const lastData = (wrapper: any) => {
   const emitted = wrapper.emitted('update:modelValue')!
@@ -65,6 +65,25 @@ describe('isSupportedImage', () => {
     expect(isSupportedImage('data:image/gif;base64,R0lGOD')).toBe(false)
     expect(isSupportedImage('data:image/svg+xml,<svg/>')).toBe(false)
     expect(isSupportedImage('data:text/plain,hello')).toBe(false)
+    // malformed or padded data URIs are data URIs too
+    expect(isSupportedImage('data:,x')).toBe(false)
+    expect(isSupportedImage('data:image/gif')).toBe(false)
+    expect(isSupportedImage('DATA:image/gif;base64,R0lGOD')).toBe(false)
+    expect(isSupportedImage(' data:image/gif;base64,R0lGOD')).toBe(false)
+    expect(isSupportedImage(' data:image/png;base64,iVBOR')).toBe(true)
+  })
+})
+
+describe('ratioPadding', () => {
+  it('turns a ratio into the padding of a box of that ratio', () => {
+    expect(ratioPadding(1)).toBe('100%')
+    expect(ratioPadding(2)).toBe('50%')
+    expect(ratioPadding('16/9')).toBe('56.25%')
+    expect(ratioPadding('4 / 3')).toBe('75%')
+    expect(ratioPadding('1.5')).toBe(`${100 / 1.5}%`)
+    expect(ratioPadding(0)).toBe('100%')
+    expect(ratioPadding('abc')).toBe('100%')
+    expect(ratioPadding(undefined)).toBe('100%')
   })
 })
 
@@ -283,7 +302,20 @@ describe('images renderer', () => {
     await flush()
     expect(withImages.findComponent(QImg).props('ratio')).toBe(1.5)
     expect(withImages.findComponent(QImg).props('fit')).toBe('contain')
+    // the placeholder of a missing image has the same ratio
+    expect(withImages.find('.q-images__image--missing').attributes('style')).toContain(`padding-bottom: ${100 / 1.5}%`)
     withImages.unmount()
+  })
+
+  it('bounds a multiple choice with the max rule before the schema maxItems', async () => {
+    const wrapper = mountForm({ schema, uischema: uischema(control('toppings', {}, { rules: { max: '1' } })), modelValue: { toppings: ['cheese'] } })
+    await flush()
+    expect(tiles(wrapper)[1]!.classes()).toContain('disabled')
+    expect(tiles(wrapper)[2]!.classes()).toContain('disabled')
+    await tiles(wrapper)[1]!.trigger('click')
+    await flush()
+    expect(lastData(wrapper).toppings).toEqual(['cheese'])
+    wrapper.unmount()
   })
 
   it('is read-only or disabled, clears its value when hidden or invalid', async () => {

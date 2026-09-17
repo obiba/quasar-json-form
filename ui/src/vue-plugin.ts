@@ -28,7 +28,7 @@ import QMarkdownEditor from './components/QMarkdownEditor'
 import QRadioMatrixRenderer from './components/QRadioMatrixRenderer'
 import QCountriesRenderer from './components/QCountriesRenderer'
 import QTypeaheadRenderer from './components/QTypeaheadRenderer'
-import QImagesRenderer, { isSupportedImage, IMAGE_MIME_TYPES } from './components/QImagesRenderer'
+import QImagesRenderer, { isSupportedImage, ratioPadding, IMAGE_MIME_TYPES } from './components/QImagesRenderer'
 import type { ImageEntry, ImageTile } from './components/QImagesRenderer'
 import QJsonForm from './components/QJsonForm'
 import { messages } from './i18n/messages'
@@ -117,6 +117,7 @@ export {
   QJsonForm,
   messages,
   isSupportedImage,
+  ratioPadding,
   IMAGE_MIME_TYPES,
   countryCodes,
   createJsonFormsI18n,

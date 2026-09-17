@@ -11,16 +11,30 @@ import type { Breakpoint, GridPlacement } from '../utils/grid'
 /** MIME types of the images a tile can display, when given as a data URI */
 export const IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
-const DATA_URI = /^data:([^;,]+)[;,]/i
+const DATA_URI = /^data:([^;,]*)[;,]/i
 
 /**
  * Whether the image source can be displayed: a non empty URL (not checked, a
  * server URL often has no extension), or a data URI of a supported MIME type.
  */
 export function isSupportedImage(src: unknown): src is string {
-  if (typeof src !== 'string' || src.trim().length === 0) return false
-  const match = DATA_URI.exec(src)
-  return match === null || IMAGE_MIME_TYPES.includes(match[1]!.toLowerCase())
+  if (typeof src !== 'string') return false
+  const source = src.trim()
+  if (source.length === 0) return false
+  if (!/^data:/i.test(source)) return true
+  const match = DATA_URI.exec(source)
+  return match !== null && IMAGE_MIME_TYPES.includes(match[1]!.toLowerCase())
+}
+
+/** `padding-bottom` of a box of the given aspect ratio (`1`, `1.5`, `'16/9'`), for the placeholder */
+export function ratioPadding(ratio: unknown): string {
+  let value: number | undefined
+  if (typeof ratio === 'number') value = ratio
+  else if (typeof ratio === 'string') {
+    const [width, height] = ratio.split('/').map((part) => Number(part.trim()))
+    value = height === undefined ? width : width! / height
+  }
+  return `${value !== undefined && isFinite(value) && value > 0 ? 100 / value : 100}%`
 }
 
 /** An entry of the `images` option map: a source, or a source with a placement and a caption */
@@ -101,9 +115,9 @@ export default defineComponent({
       }),
     )
 
-    // bounds of a multiple choice: schema `maxItems`, else the filtrex `max` rule
+    // bound of a multiple choice: the filtrex `max` rule, else the schema `maxItems`
     const maxItems = computed<number | undefined>(() => {
-      const value = control.value.schema.maxItems ?? maxValue.value
+      const value = maxValue.value ?? control.value.schema.maxItems
       return typeof value === 'number' && !isNaN(value) ? value : undefined
     })
 
@@ -213,7 +227,11 @@ export default defineComponent({
 
     const renderImage = (tile: ImageTile): VNode => {
       if (!isSupportedImage(tile.src)) {
-        return h('div', { class: 'q-images__image q-images__image--missing' }, [renderPlaceholder()])
+        // the placeholder box has the ratio of the images
+        return h('div', {
+          class: 'q-images__image q-images__image--missing',
+          style: { paddingBottom: ratioPadding(options.value.ratio ?? 1) },
+        }, [renderPlaceholder()])
       }
       return h(QImg, {
         class: 'q-images__image',
