@@ -77,3 +77,68 @@
 .q-file-list
   .q-file-item__name
     word-break: break-all
+
+// Images selection (QImagesRenderer): a CSS grid of tiles, the template and
+// gaps are inline styles computed from the control options, the placement of
+// a tile from the `grid` of its entry. A selected tile is outlined and badged
+// in the `color` option (the `text-*` class sets currentColor).
+.q-images
+  display: grid
+.q-images__cell
+  min-width: 0
+.q-images__tile
+  position: relative
+  border: 2px solid transparent
+  border-radius: 6px
+  overflow: hidden
+  cursor: pointer
+  transition: box-shadow .2s, border-color .2s
+  &:hover:not(.disabled):not(.q-images__tile--readonly)
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2), 0 2px 2px rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12)
+  &:focus-visible
+    outline: 2px solid currentColor
+    outline-offset: 2px
+  &--selected
+    border-color: currentColor
+  &--readonly
+    cursor: default
+.q-images__image
+  display: block
+  width: 100%
+  &--missing
+    position: relative
+.q-images__placeholder
+  color: $grey-6
+  background: $grey-3
+.body--dark .q-images__placeholder
+  color: $grey-5
+  background: $grey-9
+.q-images__badge
+  position: absolute
+  top: 6px
+  right: 6px
+  min-width: 22px
+  height: 22px
+  padding: 0 6px
+  border-radius: 11px
+  display: flex
+  align-items: center
+  justify-content: center
+  background: currentColor
+  font-size: 12px
+  font-weight: bold
+  line-height: 1
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3)
+  > *
+    color: white
+.q-images__caption
+  display: flex
+  align-items: center
+  justify-content: center
+  gap: 2px
+  margin-top: 4px
+  font-size: smaller
+  text-align: center
+.q-images__label
+  min-width: 0
+  overflow-wrap: anywhere

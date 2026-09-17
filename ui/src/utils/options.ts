@@ -41,7 +41,13 @@ export const RENDERER_OPTION_KEYS = [
   'confirmation',
   'addLabel',
   'addIcon',
-  'items',
+  'images',
+  'columns',
+  'gap',
+  'rowGap',
+  'columnGap',
+  'minWidth',
+  'captions',
 ]
 
 /** Copy of `options` without the given keys (defaults to `RENDERER_OPTION_KEYS`). */

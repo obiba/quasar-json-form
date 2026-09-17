@@ -11,6 +11,10 @@ import { renderMarkdown, renderMarkdownInline } from '../utils/markdown'
 export interface SelectOption {
   label: string
   value: any
+  /** image URL of a `oneOf` entry (`image` key), for the images control */
+  image?: string
+  /** grid placement of a `oneOf` entry (`grid` key), for the images control */
+  grid?: Record<string, any>
 }
 
 export interface ValidationRule {
@@ -382,15 +386,19 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
       return true
     }
 
+    // a `oneOf` entry: its `image` and `grid` keys are kept for the images control
+    const fromEntry = (val: any): SelectOption => {
+      const option: SelectOption = { label: t(String(val.title || val.const)), value: val.const }
+      if (typeof val.image === 'string') option.image = val.image
+      if (val.grid && typeof val.grid === 'object') option.grid = val.grid
+      return option
+    }
+
     if (schema.type === 'array' && schema.items) {
       const itemsSchema = schema.items
       if (itemsSchema.oneOf && Array.isArray(itemsSchema.oneOf) && itemsSchema.oneOf.length > 0) {
         // for each oneOf item, filter by visibility and map to label/value
-        return itemsSchema.oneOf
-          .filter(optionVisible)
-          .map((val: any) => {
-            return { label: t(String(val.title || val.const)), value: val.const }
-          })
+        return itemsSchema.oneOf.filter(optionVisible).map(fromEntry)
       }
 
       if (itemsSchema.enum) {
@@ -403,11 +411,7 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
 
     if (schema.oneOf && Array.isArray(schema.oneOf) && schema.oneOf.length > 0) {
       // for each oneOf item, filter by visibility and map to label/value
-      return schema.oneOf
-        .filter(optionVisible)
-        .map((val: any) => {
-          return { label: t(String(val.title || val.const)), value: val.const }
-        })
+      return schema.oneOf.filter(optionVisible).map(fromEntry)
     }
 
     if (schema.enum) {
