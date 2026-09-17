@@ -280,8 +280,7 @@ function genConfig (opts) {
 
   Object.assign(opts.rollup.output, {
     banner: buildConf.banner,
-    globals: { vue: 'Vue', quasar: 'Quasar' },
-    exports: 'named'
+    globals: { vue: 'Vue', quasar: 'Quasar' }
   })
 
   return opts

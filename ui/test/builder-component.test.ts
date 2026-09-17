@@ -141,6 +141,38 @@ describe('QJsonFormBuilder', () => {
     wrapper.unmount()
   })
 
+  it('edits the labels of an enum, converting it to oneOf, and keeps the other options', async () => {
+    const wrapper = mountBuilder({ modelValue: {
+      schema: { type: 'object', properties: { size: { type: 'integer', enum: [1, 2] } } },
+      uischema: { type: 'VerticalLayout', elements: [{ type: 'Control', scope: '#/properties/size', options: { format: 'radio', inline: true } }] },
+      translations: { en: { '1': 'One' } },
+    } })
+    await flush()
+    await rows(wrapper)[1]!.trigger('click')
+    await flush()
+    const fields = (label: string) => wrapper.findAll('label.q-field').filter((f: any) => f.find('.q-field__label').exists() && f.find('.q-field__label').text() === label)
+    expect((fields('Label')[0]!.find('input').element as HTMLInputElement).value).toBe('One')
+    await fields('Label')[1]!.find('input').setValue('Two')
+    await flush()
+    let emitted = lastEmitted(wrapper)
+    expect(emitted.schema.properties.size.enum).toBeUndefined()
+    expect(emitted.schema.properties.size.oneOf).toEqual([{ const: 1, title: '1' }, { const: 2, title: 'size.options.2' }])
+    expect(emitted.translations!.en!['size.options.2']).toBe('Two')
+    // a number stays a number
+    await fields('Value')[1]!.find('input').setValue('3')
+    await flush()
+    emitted = lastEmitted(wrapper)
+    expect(emitted.schema.properties.size.oneOf[1]).toEqual({ const: 3, title: 'size.options.3' })
+    expect(emitted.translations!.en!['size.options.3']).toBe('Two')
+    // the settings form (here the common `readonly` option) keeps the other options
+    const readonly = wrapper.findAll('.q-builder-properties .q-toggle').find((t: any) => t.element.closest('[class*="renderer"]')?.textContent?.includes('readonly'))!
+    await readonly.trigger('click')
+    await flush()
+    emitted = lastEmitted(wrapper)
+    expect(emitted.uischema!.elements[0].options).toEqual({ format: 'radio', inline: true, readonly: true })
+    wrapper.unmount()
+  })
+
   it('previews the form in the selected language and lists the translations', async () => {
     const wrapper = mountBuilder({ locale: 'fr' })
     await flush()

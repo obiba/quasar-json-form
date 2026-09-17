@@ -193,15 +193,23 @@ export default defineComponent({
         }
         return target.oneOf
       }
+      const inItems = target !== schema.value
       const rows = entries.map((entry, index) => {
+        // the slot of the label; for an `enum` (labels are the values, translated) the one it gets once converted
         const slot = textSlots(props.model, n).find((s) => s.name === `options.${entry.const}`)
+          ?? { name: `options.${entry.const}`, target: 'schema' as const, path: inItems ? ['items', 'oneOf', index, 'title'] : ['oneOf', index, 'title'] }
+        const label = key === 'enum' ? props.model.translations[props.locale]?.[String(entry.const)] ?? '' : getText(props.model, n, slot, props.locale) ?? ''
         return h('div', { class: 'row items-center q-col-gutter-xs q-mb-xs no-wrap', key: index }, [
           h('div', { class: 'col-4' }, [h(QInput, {
             modelValue: String(entry.const ?? ''), label: tr('value'), dense: true, outlined: true,
             'onUpdate:modelValue': (v: string | number | null) => {
               const oneOf = toOneOf()
               const previous = oneOf[index]!.const
-              const next = typeof previous === 'number' && v !== null && v !== '' && !isNaN(Number(v)) ? Number(v) : String(v ?? '')
+              const text = String(v ?? '')
+              // the value keeps the type of the previous one when the text allows it
+              const next = typeof previous === 'number' && text !== '' && !isNaN(Number(text)) ? Number(text)
+                : typeof previous === 'boolean' && (text === 'true' || text === 'false') ? text === 'true'
+                  : text
               if (next === previous) return
               // the label follows the value: its key changes with it
               const prefix = keyPrefix(props.model, n)
@@ -217,15 +225,15 @@ export default defineComponent({
               changed()
             },
           })]),
-          h('div', { class: 'col' }, [slot ? h(QInput, {
-            modelValue: getText(props.model, n, slot, props.locale) ?? '', label: tr('label'), dense: true, outlined: true,
+          h('div', { class: 'col' }, [h(QInput, {
+            modelValue: label, label: tr('label'), dense: true, outlined: true,
             'onUpdate:modelValue': (v: string | number | null) => {
               toOneOf()
               const current = textSlots(props.model, n).find((s) => s.name === slot.name)
               if (current) setText(props.model, n, current, props.locale, String(v ?? ''))
               changed()
             },
-          }) : null]),
+          })]),
           h('div', { class: 'col-auto' }, [h(QBtn, { flat: true, dense: true, round: true, size: 'sm', icon: 'delete', onClick: () => { toOneOf().splice(index, 1); changed() } })]),
         ])
       })
@@ -255,7 +263,13 @@ export default defineComponent({
           uischema: columnsUischema(settings),
           validationMode: 'NoValidation',
           'onUpdate:modelValue': (value: JsonObject) => {
-            const options = Object.fromEntries(Object.entries(value ?? {}).filter(([, v]) => v !== undefined && v !== null && v !== ''))
+            // the edited fields merged into the options: the others (`format`, arrays, objects...) stay
+            const options: JsonObject = { ...(isObject(n.element.options) ? n.element.options : {}) }
+            for (const name of Object.keys(settings.properties)) {
+              const v = value?.[name]
+              if (v === undefined || v === null || v === '') delete options[name]
+              else options[name] = v
+            }
             // the form also emits on mount: only a real change is applied
             if (JSON.stringify(options) === JSON.stringify(isObject(n.element.options) ? n.element.options : {})) return
             if (Object.keys(options).length > 0) n.element.options = options

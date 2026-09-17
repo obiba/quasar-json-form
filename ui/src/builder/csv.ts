@@ -75,19 +75,20 @@ export function mergeCsv(model: FormModel, text: string): CsvImport {
   const rows = parseCsv(text.replace(/^﻿/, ''))
   const header = rows[0]?.map((cell) => cell.trim())
   if (!header || header[0]?.toLowerCase() !== 'key' || header.length < 2) throw new Error('key,<language>... header expected')
-  const languages = header.slice(1).filter((locale) => locale.length > 0)
+  // the languages with their column (an unnamed column is skipped)
+  const columns = header.map((locale, column) => ({ locale, column })).filter(({ locale, column }) => column > 0 && locale.length > 0)
   let values = 0
   let keys = 0
   for (const row of rows.slice(1)) {
     const key = row[0]?.trim()
     if (!key) continue
     keys++
-    languages.forEach((locale, index) => {
-      const value = row[index + 1]
-      if (value === undefined || value === '') return
+    for (const { locale, column } of columns) {
+      const value = row[column]
+      if (value === undefined || value === '') continue
       ;(model.translations[locale] ??= {})[key] = value
       values++
-    })
+    }
   }
-  return { languages, values, keys }
+  return { languages: columns.map(({ locale }) => locale), values, keys }
 }

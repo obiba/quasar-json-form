@@ -157,6 +157,15 @@ export function fieldNames(container: JsonObject | undefined): string[] {
   return container && isObject(container.properties) ? Object.keys(container.properties) : []
 }
 
+/**
+ * The `moveNode` index of a drop: sortablejs gives the final index of the
+ * element in the target list, `moveNode` expects the index before the element
+ * leaves its list (an element moved down its own list is inserted one further).
+ */
+export function dropIndex(sameList: boolean, oldIndex: number, newIndex: number): number {
+  return sameList && newIndex > oldIndex ? newIndex + 1 : newIndex
+}
+
 /** Downloads a text as a file (no-op outside a browser). */
 export function downloadText(name: string, text: string, type = 'application/json'): void {
   if (typeof document === 'undefined' || typeof URL === 'undefined' || typeof URL.createObjectURL !== 'function') return

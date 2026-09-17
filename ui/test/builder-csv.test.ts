@@ -44,3 +44,11 @@ describe('translations CSV', () => {
     expect(() => mergeCsv(model(), '')).toThrow()
   })
 })
+
+describe('mergeCsv columns', () => {
+  it('keeps the column of each language when a header is empty', () => {
+    const m = fromDefinition({ schema: {} })
+    expect(mergeCsv(m, 'key,,fr\nname.title,ignored,Nom\n')).toEqual({ languages: ['fr'], keys: 1, values: 1 })
+    expect(m.translations).toEqual({ fr: { 'name.title': 'Nom' } })
+  })
+})

@@ -11,9 +11,9 @@ import Sortable from 'sortablejs'
 import { useFormI18n } from '../vue-plugin'
 import type { FormModel, FormNode } from './model'
 import { locate, propertySchema, descendants } from './model'
-import { addNode, removeNode, moveNode } from './operations'
+import { addNode, removeNode, moveNode, canMove } from './operations'
 import { textSlots, getText } from './texts'
-import { matchItem, nodeIcon, itemKey } from './items'
+import { matchItem, nodeIcon, itemKey, dropIndex } from './items'
 import type { BuilderCatalog } from './items'
 
 export default defineComponent({
@@ -121,14 +121,6 @@ export default defineComponent({
 
     const sortables = new Map<HTMLElement, Sortable>()
 
-    const allowed = (id: string, parentId: string): boolean => {
-      const source = locate(props.model, id)
-      const target = locate(props.model, parentId)
-      if (!source || !target) return false
-      if (descendants(source.node).some((n) => n === target.node)) return false
-      return source.list === target.list
-    }
-
     const onEnd = (evt: Sortable.SortableEvent) => {
       dragging.value = false
       const { item, from, to, oldIndex, newIndex } = evt
@@ -139,8 +131,7 @@ export default defineComponent({
       const id = item.getAttribute('data-id')
       const parentId = to.getAttribute('data-parent')
       if (!id || !parentId) return
-      const index = from === to && newIndex > oldIndex ? newIndex + 1 : newIndex
-      if (moveNode(props.model, id, parentId, index)) emit('change')
+      if (moveNode(props.model, id, parentId, dropIndex(from === to, oldIndex, newIndex))) emit('change')
     }
 
     const syncSortables = () => {
@@ -166,7 +157,7 @@ export default defineComponent({
             onMove: (evt) => {
               const id = evt.dragged.getAttribute('data-id')
               const parentId = evt.to.getAttribute('data-parent')
-              return !!id && !!parentId && allowed(id, parentId)
+              return !!id && !!parentId && canMove(props.model, id, parentId)
             },
             onEnd,
           }))
