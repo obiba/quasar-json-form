@@ -88,16 +88,27 @@ export function removeNode(model: FormModel, id: string): FormNode | undefined {
 }
 
 /**
+ * Whether a node can move under a layout: not the root, not into its own
+ * subtree, and a control stays at its level (the items of a list, or the
+ * root level).
+ */
+export function canMove(model: FormModel, id: string, parentId: string): boolean {
+  const source = locate(model, id)
+  const target = locate(model, parentId)
+  if (!source || !target || !source.parent || target.node.kind !== 'layout') return false
+  if (descendants(source.node).includes(target.node)) return false
+  return source.list === target.list
+}
+
+/**
  * Moves a node under a layout, at the given index (the end by default). A
  * control stays at its level: it cannot move into or out of the items of a
  * list. Returns false when the move is not possible.
  */
 export function moveNode(model: FormModel, id: string, parentId: string, index?: number): boolean {
-  const source = locate(model, id)
-  const target = locate(model, parentId)
-  if (!source || !target || !source.parent || target.node.kind !== 'layout') return false
-  if (descendants(source.node).includes(target.node)) return false
-  if (source.list !== target.list) return false
+  if (!canMove(model, id, parentId)) return false
+  const source = locate(model, id)!
+  const target = locate(model, parentId)!
   let at = index === undefined ? target.node.children.length : index
   if (source.parent === target.node && source.index >= 0 && source.index < at) at--
   detach(model, id)

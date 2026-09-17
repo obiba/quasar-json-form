@@ -19,6 +19,7 @@ const pages = [
   { path: 'test-images', file: 'TestImages' },
   { path: 'test-image-map', file: 'TestImageMap' },
   { path: 'test-geo', file: 'TestGeo' },
+  { path: 'test-builder', file: 'TestBuilder' },
 ]
 
 const children = pages.map(page => ({

@@ -365,12 +365,43 @@ catalogItems.find((item) => item.name === 'textarea')  // { renderer: 'QStringRe
 `ui/test/catalog.test.ts` checks that every renderer registered by the plugin is described, and
 that every `options.<name>` read by a renderer is documented.
 
-# Form builder model
+# Form builder
 
-`@obiba/quasar-ui-json-form/builder` holds the model of a form under construction: a tree of
-nodes mirroring the UI schema (`control`, `layout` or plain `element` nodes, a list of objects
-carrying the layout of its items as `detail`), bound to the JSON schema of the data and to the
-translations of the form.
+`@obiba/quasar-ui-json-form/builder` holds the `QJsonFormBuilder` component and the model it
+works on. The component edits a form bound to `v-model` as `{ schema, uischema, translations }`:
+the outline of the form with its palette (drag and drop to reorder and reparent, with sortablejs),
+the properties of the selected node (key, required, texts in the builder language, choices, the
+settings of its renderer from the catalog, validation keywords, filtrex rules, raw JSON), the live
+preview with a language switch, the translations editor (a button collects the texts of the form,
+turning literals into keys and adding the missing entries of every language; the translations as a CSV file,
+`key` then one column per language, downloaded for the translators and uploaded back: the
+non-empty cells update or add keys and languages), and the source with import and export (a
+form, a schema alone, or an angular-schema-form pair).
+
+```html
+<QJsonFormBuilder v-model="form" :languages="['en', 'fr']" :catalog="[colorApi]" :renderers="[colorRenderer]" :config="config" />
+```
+
+```js
+import { QJsonFormBuilder } from '@obiba/quasar-ui-json-form/builder'
+```
+
+| Prop | Content |
+|---|---|
+| `modelValue` | the form, `{ schema, uischema, translations }` (`v-model`) |
+| `languages` | languages of the form, added to the ones of its translations (`['en', 'fr']` or `{ en: 'English' }`) |
+| `locale` | language edited and previewed initially (the vue-i18n locale when it is one of the languages) |
+| `catalog` | `RendererApi` descriptions of the renderers of the application, added to the palette |
+| `renderers`, `config` | passed to the preview form |
+
+The labels of the builder come from the `builder.*` keys of the built-in messages (english and
+french), overridable in the application bundles.
+
+## Model
+
+The model of a form under construction: a tree of nodes mirroring the UI schema (`control`,
+`layout` or plain `element` nodes, a list of objects carrying the layout of its items as
+`detail`), bound to the JSON schema of the data and to the translations of the form.
 
 ```js
 import { fromDefinition, toDefinition, addNode, setText, textSlots } from '@obiba/quasar-ui-json-form/builder'

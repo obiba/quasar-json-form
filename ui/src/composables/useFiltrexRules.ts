@@ -121,6 +121,20 @@ export class FiltrexRuleEngine {
     }
   }
 
+  /** The error of an expression that does not compile, undefined when it does (or is empty). */
+  expressionError(expression: string): string | undefined {
+    if (!expression.trim()) return undefined
+    try {
+      compileExpression(expression, {
+        customProp: useDotAccessOperatorAndOptionalChaining,
+        extraFunctions: this.customFunctions,
+      })
+      return undefined
+    } catch (error) {
+      return error instanceof Error ? error.message : String(error)
+    }
+  }
+
   validateExpression(expression: string): boolean {
     try {
       compileExpression(expression, {

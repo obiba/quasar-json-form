@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest'
 import {
   fromDefinition, toDefinition, fromAsf, parseScope, toScope, isValidKey,
   locate, findNode, descendants, listOf, containerOf, propertySchema, isRequired, setRequired, uniqueKey,
-  addNode, removeNode, moveNode, duplicateNode, renameProperty, ruleReferences,
+  addNode, removeNode, moveNode, canMove, duplicateNode, renameProperty, ruleReferences, dropIndex,
 } from '../src/builder'
 import type { FormDefinition, FormModel } from '../src/builder'
 
@@ -320,6 +320,25 @@ describe('moveNode', () => {
     expect(moveNode(model, name.id, group!.id, 1)).toBe(true)
     expect(group!.children[1]).toBe(name)
     expect(row!.children.length).toBe(1)
+  })
+
+  it('tells what can move where, and the index of a drop', () => {
+    const model = fromDefinition(contact)
+    const [row, group, contacts, label] = model.root.children
+    expect(canMove(model, label!.id, group!.id)).toBe(true)
+    expect(canMove(model, byScope(model, '#/properties/phone').id, contacts!.detail!.id)).toBe(true)
+    expect(canMove(model, byScope(model, '#/properties/name').id, contacts!.detail!.id)).toBe(false)
+    expect(canMove(model, row!.id, row!.id)).toBe(false)
+    expect(canMove(model, model.root.id, group!.id)).toBe(false)
+    expect(canMove(model, label!.id, contacts!.id)).toBe(false)
+    expect(canMove(model, 'nope', group!.id)).toBe(false)
+    // sortablejs gives the final index: moving down the same list inserts one further
+    expect(dropIndex(true, 0, 2)).toBe(3)
+    expect(dropIndex(true, 2, 0)).toBe(0)
+    expect(dropIndex(false, 0, 2)).toBe(2)
+    const [a, b, c] = model.root.children
+    expect(moveNode(model, a!.id, model.root.id, dropIndex(true, 0, 2))).toBe(true)
+    expect(model.root.children.slice(0, 3)).toEqual([b, c, a])
   })
 
   it('refuses a move into its own subtree, across a list, or to a control', () => {

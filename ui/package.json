@@ -59,7 +59,8 @@
     "dompurify": "^3.3.1",
     "filtrex": "^3.1.0",
     "markdown-it": "^14.1.0",
-    "ol": "^10.10.0"
+    "ol": "^10.10.0",
+    "sortablejs": "^1.15.7"
   },
   "devDependencies": {
     "@rollup/plugin-buble": "^1.0.3",
@@ -69,6 +70,7 @@
     "@rollup/plugin-replace": "^5.0.5",
     "@rollup/plugin-typescript": "^12.0.0",
     "@types/markdown-it": "^14.1.2",
+    "@types/sortablejs": "^1.15.9",
     "@vitest/coverage-v8": "^3.2.7",
     "@vue/test-utils": "^2.5.0",
     "autoprefixer": "^10.4.16",
