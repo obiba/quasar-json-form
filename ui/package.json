@@ -26,6 +26,11 @@
       "import": "./dist/asf.esm.js",
       "require": "./dist/asf.common.js"
     },
+    "./catalog": {
+      "types": "./dist/catalog/index.d.ts",
+      "import": "./dist/catalog.esm.js",
+      "require": "./dist/catalog.common.js"
+    },
     "./dist/*": "./dist/*",
     "./src/*": "./src/*",
     "./package.json": "./package.json"

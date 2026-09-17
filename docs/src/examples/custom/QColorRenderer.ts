@@ -4,6 +4,7 @@ import { rankWith, isStringControl, optionIs, and } from '@jsonforms/core'
 import type { ControlElement, JsonFormsRendererRegistryEntry } from '@jsonforms/core'
 import { QColor } from 'quasar'
 import { useControlProperties, omitOptions } from 'ui'
+import type { RendererApi } from 'ui/catalog'
 
 /** A string control with `options.format: "color"`, edited with a QColor palette. */
 const QColorRenderer = defineComponent({
@@ -56,4 +57,30 @@ const QColorRenderer = defineComponent({
 export const colorRenderer: JsonFormsRendererRegistryEntry = {
   renderer: QColorRenderer,
   tester: rankWith(4, and(isStringControl, optionIs('format', 'color'))),
+}
+
+/** The description of the control, for the API tables and the palette of the form builder. */
+export const colorApi: RendererApi = {
+  name: 'QColorRenderer',
+  kind: 'control',
+  inherits: 'control',
+  triggers: [
+    { schema: '{ "type": "string" } + options.format: "color"', rank: 4, desc: 'A string property with the `color` format option.' },
+  ],
+  options: {
+    '…': { type: 'any', desc: 'Any other option is passed as a prop to [QColor](https://quasar.dev/vue-components/color-picker#qcolor-api): `formatModel`, `palette`, `dark`...' },
+  },
+  data: {
+    desc: 'The color as a `#rrggbb` string (or the `formatModel` of QColor). An emptied picker stores `undefined`.',
+    example: '{ "color": "#1976d2" }',
+  },
+  items: [
+    {
+      name: 'color',
+      label: 'Color',
+      icon: 'palette',
+      schema: { type: 'string' },
+      uischema: { type: 'Control', options: { format: 'color' } },
+    },
+  ],
 }

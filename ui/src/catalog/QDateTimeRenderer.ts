@@ -1,0 +1,43 @@
+import type { RendererApi } from './types'
+
+export default {
+  name: 'QDateTimeRenderer',
+  kind: 'control',
+  inherits: 'control',
+  triggers: [
+    {
+      schema: '{ "type": "string", "format": "date-time" }',
+      rank: 4,
+      desc: '`YYYY-MM-DD HH:mm` input with a date picker and a time picker; validated by AJV as the pickers store it (`T` separator, seconds and timezone also accepted).',
+    },
+    {
+      schema: 'format: "date-fulltime" (schema or options)',
+      rank: 4,
+      desc: '`YYYY-MM-DD HH:mm:ss`, with seconds.',
+    },
+  ],
+  options: {
+    '…': {
+      type: 'any',
+      desc: 'Every option is passed as a prop to [QInput](https://quasar.dev/vue-components/input#qinput-api).',
+    },
+  },
+  data: {
+    desc: 'A string, `YYYY-MM-DD HH:mm` or `YYYY-MM-DD HH:mm:ss`.',
+    example: '{ "meeting": "2024-03-15 14:30" }',
+  },
+  items: [
+    {
+      name: 'datetime',
+      label: 'Date and time',
+      icon: 'event_available',
+      schema: {
+        type: 'string',
+        format: 'date-time',
+      },
+      uischema: {
+        type: 'Control',
+      },
+    },
+  ],
+} satisfies RendererApi

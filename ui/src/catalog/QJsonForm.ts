@@ -1,0 +1,76 @@
+import type { RendererApi } from './types'
+
+export default {
+  name: 'QJsonForm',
+  kind: 'form',
+  props: {
+    modelValue: {
+      type: 'Object',
+      default: '{}',
+      desc: 'Form data (`v-model`).',
+    },
+    schema: {
+      type: 'Object',
+      desc: 'JSON Schema of the data.',
+    },
+    uischema: {
+      type: 'Object',
+      default: 'generated',
+      desc: 'JSON Forms UI schema; when omitted, a `VerticalLayout` with one `Control` per property of the schema.',
+    },
+    readonly: {
+      type: 'Boolean',
+      default: 'false',
+      desc: 'Render every control read-only: inputs are not editable, list and upload buttons are hidden.',
+    },
+    validationMode: {
+      type: 'String',
+      default: 'ValidateAndShow',
+      desc: '`ValidateAndShow`: validate against the schema and show the errors on the controls; `ValidateAndHide`: validate without showing; `NoValidation`: skip the schema validation. Filtrex `validation` rules are always evaluated.',
+    },
+    ajv: {
+      type: 'Ajv',
+      desc: 'Custom AJV instance (`createAjv` from `@jsonforms/core`). The default one knows the custom formats of the renderers and validates `time` and `date-time` as the pickers store them.',
+    },
+    additionalErrors: {
+      type: 'Array',
+      default: '[]',
+      desc: 'AJV-shaped errors displayed in addition to the validation errors, for instance from a server.',
+    },
+    config: {
+      type: 'Object',
+      desc: 'JSON Forms config passed to every renderer: `languages`, `countries`, `fileUpload` hooks.',
+    },
+    renderers: {
+      type: 'Array',
+      default: '[]',
+      desc: 'Renderers of the application, `{ renderer, tester }` entries tried before the built-in ones (see [custom controls](#/start/custom-controls)).',
+    },
+    languages: {
+      type: 'Array | Object',
+      desc: 'Languages of the localized strings, `[\'en\', \'fr\']` or `{ en: \'English\', fr: \'Français\' }`.',
+    },
+    translations: {
+      type: 'Object',
+      desc: 'Translations embedded in the form, keyed by language (`{ en: { \'name.title\': \'Name\' }, fr: {...} }`, flat or nested keys), looked up before the application messages (see [internationalization](#/start/i18n)).',
+    },
+    locale: {
+      type: 'String',
+      default: 'vue-i18n locale',
+      desc: 'Locale of the form, overriding the vue-i18n locale for its renderers: translations, messages and the language initially displayed by the localized strings.',
+    },
+    errors: {
+      type: 'Array',
+      default: '[]',
+      desc: 'Validation errors (`v-model:errors`), AJV-shaped `ErrorObject[]`.',
+    },
+  },
+  events: {
+    'update:modelValue': {
+      desc: 'Emitted with the new data on every change.',
+    },
+    'update:errors': {
+      desc: 'Emitted with the AJV validation errors (none in `NoValidation` mode) followed by the errors reported by the renderers themselves: filtrex `validation` rules, localized strings not completed, word limits, file counts, radio matrix and date bounds. Also emitted on mount.',
+    },
+  },
+} satisfies RendererApi

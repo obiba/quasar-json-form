@@ -20,11 +20,37 @@ function getPath(obj: any, path: string): string | undefined {
   return typeof value === 'string' ? value : undefined
 }
 
-function interpolate(message: string, values: Record<string, unknown>): string {
+/** Replaces the `{name}` placeholders of a message with the named values. */
+export function interpolate(message: string, values: Record<string, unknown>): string {
   return message.replace(/\{(\w+)\}/g, (match: string, name: string) => {
     const value = values[name]
     return value === undefined || value === null ? match : String(value)
   })
+}
+
+/** Messages of one language: flat dotted keys (`'name.title'`), nested objects, or a mix of both. */
+export type Messages = Record<string, unknown>
+
+/**
+ * Translations embedded in a form, keyed by language:
+ * `{ en: { 'name.title': 'Name' }, fr: { name: { title: 'Nom' } } }`.
+ */
+export type FormTranslations = Record<string, Messages>
+
+function lookup(messages: Messages | undefined, key: string): string | undefined {
+  if (!messages) return undefined
+  const flat = messages[key]
+  return typeof flat === 'string' ? flat : getPath(messages, key)
+}
+
+/**
+ * Looks a key up in the translations of a form, in the given locale then in
+ * its language part (`fr` for `fr-CA`); undefined when not found.
+ */
+export function lookupTranslation(translations: FormTranslations | undefined, locale: string | undefined, key: string): string | undefined {
+  if (!translations || !locale || !key) return undefined
+  const language = locale.split('-')[0]!
+  return lookup(translations[locale], key) ?? (language !== locale ? lookup(translations[language], key) : undefined)
 }
 
 /**

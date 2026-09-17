@@ -1,7 +1,7 @@
 <template>
   <q-card flat bordered class="doc-api q-my-md">
     <q-card-section class="row items-center q-py-sm doc-card-header">
-      <div class="text-subtitle2">{{ api?.name ?? name }} API</div>
+      <div class="text-subtitle2">{{ api?.name ?? name ?? example }} API</div>
       <q-space />
       <q-input v-model="filter" dense outlined debounce="200" placeholder="Filter" clearable style="width: 200px">
         <template #prepend><q-icon name="search" /></template>
@@ -62,7 +62,7 @@
         </q-tab-panel>
       </q-tab-panels>
     </template>
-    <q-card-section v-else class="text-negative">API not found: {{ name }}</q-card-section>
+    <q-card-section v-else class="text-negative">API not found: {{ name ?? example }}</q-card-section>
   </q-card>
 </template>
 
@@ -70,30 +70,23 @@
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { renderMarkdownInline } from 'ui'
+import { catalog, controlApi } from 'ui/catalog'
+import type { ApiEntry as CatalogEntry, RendererApi } from 'ui/catalog'
 import DocCode from './DocCode.vue'
+import type { DocExampleDef } from '../examples/types'
 
-interface ApiEntry { name: string; type?: string; default?: string; message?: string; desc: string }
-interface ApiDef {
-  name: string
-  /** `control`: the options of `_control.json` apply too */
-  inherits?: string
-  triggers?: { schema: string; rank: number; desc: string }[]
-  props?: Record<string, Omit<ApiEntry, 'name'>>
-  /** properties read on the UI schema element itself (next to `type`, `scope`, `options`) */
-  element?: Record<string, Omit<ApiEntry, 'name'>>
-  events?: Record<string, Omit<ApiEntry, 'name'>>
-  options?: Record<string, Omit<ApiEntry, 'name'>>
-  validation?: Record<string, Omit<ApiEntry, 'name'>>
-  data?: { desc: string; example?: string }
-}
+interface ApiEntry extends CatalogEntry { name: string }
 
-const props = defineProps<{ name: string }>()
+/** `name`: a renderer of the library catalog; `example`: the `api` of an example (a custom renderer) */
+const props = defineProps<{ name?: string; example?: string }>()
 const { t } = useI18n()
 
-const modules = import.meta.glob<{ default: ApiDef }>('../api/*.json', { eager: true })
-const api = computed<ApiDef | undefined>(() => modules[`../api/${props.name}.json`]?.default)
-const common = computed<ApiDef | undefined>(() =>
-  api.value?.inherits ? modules[`../api/_${api.value.inherits}.json`]?.default : undefined)
+const examples = import.meta.glob<{ default: DocExampleDef }>('../examples/**/*.ts', { eager: true })
+
+// the renderer descriptions come from the library catalog, or from the example
+const api = computed<RendererApi | undefined>(() =>
+  props.example ? examples[`../examples/${props.example}.ts`]?.default.api : catalog[props.name ?? ''])
+const common = computed(() => (api.value?.inherits === 'control' ? controlApi : undefined))
 
 const filter = ref('')
 
@@ -104,7 +97,7 @@ function toEntries (map?: Record<string, Omit<ApiEntry, 'name'>>): ApiEntry[] {
 function entries (group: string): ApiEntry[] {
   if (group === 'common') return toEntries(common.value?.options)
   if (group === 'element') return [...toEntries(api.value?.element), ...toEntries(common.value?.element)]
-  return toEntries((api.value as unknown as Record<string, Record<string, Omit<ApiEntry, 'name'>>>)[group])
+  return toEntries((api.value as unknown as Record<string, Record<string, CatalogEntry>>)[group])
 }
 
 function filtered<T extends object> (list: T[] | undefined): T[] {

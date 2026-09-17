@@ -1,0 +1,43 @@
+import type { RendererApi } from './types'
+
+export default {
+  name: 'QMarkdownRenderer',
+  kind: 'control',
+  inherits: 'control',
+  triggers: [
+    {
+      schema: '{ "type": "string" } + format: "markdown" (schema or options)',
+      rank: 4,
+      desc: 'Markdown editor: a textarea with a formatting toolbar (bold, italic, heading, list, link) and a preview toggle.',
+    },
+  ],
+  options: {
+    rows: {
+      type: 'Number',
+      default: '5',
+      desc: 'Rows of the textarea.',
+    },
+    '…': {
+      type: 'any',
+      desc: 'Every other option is passed as a prop to the [QInput](https://quasar.dev/vue-components/input#qinput-api) textarea.',
+    },
+  },
+  data: {
+    desc: 'The markdown text. Read-only, the rendered markdown is displayed (sanitized with DOMPurify). The toolbar titles come from the `markdown.*` i18n keys.',
+    example: '{ "notes": "Some **bold** text\\n\\n- item" }',
+  },
+  items: [
+    {
+      name: 'markdown',
+      label: 'Markdown',
+      icon: 'article',
+      schema: {
+        type: 'string',
+        format: 'markdown',
+      },
+      uischema: {
+        type: 'Control',
+      },
+    },
+  ],
+} satisfies RendererApi

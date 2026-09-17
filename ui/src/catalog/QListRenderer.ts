@@ -1,0 +1,69 @@
+import type { RendererApi } from './types'
+
+export default {
+  name: 'QListRenderer',
+  kind: 'control',
+  inherits: 'control',
+  triggers: [
+    {
+      schema: '{ "type": "array", "items": { "type": "object" } }',
+      rank: 3,
+      desc: 'A list of objects, one control per property of an item by default.',
+    },
+    {
+      schema: '{ "type": "array", "items": { "type": "string" | "number" | "boolean" | { "format": ... } } }',
+      rank: 3,
+      desc: 'A list of primitives (or of formatted objects such as localized strings), the item itself is the control. Enum arrays with `uniqueItems` are a selection instead.',
+    },
+  ],
+  options: {
+    items: {
+      type: 'Object',
+      desc: 'UI schema of one item: `Control` scopes are relative to the item schema (`#/properties/x`, or `#` for the item itself). By default a `VerticalLayout` with one control per property, or the item control with `label: false`.',
+    },
+    addLabel: {
+      type: 'String',
+      desc: 'Label of the add button, translated with `t()`; defaults to the `add-item` i18n key.',
+    },
+    addIcon: {
+      type: 'String',
+      default: 'add',
+      desc: 'Icon of the add button.',
+    },
+    ordering: {
+      type: 'Boolean',
+      default: 'true',
+      desc: 'Show the move up / move down buttons.',
+    },
+    confirmation: {
+      type: 'Boolean',
+      default: 'false',
+      desc: 'Ask for confirmation before removing an item (`confirm-remove-item`, `cancel` and `remove` i18n keys).',
+    },
+    '…': {
+      type: 'any',
+      desc: 'Every other option is passed as a prop to the [QList](https://quasar.dev/vue-components/list-and-list-items#qlist-api): `bordered`, `separator`, `dense`, `padding`...',
+    },
+  },
+  data: {
+    desc: 'An array. A new item gets the default value of the item schema. `minItems` / `maxItems` from the schema (or the filtrex `min` / `max` rules) disable the remove / add buttons; AJV also validates them. Read-only, the buttons are hidden. A hidden list (`rules.visible`) is emptied.',
+    example: '{ "comments": [{ "date": "2024-01-01", "message": "Hello" }], "tags": ["a", "b"] }',
+  },
+  items: [
+    {
+      name: 'list',
+      label: 'List',
+      icon: 'list',
+      schema: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {},
+        },
+      },
+      uischema: {
+        type: 'Control',
+      },
+    },
+  ],
+} satisfies RendererApi

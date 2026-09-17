@@ -3,6 +3,16 @@
     <q-card-section v-if="title" class="row items-center q-py-sm doc-card-header">
       <div class="text-subtitle2">{{ title }}</div>
       <q-space />
+      <q-btn-toggle
+        v-if="formLocales.length"
+        v-model="locale"
+        :options="formLocales"
+        dense
+        flat
+        toggle-color="primary"
+        size="sm"
+        class="q-mr-sm"
+      />
       <q-btn flat dense round size="sm" :icon="showSource ? 'code_off' : 'code'" @click="showSource = !showSource">
         <q-tooltip>{{ showSource ? t('form') : t('schema') }}</q-tooltip>
       </q-btn>
@@ -18,6 +28,8 @@
         :readonly="readonly"
         :validation-mode="example.validationMode"
         :languages="example.languages"
+        :translations="example.translations"
+        :locale="locale"
         :config="example.config"
         :renderers="example.renderers"
         @update:model-value="onDataUpdate"
@@ -92,6 +104,9 @@ const data = ref<Record<string, unknown>>(structuredClone(example.value?.data ??
 const errors = ref<any[]>([])
 const showSource = ref(props.source ?? false)
 const readonly = ref(example.value?.readonly ?? false)
+// the languages of the embedded translations, switched with the header toggle
+const formLocales = computed(() => Object.keys(example.value?.translations ?? {}).map((code) => ({ label: code.toUpperCase(), value: code })))
+const locale = ref<string | undefined>(example.value?.locale)
 const editing = ref(false)
 const tab = ref('schema')
 

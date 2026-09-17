@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import type { ErrorObject } from 'ajv'
-import { createTranslator, errorTranslator } from '../src/utils/i18n'
+import { createTranslator, errorTranslator, interpolate, lookupTranslation } from '../src/utils/i18n'
 import type { TranslationSource } from '../src/utils/i18n'
 
 function source(messages: Record<string, Record<string, string>>, locale = 'en', fallbackLocale?: string): TranslationSource {
@@ -66,5 +66,37 @@ describe('errorTranslator', () => {
   it('honours a control specific message through the i18n prefix', () => {
     const t2 = createTranslator(source({ en: { 'name.error.required': 'Please name it' } }))
     expect(errorTranslator(ajvError('required', { missingProperty: 'name' }), t2)).toBe('Please name it')
+  })
+})
+
+describe('lookupTranslation', () => {
+  const translations = {
+    en: { 'name.title': 'Name', color: { title: 'Color' }, count: 3 },
+    fr: { 'name.title': 'Nom' },
+  }
+
+  it('finds flat and nested keys', () => {
+    expect(lookupTranslation(translations, 'en', 'name.title')).toBe('Name')
+    expect(lookupTranslation(translations, 'en', 'color.title')).toBe('Color')
+    expect(lookupTranslation(translations, 'en', 'color')).toBeUndefined()
+    expect(lookupTranslation(translations, 'en', 'count')).toBeUndefined()
+    expect(lookupTranslation(translations, 'en', 'missing')).toBeUndefined()
+  })
+
+  it('falls back from a regional locale to its language', () => {
+    expect(lookupTranslation(translations, 'fr-CA', 'name.title')).toBe('Nom')
+    expect(lookupTranslation(translations, 'de', 'name.title')).toBeUndefined()
+  })
+
+  it('tolerates missing inputs', () => {
+    expect(lookupTranslation(undefined, 'en', 'name.title')).toBeUndefined()
+    expect(lookupTranslation(translations, undefined, 'name.title')).toBeUndefined()
+    expect(lookupTranslation(translations, 'en', '')).toBeUndefined()
+  })
+})
+
+describe('interpolate', () => {
+  it('replaces the named placeholders and keeps the unknown ones', () => {
+    expect(interpolate('At least {limit} of {what}', { limit: 3 })).toBe('At least 3 of {what}')
   })
 })
