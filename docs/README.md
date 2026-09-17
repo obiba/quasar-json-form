@@ -7,11 +7,10 @@ Quasar SPA published on GitHub Pages at https://www.obiba.org/quasar-json-form/ 
 ```bash
 npm run dev      # http://localhost:9000
 npm run build    # dist/spa, served under DOCS_PUBLIC_PATH (default `/`)
-npm test         # API documentation consistency (test/api.test.ts)
 ```
 
 - `src/pages/**/*.md`: one page per entry of `src/menu.ts` (the route is the file path).
 - `src/examples/<group>/<name>.ts`: live examples, `export default { schema, uischema, data?, config?, languages? }`,
   displayed with `<DocExample name="group/name" title="..." />`.
-- `src/api/<Name>.json`: attributes of a renderer (triggers, options, validation, data), displayed with
-  `<DocApi name="Name" />`. `_control.json` holds the options common to every control.
+- `<DocApi name="Name" />`: attributes of a renderer (triggers, options, validation, data), read from
+  the library catalog (`../ui/src/catalog`, checked by `ui/test/catalog.test.ts`).

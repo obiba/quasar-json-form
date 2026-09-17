@@ -1,0 +1,43 @@
+import type { RendererApi } from './types'
+
+export default {
+  name: 'QTimeRenderer',
+  kind: 'control',
+  inherits: 'control',
+  triggers: [
+    {
+      schema: '{ "type": "string", "format": "time" }',
+      rank: 4,
+      desc: '`HH:mm` input with a time picker (24h); validated by AJV as the picker stores it (seconds and timezone optional).',
+    },
+    {
+      schema: 'format: "fulltime" (schema or options)',
+      rank: 4,
+      desc: '`HH:mm:ss`, the picker shows the seconds.',
+    },
+  ],
+  options: {
+    '…': {
+      type: 'any',
+      desc: 'Every option is passed as a prop to [QInput](https://quasar.dev/vue-components/input#qinput-api).',
+    },
+  },
+  data: {
+    desc: 'A string, `HH:mm` or `HH:mm:ss`. Read-only, the picker icon is hidden.',
+    example: '{ "start": "09:30", "precise": "09:30:15" }',
+  },
+  items: [
+    {
+      name: 'time',
+      label: 'Time',
+      icon: 'schedule',
+      schema: {
+        type: 'string',
+        format: 'time',
+      },
+      uischema: {
+        type: 'Control',
+      },
+    },
+  ],
+} satisfies RendererApi

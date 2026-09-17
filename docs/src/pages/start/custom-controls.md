@@ -80,3 +80,18 @@ useReportedErrors(() => control.value.path, 'contrast', messages)
 
 Read-only rendering is the responsibility of the control: check `isReadonly` and render the
 value (or the Quasar component with `readonly`) instead of an editable input.
+
+## Catalog
+
+The library describes its renderers in a catalog, `@obiba/quasar-ui-json-form/catalog`: the
+shapes that trigger each one, its element keys, options and validation checks (the API tables of
+this site), and the items it contributes to the palette of the form builder, with the schema and
+UI schema fragments a new element starts from. A custom control can be described the same way,
+as a `RendererApi` object, to appear in the builder palette.
+
+```js
+import { catalog, catalogItems, rendererOptions } from '@obiba/quasar-ui-json-form/catalog'
+
+rendererOptions(catalog.QStringRenderer)  // `rows`, `placeholder`... plus the common `class`, `readonly`...
+catalogItems.map((item) => item.name)     // 'text', 'textarea', 'email', ..., 'tabs', 'stepper'
+```

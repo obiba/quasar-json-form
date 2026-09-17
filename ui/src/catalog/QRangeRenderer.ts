@@ -1,0 +1,50 @@
+import type { RendererApi } from './types'
+
+export default {
+  name: 'QRangeRenderer',
+  kind: 'control',
+  inherits: 'control',
+  triggers: [
+    {
+      schema: '{ "type": "object" } + format: "range"',
+      rank: 6,
+      desc: 'An object property with the `range` format, in the schema or in `options.format`.',
+    },
+  ],
+  options: {
+    '…': {
+      type: 'any',
+      desc: 'Every option is passed as a prop to [QRange](https://quasar.dev/vue-components/range#qrange-api): `min`, `max`, `step`, `minRange`, `maxRange`, `dragRange`, `dragOnlyRange`, `label`, `labelAlways`, `markers`, `markerLabels`, `snap`, `color`, `dense`...',
+    },
+  },
+  data: {
+    desc: 'An object `{ min, max }` of two numbers (the QRange model), `undefined` when neither end is set. The `min` and `max` sub-properties are validated by AJV like any number.',
+    example: '{ "ages": { "min": 20, "max": 60 } }',
+  },
+  items: [
+    {
+      name: 'range',
+      label: 'Range',
+      icon: 'straighten',
+      schema: {
+        type: 'object',
+        format: 'range',
+        properties: {
+          min: {
+            type: 'number',
+          },
+          max: {
+            type: 'number',
+          },
+        },
+      },
+      uischema: {
+        type: 'Control',
+        options: {
+          min: 0,
+          max: 100,
+        },
+      },
+    },
+  ],
+} satisfies RendererApi

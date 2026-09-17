@@ -1,0 +1,37 @@
+import type { RendererApi } from './types'
+
+export default {
+  name: 'QToggleRenderer',
+  kind: 'control',
+  inherits: 'control',
+  triggers: [
+    {
+      schema: '{ "type": "boolean" }',
+      rank: 3,
+      desc: 'Any boolean property.',
+    },
+  ],
+  options: {
+    '…': {
+      type: 'any',
+      desc: 'Every other option is passed as a prop to [QToggle](https://quasar.dev/vue-components/toggle#qtoggle-api): `color`, `icon`, `checkedIcon`, `uncheckedIcon`, `size`, `leftLabel`, `keepColor`, `dense`...',
+    },
+  },
+  data: {
+    desc: '`true` or `false`. Read-only, the toggle is displayed but ignores clicks.',
+    example: '{ "subscribed": true }',
+  },
+  items: [
+    {
+      name: 'toggle',
+      label: 'Toggle',
+      icon: 'toggle_on',
+      schema: {
+        type: 'boolean',
+      },
+      uischema: {
+        type: 'Control',
+      },
+    },
+  ],
+} satisfies RendererApi

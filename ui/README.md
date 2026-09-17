@@ -346,6 +346,25 @@ or an empty string. Ordering comparisons with a boolean or null literal are reje
 The 13 default Mica forms are converted as acceptance fixtures (`test/fixtures/asf`, snapshots in
 `__snapshots__`), and the `ui/dev` page "test-asf-converter" renders any pasted pair.
 
+# Renderer catalog
+
+`@obiba/quasar-ui-json-form/catalog` describes every built-in renderer and the form component:
+the schema shapes that trigger it, the element keys, options and validation checks it understands,
+the data it writes, and the items it contributes to the form builder palette (name, label, icon,
+and the schema and UI schema fragments a new element starts from). It is the source of the API
+documentation of the site and of the form builder.
+
+```js
+import { catalog, catalogItems, controlApi, rendererOptions } from '@obiba/quasar-ui-json-form/catalog'
+
+catalog.QStringRenderer.options.rows.desc    // 'Number of rows; when greater than 1 the input is a `textarea`.'
+rendererOptions(catalog.QStringRenderer)    // its options, with the ones common to every control
+catalogItems.find((item) => item.name === 'textarea')  // { renderer: 'QStringRenderer', schema, uischema, ... }
+```
+
+`ui/test/catalog.test.ts` checks that every renderer registered by the plugin is described, and
+that every `options.<name>` read by a renderer is documented.
+
 # Setup
 ```bash
 $ npm install

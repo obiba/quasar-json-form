@@ -70,30 +70,18 @@
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { renderMarkdownInline } from 'ui'
+import { catalog, controlApi } from 'ui/catalog'
+import type { ApiEntry as CatalogEntry, RendererApi } from 'ui/catalog'
 import DocCode from './DocCode.vue'
 
-interface ApiEntry { name: string; type?: string; default?: string; message?: string; desc: string }
-interface ApiDef {
-  name: string
-  /** `control`: the options of `_control.json` apply too */
-  inherits?: string
-  triggers?: { schema: string; rank: number; desc: string }[]
-  props?: Record<string, Omit<ApiEntry, 'name'>>
-  /** properties read on the UI schema element itself (next to `type`, `scope`, `options`) */
-  element?: Record<string, Omit<ApiEntry, 'name'>>
-  events?: Record<string, Omit<ApiEntry, 'name'>>
-  options?: Record<string, Omit<ApiEntry, 'name'>>
-  validation?: Record<string, Omit<ApiEntry, 'name'>>
-  data?: { desc: string; example?: string }
-}
+interface ApiEntry extends CatalogEntry { name: string }
 
 const props = defineProps<{ name: string }>()
 const { t } = useI18n()
 
-const modules = import.meta.glob<{ default: ApiDef }>('../api/*.json', { eager: true })
-const api = computed<ApiDef | undefined>(() => modules[`../api/${props.name}.json`]?.default)
-const common = computed<ApiDef | undefined>(() =>
-  api.value?.inherits ? modules[`../api/_${api.value.inherits}.json`]?.default : undefined)
+// the renderer descriptions come from the library catalog
+const api = computed<RendererApi | undefined>(() => catalog[props.name])
+const common = computed(() => (api.value?.inherits === 'control' ? controlApi : undefined))
 
 const filter = ref('')
 
@@ -104,7 +92,7 @@ function toEntries (map?: Record<string, Omit<ApiEntry, 'name'>>): ApiEntry[] {
 function entries (group: string): ApiEntry[] {
   if (group === 'common') return toEntries(common.value?.options)
   if (group === 'element') return [...toEntries(api.value?.element), ...toEntries(common.value?.element)]
-  return toEntries((api.value as unknown as Record<string, Record<string, Omit<ApiEntry, 'name'>>>)[group])
+  return toEntries((api.value as unknown as Record<string, Record<string, CatalogEntry>>)[group])
 }
 
 function filtered<T extends object> (list: T[] | undefined): T[] {

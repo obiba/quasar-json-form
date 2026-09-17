@@ -120,6 +120,34 @@ const builds = [
   {
     rollup: {
       input: {
+        input: pathResolve('../src/catalog/index.ts')
+      },
+      output: {
+        file: pathResolve('../dist/catalog.esm.js'),
+        format: 'es'
+      }
+    },
+    build: {
+      minified: true
+    }
+  },
+  {
+    rollup: {
+      input: {
+        input: pathResolve('../src/catalog/index.ts')
+      },
+      output: {
+        file: pathResolve('../dist/catalog.common.js'),
+        format: 'cjs'
+      }
+    },
+    build: {
+      minified: true
+    }
+  },
+  {
+    rollup: {
+      input: {
         input: pathResolve('../src/index.umd.ts')
       },
       output: {
