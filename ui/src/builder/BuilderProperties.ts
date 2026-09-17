@@ -7,7 +7,7 @@
  */
 import { h, defineComponent, computed, ref, watch } from 'vue'
 import type { PropType, VNode } from 'vue'
-import { QInput, QToggle, QBtn, QIcon, QBanner, QChip, QExpansionItem, QSeparator } from 'quasar'
+import { QInput, QToggle, QBtn, QIcon, QBanner, QChip, QCard, QCardSection, QSeparator } from 'quasar'
 import { useFormI18n, QJsonForm } from '../vue-plugin'
 import type { FormModel, FormNode, JsonObject } from './model'
 import { locate, propertySchema, isRequired, setRequired, containerOf, isValidKey } from './model'
@@ -73,8 +73,24 @@ export default defineComponent({
 
     // --- helpers
 
-    const section = (title: string, content: VNode[], open = true): VNode =>
-      h(QExpansionItem, { label: title, defaultOpened: open, dense: true, headerClass: 'text-weight-medium', class: 'q-builder-section' }, () => h('div', { class: 'q-px-md q-pb-md' }, content))
+    /** a card per section, every input visible */
+    const section = (title: string, content: (VNode | null)[]): VNode =>
+      h(QCard, { flat: true, bordered: true, class: 'q-builder-section q-mb-md' }, () => [
+        h(QCardSection, { class: 'q-py-xs text-weight-medium' }, () => title),
+        h(QSeparator),
+        h(QCardSection, () => content),
+      ])
+
+    /** inputs on two columns */
+    const columns = (inputs: (VNode | null)[]): VNode =>
+      h('div', { class: 'row q-col-gutter-sm' }, inputs.filter((v) => v !== null).map((input) => h('div', { class: 'col-12 col-sm-6' }, [input])))
+
+    /** the UI schema of a settings form: its controls on two columns */
+    const columnsUischema = (schema: JsonObject): JsonObject => ({
+      type: 'VerticalLayout',
+      options: { class: 'row q-col-gutter-sm' },
+      elements: Object.keys(schema.properties).map((key) => ({ type: 'Control', scope: `#/properties/${key}`, options: { class: 'col-12 col-sm-6', dense: true, outlined: true } })),
+    })
 
     const textInput = (slot: TextSlot, label: string, multiline = false): VNode => {
       const n = node.value!
@@ -85,7 +101,6 @@ export default defineComponent({
         outlined: true,
         autogrow: multiline,
         type: multiline ? 'textarea' : 'text',
-        class: 'q-mb-sm',
         hint: `${keyPrefix(props.model, n)}.${slot.name}`,
         hideHint: true,
         'onUpdate:modelValue': (value: string | number | null) => {
@@ -104,7 +119,7 @@ export default defineComponent({
     watch(() => (schema.value ? pretty(schema.value) : ''), (next) => { rawSchema.text.value = next; rawSchema.error.value = '' }, { immediate: true })
 
     const jsonInput = (label: string, { text, error }: { text: { value: string }; error: { value: string } }, apply: (parsed: any) => void): VNode => {
-      return h('div', { class: 'q-mb-md' }, [
+      return h('div', {}, [
         h(QInput, { modelValue: text.value, label, dense: true, outlined: true, type: 'textarea', autogrow: true, inputClass: 'q-builder-code', error: !!error.value, errorMessage: error.value, 'onUpdate:modelValue': (v: string | number | null) => { text.value = String(v ?? '') } }),
         h(QBtn, {
           label: tr('apply'), size: 'sm', color: 'primary', unelevated: true, class: 'q-mt-xs',
@@ -163,7 +178,7 @@ export default defineComponent({
       const n = node.value!
       const slots = textSlots(props.model, n).filter((slot) => !slot.name.startsWith('options.') && !slot.name.startsWith('validation.'))
       if (slots.length === 0) return null
-      return section(tr('texts'), slots.map((slot) => textInput(slot, slot.name.startsWith('labels.') ? `${tr('label')} ${Number(slot.name.slice(7)) + 1}` : slot.name, slot.name === 'description' || slot.name === 'text' || slot.name === 'hint')))
+      return section(tr('texts'), [columns(slots.map((slot) => textInput(slot, slot.name.startsWith('labels.') ? `${tr('label')} ${Number(slot.name.slice(7)) + 1}` : slot.name, slot.name === 'description' || slot.name === 'text' || slot.name === 'hint')))])
     }
 
     const renderChoices = (): VNode | null => {
@@ -237,6 +252,7 @@ export default defineComponent({
         content.push(h(QJsonForm, {
           modelValue: isObject(n.element.options) ? n.element.options : {},
           schema: settings,
+          uischema: columnsUischema(settings),
           validationMode: 'NoValidation',
           'onUpdate:modelValue': (value: JsonObject) => {
             const options = Object.fromEntries(Object.entries(value ?? {}).filter(([, v]) => v !== undefined && v !== null && v !== ''))
@@ -254,7 +270,7 @@ export default defineComponent({
           ...Object.keys(others).map((name) => h(QChip, { dense: true, size: 'sm', label: name })),
         ]))
       }
-      return section(tr('options'), content, false)
+      return section(tr('options'), content)
     }
 
     const renderKeywords = (): VNode | null => {
@@ -267,6 +283,7 @@ export default defineComponent({
         h(QJsonForm, {
           modelValue: current,
           schema: keywords,
+          uischema: columnsUischema(keywords),
           validationMode: 'NoValidation',
           'onUpdate:modelValue': (value: JsonObject) => {
             const target = propertySchema(props.model, n.id)
@@ -284,7 +301,7 @@ export default defineComponent({
             if (touched) changed()
           },
         }),
-      ], false)
+      ])
     }
 
     const ruleInput = (n: FormNode, name: string, label: string): VNode => {
@@ -292,7 +309,7 @@ export default defineComponent({
       const value = typeof rules[name] === 'string' ? rules[name] : ''
       const error = expressionError(value)
       return h(QInput, {
-        modelValue: value, label, dense: true, outlined: true, class: 'q-mb-sm', inputClass: 'q-builder-code',
+        modelValue: value, label, dense: true, outlined: true, inputClass: 'q-builder-code',
         error: !!error, errorMessage: error ? `${tr('invalidExpression')}: ${error}` : undefined,
         'onUpdate:modelValue': (v: string | number | null) => {
           const text = String(v ?? '')
@@ -314,17 +331,19 @@ export default defineComponent({
       if (names.length > 0) {
         content.push(h('div', { class: 'text-caption text-grey-7 q-mb-sm' }, [tr('fields'), ': ', ...names.map((name) => h(QChip, { dense: true, size: 'sm', label: name }))]))
       }
-      content.push(ruleInput(n, 'visible', tr('visible')))
-      if (n.kind === 'control') content.push(ruleInput(n, 'enabled', tr('enabled')))
       const format = schema.value?.format ?? (isObject(n.element.options) ? n.element.options.format : undefined)
-      if (format === 'computed') content.push(ruleInput(n, 'compute', tr('compute')))
+      content.push(columns([
+        ruleInput(n, 'visible', tr('visible')),
+        n.kind === 'control' ? ruleInput(n, 'enabled', tr('enabled')) : null,
+        format === 'computed' ? ruleInput(n, 'compute', tr('compute')) : null,
+      ]))
       if (n.kind === 'control') {
         const validation: JsonObject[] = Array.isArray(rules.validation) ? rules.validation : []
         validation.forEach((rule, index) => {
           const expr = typeof rule.expr === 'string' ? rule.expr : typeof rule.expression === 'string' ? rule.expression : ''
           const error = expressionError(expr)
           const slot = textSlots(props.model, n).find((s) => s.name === `validation.${index}`)
-          content.push(h('div', { class: 'row q-col-gutter-xs items-start no-wrap q-mb-xs', key: index }, [
+          content.push(h('div', { class: 'row q-col-gutter-xs items-start no-wrap q-mt-sm', key: index }, [
             h('div', { class: 'col-5' }, [h(QInput, {
               modelValue: expr, label: tr('expression'), dense: true, outlined: true, inputClass: 'q-builder-code',
               error: !!error, errorMessage: error ? `${tr('invalidExpression')}: ${error}` : undefined,
@@ -345,27 +364,27 @@ export default defineComponent({
           },
         }))
       }
-      return section(tr('rules'), content, false)
+      return section(tr('rules'), content)
     }
 
     const renderRaw = (): VNode => {
       const n = node.value!
-      const content: VNode[] = [
+      const content: (VNode | null)[] = [
         jsonInput(tr('rawElement'), rawElement, (parsed) => {
           delete parsed.elements
           delete parsed.scope
           n.element = parsed
         }),
+        n.kind === 'control' && schema.value
+          ? jsonInput(tr('rawSchema'), rawSchema, (parsed) => {
+            const target = propertySchema(props.model, n.id)
+            if (!target) return
+            for (const key of Object.keys(target)) delete target[key]
+            Object.assign(target, parsed)
+          })
+          : null,
       ]
-      if (n.kind === 'control' && schema.value) {
-        content.push(jsonInput(tr('rawSchema'), rawSchema, (parsed) => {
-          const target = propertySchema(props.model, n.id)
-          if (!target) return
-          for (const key of Object.keys(target)) delete target[key]
-          Object.assign(target, parsed)
-        }))
-      }
-      return section(tr('raw'), content, false)
+      return section(tr('raw'), [columns(content)])
     }
 
     return () => {
