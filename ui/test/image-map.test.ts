@@ -71,6 +71,10 @@ describe('parseArea', () => {
     expect(parseArea({ shape: 'rect' })).toBeUndefined()
     expect(parseArea({ shape: 'rect', coords: [1, 2, 3] })).toBeUndefined()
     expect(parseArea({ shape: 'rect', coords: '1, 2, 3, x' })).toBeUndefined()
+    expect(parseArea({ shape: 'rect', coords: [1, 2, 3, null] })).toBeUndefined()
+    expect(parseArea({ shape: 'rect', coords: [1, 2, 3, true] })).toBeUndefined()
+    expect(parseArea({ shape: 'rect', coords: [1, 2, 3, ''] })).toBeUndefined()
+    expect(parseArea({ shape: 'rect', coords: [1, 2, 3, {}] })).toBeUndefined()
     expect(parseArea({ shape: 'circle', coords: [1, 2] })).toBeUndefined()
     expect(parseArea({ shape: 'circle', coords: [1, 2, -3] })).toBeUndefined()
     expect(parseArea({ shape: 'poly', coords: [1, 2, 3, 4] })).toBeUndefined()
@@ -135,6 +139,17 @@ describe('image map renderer', () => {
     expect(areas(wrapper).length).toBe(3)
     expect(areas(wrapper)[2]!.element.tagName).toBe('circle')
     expect(areas(wrapper)[2]!.attributes()).toMatchObject({ cx: '520', cy: '330', r: '40' })
+    wrapper.unmount()
+  })
+
+  it('leaves a value named like an inherited property without area', async () => {
+    const wrapper = mountForm({
+      schema: { type: 'object', properties: { side: { type: 'string', oneOf: [{ const: 'toString', title: 'Text' }, { const: 'constructor', title: 'Builder' }, { const: 'left', title: 'Left' }] } } },
+      uischema: uischema(control('side', { areas: { left: sides.left } })),
+      modelValue: {},
+    })
+    await flush()
+    expect(areas(wrapper).map((shape: any) => shape.attributes('aria-label'))).toEqual(['Left'])
     wrapper.unmount()
   })
 
@@ -262,8 +277,10 @@ describe('image map renderer', () => {
     expect(selects[0]!.props('dense')).toBe(true)
     expect(selects[0]!.props('modelValue')).toBeUndefined()
     // the renderer options are not forwarded to the select
-    expect(selects[0]!.attributes('image')).toBeUndefined()
-    expect(selects[0]!.attributes('format')).toBeUndefined()
+    expect(selects[0]!.vm.$attrs).not.toHaveProperty('image')
+    expect(selects[0]!.vm.$attrs).not.toHaveProperty('format')
+    expect(selects[0]!.vm.$attrs).not.toHaveProperty('select')
+    expect(selects[0]!.vm.$attrs).not.toHaveProperty('maxWidth')
     // an area click updates the select
     await areas(wrapper)[0]!.trigger('click')
     await flush()
@@ -279,11 +296,11 @@ describe('image map renderer', () => {
     await flush()
     expect(lastData(wrapper).room).toBe('garage')
     expect(areas(wrapper).slice(0, 3).some((shape: any) => shape.classes().includes('q-image-map__area--selected'))).toBe(false)
-    // a cleared optional select is no value; a multiple select keeps the array
+    // the select emits the click order, the data follows the entry order
     expect(selects[1]!.props('clearable')).toBe(true)
     wrapper.findAllComponents(QSelect)[1]!.vm.$emit('update:modelValue', ['pool', 'kitchen'])
     await flush()
-    expect(lastData(wrapper).rooms).toEqual(['pool', 'kitchen'])
+    expect(lastData(wrapper).rooms).toEqual(['kitchen', 'pool'])
     expect(areas(wrapper)[3]!.classes()).toContain('q-image-map__area--selected')
     expect(areas(wrapper)[5]!.classes()).toContain('q-image-map__area--selected')
     wrapper.findAllComponents(QSelect)[1]!.vm.$emit('update:modelValue', null)

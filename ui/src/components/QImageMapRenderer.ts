@@ -5,7 +5,7 @@ import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
 import { QIcon, QSelect } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
 import { useFormI18n } from '../composables/useFormI18n'
-import { omitOptions } from '../utils/options'
+import { omitOptions, RENDERER_OPTION_KEYS } from '../utils/options'
 import { isSupportedImage } from './QImagesRenderer'
 
 /** A clickable area of the image, in the pixels of the image */
@@ -49,7 +49,9 @@ export function parseArea(input: unknown): ImageArea | undefined {
   const kind = typeof shape === 'string' ? SHAPES[shape.trim().toLowerCase()] : undefined
   if (!kind) return undefined
   let values: number[]
-  if (Array.isArray(coords)) values = coords.map((value) => Number(value))
+  const toNumber = (value: unknown): number =>
+    typeof value === 'number' || (typeof value === 'string' && value.trim().length > 0) ? Number(value) : NaN
+  if (Array.isArray(coords)) values = coords.map(toNumber)
   else if (typeof coords === 'string') values = coords.split(/[\s,]+/).filter((part) => part.length > 0).map((part) => Number(part))
   else return undefined
   if (values.some((value) => !isFinite(value))) return undefined
@@ -126,7 +128,8 @@ export default defineComponent({
     /** `options.areas` entries, keyed by the string form of the value */
     const areaEntries = computed<Record<string, ImageArea>>(() => {
       const map = options.value.areas
-      const entries: Record<string, ImageArea> = {}
+      // no prototype: a value such as `toString` must not resolve to an inherited property
+      const entries: Record<string, ImageArea> = Object.create(null)
       if (!map || typeof map !== 'object' || Array.isArray(map)) return entries
       Object.keys(map).forEach((key) => {
         const area = parseArea(map[key])
@@ -158,15 +161,16 @@ export default defineComponent({
 
     const isFull = computed(() => isMultiple.value && maxItems.value !== undefined && selection.value.length >= maxItems.value)
 
-    const onChange = (value: any) => {
-      // a cleared selection means "no value", so that `required` applies
-      controlResult.handleChange(control.value.path, value === null ? undefined : value)
-    }
-
     /** the values in the order of the options */
     const normalize = (values: any[]): any[] => {
       const set = new Set(values)
       return selectOptions.value.map((option) => option.value).filter((value) => set.has(value))
+    }
+
+    const onChange = (value: any) => {
+      // a cleared selection means "no value", so that `required` applies; an
+      // array (the select emits the click order) follows the option order
+      controlResult.handleChange(control.value.path, value === null ? undefined : (Array.isArray(value) ? normalize(value) : value))
     }
 
     const toggle = (region: ImageRegion) => {
@@ -179,7 +183,7 @@ export default defineComponent({
       if (isSelected(region.value)) {
         onChange(selection.value.filter((value) => value !== region.value))
       } else if (!isFull.value) {
-        onChange(normalize([...selection.value, region.value]))
+        onChange([...selection.value, region.value])
       }
     }
 
@@ -307,7 +311,7 @@ export default defineComponent({
 
     const renderSelect = (): VNode =>
       h(QSelect, {
-        ...omitOptions(options.value, ['class']),
+        ...omitOptions(options.value, [...RENDERER_OPTION_KEYS, 'class']),
         class: 'q-image-map__select',
         modelValue: control.value.data,
         'onUpdate:modelValue': onChange,
