@@ -18,6 +18,7 @@ const pages = [
   { path: 'test-asf-converter', file: 'TestAsfConverter' },
   { path: 'test-images', file: 'TestImages' },
   { path: 'test-image-map', file: 'TestImageMap' },
+  { path: 'test-geo', file: 'TestGeo' },
 ]
 
 const children = pages.map(page => ({

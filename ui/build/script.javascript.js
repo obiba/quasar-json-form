@@ -58,8 +58,12 @@ const builds = [
       input: {
         input: pathResolve('../src/index.esm.ts')
       },
+      // the map adapter (OpenLayers) is a dynamic import of the geo renderer:
+      // a directory output keeps it in its own chunk, loaded on demand
       output: {
-        file: pathResolve('../dist/index.esm.js'),
+        dir: pathResolve('../dist'),
+        entryFileNames: 'index.esm.js',
+        chunkFileNames: '[name].esm.js',
         format: 'es'
       }
     },
@@ -74,7 +78,9 @@ const builds = [
         input: pathResolve('../src/index.common.ts')
       },
       output: {
-        file: pathResolve('../dist/index.common.js'),
+        dir: pathResolve('../dist'),
+        entryFileNames: 'index.common.js',
+        chunkFileNames: '[name].common.js',
         format: 'cjs'
       }
     },
@@ -119,7 +125,9 @@ const builds = [
       output: {
         name: 'qJsonForm',
         file: pathResolve('../dist/index.umd.js'),
-        format: 'umd'
+        format: 'umd',
+        // no code splitting in a UMD bundle
+        inlineDynamicImports: true
       }
     },
     build: {
@@ -186,7 +194,9 @@ function build (builds) {
 function genConfig (opts) {
   Object.assign(opts.rollup.input, {
     plugins: rollupPlugins,
-    external: [ 'vue', 'quasar' ]
+    external: [ 'vue', 'quasar' ],
+    // the entry chunk may export what the map chunk shares with it (no facade)
+    preserveEntrySignatures: 'allow-extension'
   })
 
   Object.assign(opts.rollup.output, {
@@ -206,15 +216,34 @@ function buildEntry (config) {
   return rollup
     .rollup(config.rollup.input)
     .then(bundle => bundle.generate(config.rollup.output))
-    .then(({ output }) => {
-      const code = config.rollup.output.format === 'umd'
-        ? injectVueRequirement(output[0].code)
-        : output[0].code
-
-      return config.build.unminified
-        ? buildUtils.writeFile(config.rollup.output.file, code)
-        : code
+    .then(({ output }) => Promise.all(
+      output
+        .filter(chunk => chunk.type === 'chunk')
+        .map(chunk => buildChunk(config, chunk))
+    ))
+    .catch(err => {
+      console.error(err)
+      process.exit(1)
     })
+}
+
+// the file of a chunk: the `file` of a single-file output, else the chunk
+// name in the output `dir`
+function chunkFile (config, chunk) {
+  return config.rollup.output.file || path.join(config.rollup.output.dir, chunk.fileName)
+}
+
+function buildChunk (config, chunk) {
+  const file = chunkFile(config, chunk)
+  const code = config.rollup.output.format === 'umd'
+    ? injectVueRequirement(chunk.code)
+    : chunk.code
+
+  return Promise.resolve(
+    config.build.unminified
+      ? buildUtils.writeFile(file, code)
+      : code
+  )
     .then(code => {
       if (!config.build.minified) {
         return code
@@ -232,15 +261,11 @@ function buildEntry (config) {
 
       return buildUtils.writeFile(
         config.build.minExt === true
-          ? addExtension(config.rollup.output.file)
-          : config.rollup.output.file,
+          ? addExtension(file)
+          : file,
         buildConf.banner + minified.code,
         true
       )
-    })
-    .catch(err => {
-      console.error(err)
-      process.exit(1)
     })
 }
 

@@ -188,3 +188,50 @@
   background: $grey-9
 .q-image-map__select
   margin-top: 8px
+
+.q-geo
+  position: relative
+  &.disabled
+    opacity: 0.6
+    .q-geo__map
+      pointer-events: none
+.q-geo__toolbar
+  margin-bottom: 4px
+  min-height: 28px
+.q-geo__map
+  position: relative
+  width: 100%
+  background: $grey-3
+  border-radius: 4px
+  overflow: hidden
+  color: $grey-8
+  canvas
+    display: block
+// the tiles in a scale of greys, the geometry keeps its color (own layer element)
+.q-geo--grayscale .q-geo__tiles
+  filter: grayscale(1)
+.body--dark .q-geo--grayscale .q-geo__tiles
+  filter: grayscale(1) invert(1) brightness(0.85)
+.body--dark .q-geo__map
+  background: $grey-9
+  color: $grey-4
+.q-geo__placeholder
+  z-index: 1
+  color: $grey-6
+  background: $grey-3
+  line-height: normal
+.body--dark .q-geo__placeholder
+  color: $grey-5
+  background: $grey-9
+.q-geo__attribution
+  color: $grey-7
+  text-align: right
+  line-height: 1.4
+  margin-top: 2px
+  a
+    color: inherit
+.q-geo__inputs
+  margin-top: 8px
+.q-geo__summary
+  color: $grey-7
+  margin-top: 4px

@@ -32,6 +32,8 @@ import QImagesRenderer, { isSupportedImage, ratioPadding, IMAGE_MIME_TYPES } fro
 import type { ImageEntry, ImageTile } from './components/QImagesRenderer'
 import QImageMapRenderer, { parseArea } from './components/QImageMapRenderer'
 import type { ImageArea, ImageMapImage, ImageRegion } from './components/QImageMapRenderer'
+import QGeoRenderer, { parseGeometry, parseGeoKinds, parseGeoTiles, parsePosition, countPositions, GEO_KINDS, GEO_TYPES, GEO_PRECISION, OSM_TILES } from './components/QGeoRenderer'
+import type { GeoGeometry, GeoKind, GeoPosition, GeoTiles, GeoType, GeoMap, GeoMapOptions } from './components/QGeoRenderer'
 import QJsonForm from './components/QJsonForm'
 import { messages } from './i18n/messages'
 import { countryCodes } from './data/countries'
@@ -84,6 +86,7 @@ function install(app: App): void {
   app.component(QTypeaheadRenderer.name!, QTypeaheadRenderer)
   app.component(QImagesRenderer.name!, QImagesRenderer)
   app.component(QImageMapRenderer.name!, QImageMapRenderer)
+  app.component(QGeoRenderer.name!, QGeoRenderer)
   app.component(QJsonForm.name!, QJsonForm)
 }
 
@@ -118,12 +121,22 @@ export {
   QTypeaheadRenderer,
   QImagesRenderer,
   QImageMapRenderer,
+  QGeoRenderer,
   QJsonForm,
   messages,
   isSupportedImage,
   ratioPadding,
   IMAGE_MIME_TYPES,
   parseArea,
+  parseGeometry,
+  parseGeoKinds,
+  parseGeoTiles,
+  parsePosition,
+  countPositions,
+  GEO_KINDS,
+  GEO_TYPES,
+  GEO_PRECISION,
+  OSM_TILES,
   countryCodes,
   createJsonFormsI18n,
   createTranslator,
@@ -172,6 +185,13 @@ export type {
   ImageArea,
   ImageMapImage,
   ImageRegion,
+  GeoGeometry,
+  GeoKind,
+  GeoPosition,
+  GeoTiles,
+  GeoType,
+  GeoMap,
+  GeoMapOptions,
   AsfConvertOptions,
   AsfConvertResult,
   AsfDiagnostic,

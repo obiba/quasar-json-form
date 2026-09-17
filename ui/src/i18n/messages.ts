@@ -77,6 +77,18 @@ const en: FormMessages = {
     moveBefore: 'Move before',
     moveAfter: 'Move after',
   },
+  geo: {
+    point: 'Point',
+    linestring: 'Line',
+    polygon: 'Polygon',
+    locate: 'My position',
+    clear: 'Clear',
+    latitude: 'Latitude',
+    longitude: 'Longitude',
+    points: '{count} points',
+    locateError: 'The current position could not be obtained',
+    loadError: 'The map could not be loaded',
+  },
 }
 
 const fr: FormMessages = {
@@ -139,6 +151,18 @@ const fr: FormMessages = {
   images: {
     moveBefore: 'Déplacer avant',
     moveAfter: 'Déplacer après',
+  },
+  geo: {
+    point: 'Point',
+    linestring: 'Ligne',
+    polygon: 'Polygone',
+    locate: 'Ma position',
+    clear: 'Effacer',
+    latitude: 'Latitude',
+    longitude: 'Longitude',
+    points: '{count} points',
+    locateError: "La position actuelle n'a pas pu être obtenue",
+    loadError: "La carte n'a pas pu être chargée",
   },
 }
 

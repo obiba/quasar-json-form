@@ -26,7 +26,7 @@ export const CUSTOM_FORMATS = [
   'file', 'files', 'obibaFiles',
   'localizedString', 'localizedstring', 'obibaSimpleMde', 'markdown',
   'radioGroupCollection', 'radio-matrix',
-  'countries', 'obibaCountriesUiSelect', 'typeahead', 'images', 'image-map',
+  'countries', 'obibaCountriesUiSelect', 'typeahead', 'images', 'image-map', 'geo', 'geojson',
   'datepicker', 'ymdatepicker', 'year-month', 'fulltime', 'date-fulltime',
   'computed', 'textarea', 'password', 'search', 'tel',
 ]
