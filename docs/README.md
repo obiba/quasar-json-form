@@ -13,4 +13,6 @@ npm run build    # dist/spa, served under DOCS_PUBLIC_PATH (default `/`)
 - `src/examples/<group>/<name>.ts`: live examples, `export default { schema, uischema, data?, config?, languages? }`,
   displayed with `<DocExample name="group/name" title="..." />`.
 - `<DocApi name="Name" />`: attributes of a renderer (triggers, options, validation, data), read from
-  the library catalog (`../ui/src/catalog`, checked by `ui/test/catalog.test.ts`).
+  the library catalog (`../ui/src/catalog`, checked by `ui/test/catalog.test.ts`), or of the form
+  builder (`builderApi` of `../ui/src/builder`).
+- `<DocPlayground />`, `<DocAsfPlayground />`, `<DocBuilder />`: the playgrounds, full width.

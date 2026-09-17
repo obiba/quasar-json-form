@@ -8,6 +8,7 @@
 import QJsonFormBuilder from './QJsonFormBuilder'
 
 export { QJsonFormBuilder }
+export { builderApi } from './api'
 export { builderCatalog, matchItem, nodeIcon, itemKey, optionsSchema, rawOptions, keywordsSchema, choicesOf, expressionError, fieldNames, dropIndex, downloadText } from './items'
 export type { BuilderCatalog } from './items'
 export { recognize } from './BuilderImport'

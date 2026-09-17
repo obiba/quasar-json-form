@@ -72,20 +72,22 @@ import { useI18n } from 'vue-i18n'
 import { renderMarkdownInline } from 'ui'
 import { catalog, controlApi } from 'ui/catalog'
 import type { ApiEntry as CatalogEntry, RendererApi } from 'ui/catalog'
+import { builderApi } from 'ui/builder'
 import DocCode from './DocCode.vue'
 import type { DocExampleDef } from '../examples/types'
 
 interface ApiEntry extends CatalogEntry { name: string }
 
-/** `name`: a renderer of the library catalog; `example`: the `api` of an example (a custom renderer) */
+/** `name`: a renderer of the library catalog or the form builder; `example`: the `api` of an example (a custom renderer) */
 const props = defineProps<{ name?: string; example?: string }>()
 const { t } = useI18n()
 
 const examples = import.meta.glob<{ default: DocExampleDef }>('../examples/**/*.ts', { eager: true })
 
-// the renderer descriptions come from the library catalog, or from the example
+// the descriptions come from the library catalog (plus the builder, described by its own entry), or from the example
+const described: Record<string, RendererApi> = { ...catalog, [builderApi.name]: builderApi }
 const api = computed<RendererApi | undefined>(() =>
-  props.example ? examples[`../examples/${props.example}.ts`]?.default.api : catalog[props.name ?? ''])
+  props.example ? examples[`../examples/${props.example}.ts`]?.default.api : described[props.name ?? ''])
 const common = computed(() => (api.value?.inherits === 'control' ? controlApi : undefined))
 
 const filter = ref('')

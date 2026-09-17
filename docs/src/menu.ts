@@ -77,6 +77,15 @@ const menu: MenuSection[] = [
     ],
   },
   {
+    title: 'Form builder',
+    icon: 'construction',
+    pages: [
+      { title: 'QJsonFormBuilder', path: 'builder/overview' },
+      { title: 'Model', path: 'builder/model' },
+      { title: 'Builder playground', path: 'builder/playground' },
+    ],
+  },
+  {
     title: 'Playground',
     icon: 'science',
     pages: [

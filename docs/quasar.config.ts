@@ -62,6 +62,7 @@ export default defineConfig(() => {
       alias: {
         // before `ui`, which would otherwise match this prefix
         'ui/catalog': path.resolve(__dirname, '../ui/src/catalog/index.ts'),
+        'ui/builder': path.resolve(__dirname, '../ui/src/builder/index.ts'),
         ui: path.resolve(__dirname, '../ui/src/index.esm.ts'),
         // the JSON Forms packages of the library, for the custom renderers of the examples
         '@jsonforms/core': path.resolve(__dirname, '../ui/node_modules/@jsonforms/core'),
