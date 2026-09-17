@@ -1,9 +1,17 @@
 /**
  * Form builder: `@obiba/quasar-ui-json-form/builder`
  *
- * The model of a form under construction (a tree of nodes bound to a JSON
- * schema and to the translations of the form), and its operations.
+ * The `QJsonFormBuilder` component, and the model of a form under
+ * construction (a tree of nodes bound to a JSON schema and to the
+ * translations of the form) with its operations.
  */
+import QJsonFormBuilder from './QJsonFormBuilder'
+
+export { QJsonFormBuilder }
+export { builderCatalog, matchItem, nodeIcon, itemKey, optionsSchema, rawOptions, keywordsSchema, choicesOf, expressionError, fieldNames, downloadText } from './items'
+export type { BuilderCatalog } from './items'
+export { recognize } from './BuilderSource'
+export type { ImportedForm } from './BuilderSource'
 export {
   fromDefinition, toDefinition, fromAsf,
   parseScope, toScope, isValidKey,

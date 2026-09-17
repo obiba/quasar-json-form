@@ -57,6 +57,16 @@ export default {
   },
   items: [
     {
+      name: 'category',
+      label: 'Tab',
+      icon: 'tab_unselected',
+      uischema: {
+        type: 'Category',
+        label: '',
+        elements: [],
+      },
+    },
+    {
       name: 'group',
       label: 'Group',
       icon: 'folder',

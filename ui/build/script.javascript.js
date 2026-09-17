@@ -52,6 +52,27 @@ const rollupPlugins = [
     // Skip buble - TypeScript plugin handles transpilation to ES2020
 ]
 
+// The builder entry uses the library through its public entries, not a copy:
+// these modules stay external and resolve to the package names.
+const LIBRARY_ENTRIES = {
+  [pathResolve('../src/vue-plugin.ts')]: '@obiba/quasar-ui-json-form',
+  [pathResolve('../src/catalog/index.ts')]: '@obiba/quasar-ui-json-form/catalog',
+  [pathResolve('../src/asf/index.ts')]: '@obiba/quasar-ui-json-form/asf'
+}
+
+// Resolves the imports of the library entries to the package names, external
+const externalLibraryPlugin = {
+  name: 'external-library',
+  async resolveId (source, importer, options) {
+    if (!importer) return null
+    const resolved = await this.resolve(source, importer, { ...options, skipSelf: true })
+    if (resolved && LIBRARY_ENTRIES[resolved.id]) {
+      return { id: LIBRARY_ENTRIES[resolved.id], external: true }
+    }
+    return null
+  }
+}
+
 const builds = [
   {
     rollup: {
@@ -155,6 +176,7 @@ const builds = [
         format: 'es'
       }
     },
+    externalLibrary: true,
     build: {
       minified: true
     }
@@ -169,6 +191,7 @@ const builds = [
         format: 'cjs'
       }
     },
+    externalLibrary: true,
     build: {
       minified: true
     }
@@ -249,7 +272,7 @@ function build (builds) {
 
 function genConfig (opts) {
   Object.assign(opts.rollup.input, {
-    plugins: rollupPlugins,
+    plugins: opts.externalLibrary ? [ externalLibraryPlugin, ...rollupPlugins ] : rollupPlugins,
     external: [ 'vue', 'quasar' ],
     // the entry chunk may export what the map chunk shares with it (no facade)
     preserveEntrySignatures: 'allow-extension'
@@ -257,7 +280,8 @@ function genConfig (opts) {
 
   Object.assign(opts.rollup.output, {
     banner: buildConf.banner,
-    globals: { vue: 'Vue', quasar: 'Quasar' }
+    globals: { vue: 'Vue', quasar: 'Quasar' },
+    exports: 'named'
   })
 
   return opts
