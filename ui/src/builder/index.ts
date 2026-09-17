@@ -11,6 +11,8 @@ export { QJsonFormBuilder }
 export { builderCatalog, matchItem, nodeIcon, itemKey, optionsSchema, rawOptions, keywordsSchema, choicesOf, expressionError, fieldNames, downloadText } from './items'
 export type { BuilderCatalog } from './items'
 export { recognize } from './BuilderSource'
+export { parseCsv, translationsToCsv, mergeCsv } from './csv'
+export type { CsvImport } from './csv'
 export type { ImportedForm } from './BuilderSource'
 export {
   fromDefinition, toDefinition, fromAsf,

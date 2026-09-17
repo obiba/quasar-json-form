@@ -9,6 +9,8 @@ import { QInput, QToggle, QBtn, QMarkupTable, QBadge } from 'quasar'
 import { useFormI18n } from '../vue-plugin'
 import type { FormModel } from './model'
 import { usedKeys, pruneTranslations } from './texts'
+import { translationsToCsv, mergeCsv } from './csv'
+import { downloadText } from './items'
 
 export default defineComponent({
   name: 'QJsonFormBuilderTranslations',
@@ -24,6 +26,25 @@ export default defineComponent({
     const missingOnly = ref(false)
     const newLanguage = ref('')
     const pruned = ref<number | undefined>(undefined)
+    const csvStatus = ref('')
+    const fileInput = ref<HTMLInputElement | null>(null)
+
+    const downloadCsv = () => downloadText('translations.csv', translationsToCsv(props.model, props.languages), 'text/csv')
+
+    const uploadCsv = async (event: Event) => {
+      const input = event.target as HTMLInputElement
+      const file = input.files?.[0]
+      input.value = ''
+      if (!file) return
+      try {
+        const result = mergeCsv(props.model, await file.text())
+        result.languages.filter((locale) => !props.languages.includes(locale)).forEach((locale) => emit('add-language', locale))
+        csvStatus.value = tr('csvImported', { keys: result.keys, values: result.values })
+        emit('change')
+      } catch (e) {
+        csvStatus.value = `${tr('csvInvalid')}: ${(e as Error).message}`
+      }
+    }
 
     const keys = computed(() => {
       const all = new Set<string>(usedKeys(props.model))
@@ -69,6 +90,12 @@ export default defineComponent({
         h('div', { class: 'col-auto' }, [
           h(QBtn, { flat: true, dense: true, size: 'sm', icon: 'cleaning_services', label: tr('prune'), onClick: () => { pruned.value = pruneTranslations(props.model).length; emit('change') } }),
           pruned.value !== undefined ? h('span', { class: 'text-caption text-grey-7 q-ml-sm' }, tr('pruned', { count: pruned.value })) : null,
+        ]),
+        h('div', { class: 'col-auto' }, [
+          h(QBtn, { flat: true, dense: true, size: 'sm', icon: 'download', label: tr('downloadCsv'), onClick: downloadCsv }),
+          h(QBtn, { flat: true, dense: true, size: 'sm', icon: 'upload', label: tr('uploadCsv'), onClick: () => fileInput.value?.click() }),
+          h('input', { ref: fileInput, type: 'file', accept: '.csv,text/csv', style: 'display: none', onChange: uploadCsv }),
+          csvStatus.value ? h('span', { class: 'text-caption text-grey-7 q-ml-sm' }, csvStatus.value) : null,
         ]),
       ]),
       h(QMarkupTable, { flat: true, bordered: true, dense: true, wrapCells: true }, () => [
