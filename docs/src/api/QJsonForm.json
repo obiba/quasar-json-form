@@ -11,6 +11,8 @@
     "config": { "type": "Object", "desc": "JSON Forms config passed to every renderer: `languages`, `countries`, `fileUpload` hooks." },
     "renderers": { "type": "Array", "default": "[]", "desc": "Renderers of the application, `{ renderer, tester }` entries tried before the built-in ones (see [custom controls](#/start/custom-controls))." },
     "languages": { "type": "Array | Object", "desc": "Languages of the localized strings, `['en', 'fr']` or `{ en: 'English', fr: 'Français' }`." },
+    "translations": { "type": "Object", "desc": "Translations embedded in the form, keyed by language (`{ en: { 'name.title': 'Name' }, fr: {...} }`, flat or nested keys), looked up before the application messages (see [internationalization](#/start/i18n))." },
+    "locale": { "type": "String", "default": "vue-i18n locale", "desc": "Locale of the form, overriding the vue-i18n locale for its renderers: translations, messages and the language initially displayed by the localized strings." },
     "errors": { "type": "Array", "default": "[]", "desc": "Validation errors (`v-model:errors`), AJV-shaped `ErrorObject[]`." }
   },
   "events": {

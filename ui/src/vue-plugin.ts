@@ -38,7 +38,8 @@ import QJsonForm from './components/QJsonForm'
 import { messages } from './i18n/messages'
 import { countryCodes } from './data/countries'
 import type { CountryCode } from './data/countries'
-import { createJsonFormsI18n, createTranslator, errorTranslator } from './utils/i18n'
+import { createJsonFormsI18n, createTranslator, errorTranslator, interpolate, lookupTranslation } from './utils/i18n'
+import type { FormTranslations, Messages } from './utils/i18n'
 import { renderMarkdown, renderMarkdownInline } from './utils/markdown'
 import { countWords, parseWordLimit } from './utils/words'
 import { filtrexEngine, FiltrexRuleEngine } from './composables/useFiltrexRules'
@@ -47,10 +48,10 @@ import type { FormErrorRegistry } from './composables/useFormErrors'
 import { normalizeLanguages, useControlProperties } from './composables/useControlProperties'
 import type { Language, LanguagesInput, ControlPropertiesReturn, SelectOption } from './composables/useControlProperties'
 import { useFormI18n } from './composables/useFormI18n'
-import type { FormI18n } from './composables/useFormI18n'
+import type { FormI18n, FormI18nOverride } from './composables/useFormI18n'
 import { omitOptions, RENDERER_OPTION_KEYS } from './utils/options'
 import type { FileItem, FileUploadHooks, FileUploadContext } from './components/QFileUploadRenderer'
-import { DATA_KEY, READONLY_KEY, LANGUAGES_KEY, LOCALE_KEY, COUNTRIES_KEY, FORM_ERRORS_KEY } from './composables/keys'
+import { DATA_KEY, READONLY_KEY, LANGUAGES_KEY, LOCALE_KEY, COUNTRIES_KEY, FORM_ERRORS_KEY, I18N_KEY } from './composables/keys'
 import { convert as convertAsf, toJsonForms, isAsfDefinition, transpileCondition as transpileAsfCondition, ConditionError as AsfConditionError } from './asf'
 import type { AsfConvertOptions, AsfConvertResult, AsfDiagnostic } from './asf'
 
@@ -141,6 +142,8 @@ export {
   createJsonFormsI18n,
   createTranslator,
   errorTranslator,
+  interpolate,
+  lookupTranslation,
   renderMarkdown,
   renderMarkdownInline,
   countWords,
@@ -161,6 +164,7 @@ export {
   LOCALE_KEY,
   COUNTRIES_KEY,
   FORM_ERRORS_KEY,
+  I18N_KEY,
   convertAsf,
   toJsonForms,
   isAsfDefinition,
@@ -177,6 +181,9 @@ export type {
   ControlPropertiesReturn,
   SelectOption,
   FormI18n,
+  FormI18nOverride,
+  FormTranslations,
+  Messages,
   FileItem,
   FileUploadHooks,
   FileUploadContext,

@@ -10,10 +10,12 @@ import { vanillaRenderers } from '@jsonforms/vue-vanilla'
 import '@jsonforms/vue-vanilla/vanilla.css'
 import { useFormI18n } from '../composables/useFormI18n'
 import { provideFormErrorRegistry } from '../composables/useFormErrors'
-import { LANGUAGES_KEY, LOCALE_KEY } from '../composables/keys'
+import { I18N_KEY, LANGUAGES_KEY, LOCALE_KEY } from '../composables/keys'
+import type { FormI18nOverride } from '../composables/useFormI18n'
 import type { LanguagesInput } from '../composables/useControlProperties'
 import qRenderers from '../utils/renderers'
 import { createJsonFormsI18n } from '../utils/i18n'
+import type { FormTranslations } from '../utils/i18n'
 
 // The Quasar renderers, with the vanilla ones as a fallback
 const builtinRenderers = Object.freeze([...vanillaRenderers, ...qRenderers])
@@ -155,6 +157,30 @@ export default defineComponent({
       default: undefined,
     },
     /**
+     * Translations embedded in the form, keyed by language:
+     * `{ en: { 'name.title': 'Name' }, fr: { 'name.title': 'Nom' } }` (flat
+     * dotted keys or nested objects). Every key of the schema and UI schema
+     * (titles, descriptions, hints, option labels, messages...) is looked up
+     * here first, in the form locale then in the vue-i18n fallback locale,
+     * before the vue-i18n messages of the application.
+     */
+    translations: {
+      type: Object as PropType<FormTranslations>,
+      required: false,
+      default: undefined,
+    },
+    /**
+     * Locale of the form, overriding the vue-i18n locale for its renderers
+     * only: the language of the translations, of the application messages and
+     * of the built-in messages, and the language initially displayed by the
+     * localized string controls.
+     */
+    locale: {
+      type: String,
+      required: false,
+      default: undefined,
+    },
+    /**
      * Renderers of the application (`{ renderer, tester }` entries, see
      * `rankWith` from `@jsonforms/core`), tried before the built-in ones: a
      * control is rendered by the entry whose tester returns the highest rank,
@@ -177,7 +203,17 @@ export default defineComponent({
   },
   emits: ['update:modelValue', 'update:errors'],
   setup(props: any, { emit }: any) {
-    const { t, te, locale, fallbackLocale } = useFormI18n()
+    // the `translations` and `locale` props, else an application-level provide
+    // (raw value or ref); provided to the renderers, and used by this form
+    const inheritedI18n = inject<unknown>(I18N_KEY, undefined)
+    const scopedI18n = computed<FormI18nOverride | undefined>(() => {
+      const inherited = unref(inheritedI18n) as FormI18nOverride | undefined
+      const formLocale = props.locale ?? inherited?.locale
+      const translations = props.translations ?? inherited?.translations
+      return formLocale === undefined && translations === undefined ? undefined : { locale: formLocale, translations }
+    })
+    provide(I18N_KEY, scopedI18n)
+    const { t, te, locale, fallbackLocale } = useFormI18n(scopedI18n)
 
     // AJV instance: the given one, or a default knowing the custom formats.
     // Never a reactive proxy (an application may keep it in reactive state):
@@ -226,14 +262,19 @@ export default defineComponent({
         : generateDefaultUISchema(props.schema)
     })
 
-    // JSON Forms translation state backed by vue-i18n (or the pass-through
-    // fallback when it is not installed), refreshed on locale change
-    const i18n = computed(() => createJsonFormsI18n({
-      locale: String(locale.value),
-      fallbackLocale: fallbackLocale.value,
-      te,
-      t,
-    }))
+    // JSON Forms translation state backed by the form translations and
+    // vue-i18n (or the pass-through fallback when it is not installed),
+    // refreshed on locale or translations change (`t` and `te` read the
+    // translations lazily: the state must depend on them explicitly)
+    const i18n = computed(() => {
+      void scopedI18n.value
+      return createJsonFormsI18n({
+        locale: String(locale.value),
+        fallbackLocale: fallbackLocale.value,
+        te,
+        t,
+      })
+    })
 
     // Frozen, so that JSON Forms does not make the array (and the components
     // in it) reactive; the raw prop for the same reason

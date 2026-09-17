@@ -11,6 +11,10 @@ export interface DocExampleDef {
   /** renderers of the application, passed to the `renderers` prop */
   renderers?: JsonFormsRendererRegistryEntry[]
   languages?: string[] | Record<string, string>
+  /** translations embedded in the form, keyed by language; the example gets a language switch */
+  translations?: Record<string, Record<string, unknown>>
+  /** locale of the form, overriding the site one */
+  locale?: string
   readonly?: boolean
   /**
    * Called with the new data on every change, before it is applied, with the

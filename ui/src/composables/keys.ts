@@ -14,5 +14,7 @@ export const LANGUAGES_KEY = 'jsonforms-languages'
 export const LOCALE_KEY = 'jsonforms-locale'
 /** ISO country list for the countries renderer (`Ref<CountryCode[] | Record<string, CountryCode[]>>`) */
 export const COUNTRIES_KEY = 'jsonforms-countries'
+/** translations and locale of the form (`Ref<FormI18nOverride | undefined>`, see `useFormI18n`) */
+export const I18N_KEY = 'jsonforms-i18n'
 /** renderer-level errors registry (see `useFormErrors`) */
 export const FORM_ERRORS_KEY = 'jsonforms-custom-errors'
