@@ -54,7 +54,7 @@ Every operation keeps the schema in step with the tree:
 | `addNode(model, parentId, template, index?, key?)` | Adds a node made from a template (a catalog item, or any `{ schema?, uischema }` pair) under a layout. A control template creates its property in the container of the layout, the root schema or the `items` of its list, under `key` made unique (`field` by default) |
 | `removeNode(model, id)` | Removes the node and its descendants; the property of a control is removed unless another control still uses it |
 | `moveNode(model, id, parentId, index?)`, `canMove(model, id, parentId)` | Reorders or reparents a node. A control stays at its level: it cannot move into or out of the items of a list |
-| `duplicateNode(model, id)` | Copies the node next to itself; the property of a control is copied under a new key |
+| `duplicateNode(model, id)` | Copies the node next to itself; the property of a control is copied under a new key, and the layouts of the copy get their own keys, their translations copied |
 | `renameProperty(model, id, key)` | Renames the property of a control and rewrites the scopes of the nested controls; false when the key is invalid or taken |
 | `ruleReferences(model, name)` | The filtrex rules of the form mentioning a property, to review after a rename |
 | `locate(model, id)`, `findNode`, `locations`, `descendants`, `listOf`, `propertySchema`, `isRequired`, `setRequired` | Navigation and property helpers |

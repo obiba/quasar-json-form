@@ -20,7 +20,7 @@ export const builderApi: RendererApi = {
     locale: {
       type: 'String',
       default: 'vue-i18n locale',
-      desc: 'Language edited and previewed initially, when it is one of the languages of the form; else the vue-i18n locale when it is one, else the first language.',
+      desc: 'Language edited and previewed, when it is one of the languages of the form; else the vue-i18n locale when it is one, else the first language. The language switch of the builder changes it for the builder only.',
     },
     catalog: {
       type: 'Array',

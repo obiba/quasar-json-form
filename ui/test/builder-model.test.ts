@@ -4,6 +4,7 @@ import {
   fromDefinition, toDefinition, fromAsf, parseScope, toScope, isValidKey,
   locate, findNode, descendants, listOf, containerOf, propertySchema, isRequired, setRequired, uniqueKey,
   addNode, removeNode, moveNode, canMove, duplicateNode, renameProperty, ruleReferences, dropIndex,
+  textSlots, setText,
 } from '../src/builder'
 import type { FormDefinition, FormModel } from '../src/builder'
 
@@ -67,6 +68,9 @@ describe('scopes and keys', () => {
     expect(uniqueKey(container, 'other')).toBe('other')
     expect(uniqueKey(container, '')).toBe('field')
     expect(uniqueKey(undefined, 'x')).toBe('x')
+    // names of the object prototype are keys like any other
+    expect(uniqueKey(container, 'constructor')).toBe('constructor')
+    expect(uniqueKey({ properties: { toString: {} } }, 'toString')).toBe('toString2')
   })
 })
 
@@ -388,6 +392,38 @@ describe('duplicateNode', () => {
     expect(new Set(ids).size).toBe(ids.length)
   })
 
+  it('gives a copied layout its own keys, nested layouts included', () => {
+    const model = fromDefinition({
+      schema: { type: 'object', properties: { name: { type: 'string', title: 'name.title' } } },
+      uischema: {
+        type: 'VerticalLayout',
+        elements: [{ type: 'Group', label: 'group.1.label', elements: [
+          { type: 'Control', scope: '#/properties/name' },
+          { type: 'Section', label: 'section.1.label', description: 'section.1.description' },
+          { type: 'Group', label: 'group.2.label', elements: [] },
+        ] }],
+      },
+      translations: { en: { 'name.title': 'Name', 'group.1.label': 'Outer', 'section.1.label': 'Section', 'group.2.label': 'Inner' }, fr: { 'group.1.label': 'Externe' } },
+    })
+    const group = model.root.children[0]!
+    const copy = duplicateNode(model, group.id)!
+    expect(copy.element.label).toBe('group.3.label')
+    expect(copy.children[1]!.element).toEqual({ type: 'Section', label: 'section.2.label', description: 'section.2.description' })
+    expect(copy.children[2]!.element.label).toBe('group.4.label')
+    // the control of the copy keeps its property and its key
+    expect(copy.children[0]!.path).toEqual(['name'])
+    expect(group.element.label).toBe('group.1.label')
+    expect(model.translations.en).toEqual({ 'name.title': 'Name', 'group.1.label': 'Outer', 'section.1.label': 'Section', 'group.2.label': 'Inner', 'group.3.label': 'Outer', 'section.2.label': 'Section', 'group.4.label': 'Inner' })
+    expect(model.translations.fr).toEqual({ 'group.1.label': 'Externe', 'group.3.label': 'Externe' })
+    // editing the copy leaves the original alone
+    setText(model, copy, textSlots(model, copy).find((s) => s.name === 'label')!, 'en', 'Copy')
+    expect(model.translations.en!['group.1.label']).toBe('Outer')
+    // an orphan translation is not overwritten by the next copy
+    model.translations.en!['group.5.label'] = 'Orphan'
+    expect(duplicateNode(model, group.id)!.element.label).toBe('group.6.label')
+    expect(model.translations.en!['group.5.label']).toBe('Orphan')
+  })
+
   it('does not duplicate the root or a detail', () => {
     const model = fromDefinition(contact)
     expect(duplicateNode(model, model.root.id)).toBeUndefined()
@@ -428,6 +464,21 @@ describe('renameProperty', () => {
     expect(model3.schema.properties.contacts.items.required).toEqual(['phone'])
   })
 
+  it('renames the generated keys of the control even untranslated, not its key-shaped literals', () => {
+    const model = fromDefinition({
+      schema: { type: 'object', properties: { name: { type: 'string', title: 'name.title', description: 'name.custom' } } },
+      uischema: { type: 'VerticalLayout', elements: [{ type: 'Control', scope: '#/properties/name', hint: 'name.hint' }] },
+      translations: { en: { 'name.title': 'Name' } },
+    })
+    expect(renameProperty(model, model.root.children[0]!.id, 'fullName')).toBe(true)
+    const property = model.schema.properties.fullName
+    expect(property.title).toBe('fullName.title')
+    // the generated `name.hint`, translated nowhere (cleared), follows
+    expect(model.root.children[0]!.element.hint).toBe('fullName.hint')
+    // a literal that merely looks like a key does not
+    expect(property.description).toBe('name.custom')
+  })
+
   it('refuses an invalid or taken key, and a non control', () => {
     const model = fromDefinition(contact)
     const name = byScope(model, '#/properties/name')
@@ -436,6 +487,9 @@ describe('renameProperty', () => {
     expect(renameProperty(model, name.id, 'name')).toBe(true)
     expect(renameProperty(model, model.root.id, 'x')).toBe(false)
     expect(Object.keys(model.schema.properties)).toEqual(['name', 'email', 'address', 'contacts'])
+    // a name of the object prototype is not taken
+    expect(renameProperty(model, name.id, 'constructor')).toBe(true)
+    expect(Object.keys(model.schema.properties)).toEqual(['constructor', 'email', 'address', 'contacts'])
   })
 
   it('finds the rules mentioning a property', () => {

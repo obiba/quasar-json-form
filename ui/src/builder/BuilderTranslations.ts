@@ -20,7 +20,7 @@ export default defineComponent({
     /** the language the literals of the form are written in */
     locale: { type: String, required: true },
   },
-  emits: ['change', 'add-language'],
+  emits: ['add-language'],
   setup(props, { emit }) {
     const { translate } = useFormI18n()
     const tr = (key: string, named?: Record<string, unknown>) => translate(`builder.${key}`, named)
@@ -33,7 +33,6 @@ export default defineComponent({
     const collect = () => {
       const result = collectKeys(props.model, props.languages, props.locale)
       collected.value = tr('collected', result)
-      emit('change')
     }
     const csvStatus = ref('')
     const fileInput = ref<HTMLInputElement | null>(null)
@@ -49,7 +48,6 @@ export default defineComponent({
         const result = mergeCsv(props.model, await file.text())
         result.languages.filter((locale) => !props.languages.includes(locale)).forEach((locale) => emit('add-language', locale))
         csvStatus.value = tr('csvImported', { keys: result.keys, values: result.values })
-        emit('change')
       } catch (e) {
         csvStatus.value = `${tr('csvInvalid')}: ${(e as Error).message}`
       }
@@ -75,7 +73,6 @@ export default defineComponent({
       const messages = (props.model.translations[locale] ??= {})
       if (value === '') delete messages[key]
       else messages[key] = value
-      emit('change')
     }
 
     const addLanguage = () => {
@@ -84,7 +81,6 @@ export default defineComponent({
       props.model.translations[code] ??= {}
       newLanguage.value = ''
       emit('add-language', code)
-      emit('change')
     }
 
     return () => h('div', { class: 'q-builder-translations' }, [
@@ -101,7 +97,7 @@ export default defineComponent({
           collected.value ? h('span', { class: 'text-caption text-grey-7 q-ml-sm' }, collected.value) : null,
         ]),
         h('div', { class: 'col-auto' }, [
-          h(QBtn, { flat: true, dense: true, size: 'sm', icon: 'cleaning_services', label: tr('prune'), onClick: () => { pruned.value = pruneTranslations(props.model).length; emit('change') } }),
+          h(QBtn, { flat: true, dense: true, size: 'sm', icon: 'cleaning_services', label: tr('prune'), onClick: () => { pruned.value = pruneTranslations(props.model).length } }),
           pruned.value !== undefined ? h('span', { class: 'text-caption text-grey-7 q-ml-sm' }, tr('pruned', { count: pruned.value })) : null,
         ]),
         h('div', { class: 'col-auto' }, [

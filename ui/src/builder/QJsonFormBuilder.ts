@@ -30,7 +30,7 @@ export default defineComponent({
     modelValue: { type: Object as PropType<FormDefinition>, default: () => ({ schema: { type: 'object', properties: {} } }) },
     /** languages of the form, added to the ones of its translations */
     languages: { type: [Array, Object] as PropType<LanguagesInput>, default: undefined },
-    /** language edited and previewed initially (the vue-i18n locale when it is one of the languages) */
+    /** language edited and previewed, when it is one of the languages (else the vue-i18n locale when it is one, else the first) */
     locale: { type: String, default: undefined },
     /** descriptions of the renderers of the application, added to the palette */
     catalog: { type: Array as PropType<RendererApi[]>, default: () => [] },
@@ -56,7 +56,8 @@ export default defineComponent({
       return codes.length > 0 ? codes : ['en']
     })
     const locale = ref(props.locale && languages.value.includes(props.locale) ? props.locale : languages.value.includes(String(appLocale.value)) ? String(appLocale.value) : languages.value[0]!)
-    watch(languages, (codes) => { if (!codes.includes(locale.value)) locale.value = codes[0]! })
+    watch(languages, (codes) => { if (!codes.includes(locale.value)) locale.value = props.locale && codes.includes(props.locale) ? props.locale : codes[0]! })
+    watch(() => props.locale, (code) => { if (code && languages.value.includes(code)) locale.value = code })
 
     // the definition emitted last, to tell an echo of it from a new value
     let emitted = ''
@@ -119,10 +120,11 @@ export default defineComponent({
             h(QSeparator),
             h(QTabPanels, { modelValue: tab.value, animated: true, keepAlive: true, class: 'bg-transparent' }, () => [
               h(QTabPanel, { name: 'properties' }, () => h(BuilderProperties, { model: state.model, catalog: catalog.value, nodeId: selected.value, locale: locale.value })),
-              h(QTabPanel, { name: 'preview' }, () => h(BuilderPreview, { model: state.model, locale: locale.value, languages: languages.value, renderers: props.renderers, config: props.config })),
+              h(QTabPanel, { name: 'preview' }, () => h(BuilderPreview, { model: state.model, active: tab.value === 'preview', locale: locale.value, languages: languages.value, renderers: props.renderers, config: props.config })),
               h(QTabPanel, { name: 'translations' }, () => h(BuilderTranslations, { model: state.model, languages: languages.value, locale: locale.value, onAddLanguage: (code: string) => { locale.value = code } })),
               h(QTabPanel, { name: 'source' }, () => h(BuilderSource, {
                 model: state.model,
+                active: tab.value === 'source',
                 onReplace: (definition: FormDefinition) => load(fromDefinition(definition)),
               })),
             ]),

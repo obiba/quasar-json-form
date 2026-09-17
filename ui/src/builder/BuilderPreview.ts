@@ -3,7 +3,7 @@
  * The live preview of the form: rendered with `QJsonForm` in the builder
  * language, with a read-only toggle and the data and errors it produces.
  */
-import { h, defineComponent, computed, ref, watch } from 'vue'
+import { h, defineComponent, ref, shallowRef, watch } from 'vue'
 import type { PropType } from 'vue'
 import type { JsonFormsRendererRegistryEntry } from '@jsonforms/core'
 import { QToggle, QBtn, QCard, QCardSection, QSeparator, QTabs, QTab, QTabPanels, QTabPanel, QBadge, QBanner } from 'quasar'
@@ -15,6 +15,8 @@ export default defineComponent({
   name: 'QJsonFormBuilderPreview',
   props: {
     model: { type: Object as PropType<FormModel>, required: true },
+    /** the preview is shown: the form follows the model only then (it is kept alive in a tab) */
+    active: { type: Boolean, default: true },
     locale: { type: String, required: true },
     languages: { type: Array as PropType<string[]>, required: true },
     renderers: { type: Array as PropType<JsonFormsRendererRegistryEntry[]>, default: () => [] },
@@ -23,7 +25,9 @@ export default defineComponent({
   setup(props) {
     const { translate } = useFormI18n()
     const tr = (key: string) => translate(`builder.${key}`)
-    const definition = computed(() => toDefinition(props.model))
+    // the form of the model, refreshed on its changes while the preview is shown
+    const definition = shallowRef(toDefinition(props.model))
+    watch(() => (props.active ? props.model : undefined), (model) => { if (model) definition.value = toDefinition(model) }, { deep: true })
     const data = ref<Record<string, unknown>>({})
     const errors = ref<any[]>([])
     const readonly = ref(false)

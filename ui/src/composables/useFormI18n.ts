@@ -85,20 +85,26 @@ function withBuiltinFallback(i18n: Omit<FormI18n, 'translate'>): FormI18n {
  * Wraps the application translation functions with the translations and
  * locale of the form: a key is looked up in the form translations for the
  * form locale, then for the application fallback locale, and then handed to
- * the application (in the form locale when it is set).
+ * the application (in the form locale when it is set); `te` without a locale
+ * answers for the same lookup.
  */
 function withFormTranslations(base: BaseI18n, override: Ref<FormI18nOverride | undefined>): Omit<FormI18n, 'translate'> {
   const formLocale = computed<string | undefined>(() => unref(override)?.locale)
   const locale = computed<string>(() => formLocale.value ?? String(base.locale.value))
   const find = (key: string, loc?: string): string | undefined =>
     lookupTranslation(unref(override)?.translations, loc ?? locale.value, key)
+  /** the form translation `t` would use: the given locale, else the form locale then the fallback one */
+  const findWithFallback = (key: string, loc?: string): string | undefined => {
+    if (loc) return find(key, loc)
+    const fallback = base.fallbackLocale.value
+    return find(key) ?? (fallback ? find(key, fallback) : undefined)
+  }
   return {
     t: (key: string, named?: Record<string, unknown>) => {
-      const fallback = base.fallbackLocale.value
-      const message = find(key) ?? (fallback ? find(key, fallback) : undefined)
+      const message = findWithFallback(key)
       return message !== undefined ? interpolate(message, named ?? {}) : base.t(key, named ?? {}, formLocale.value)
     },
-    te: (key: string, loc?: string) => find(key, loc) !== undefined || base.te(key, loc ?? formLocale.value),
+    te: (key: string, loc?: string) => findWithFallback(key, loc) !== undefined || base.te(key, loc ?? formLocale.value),
     locale: locale as unknown as Ref<string>,
     fallbackLocale: base.fallbackLocale,
   }

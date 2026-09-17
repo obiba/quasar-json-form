@@ -3,7 +3,7 @@
  * The source of the form: schema, UI schema and translations as JSON, each
  * editable and applied as a whole.
  */
-import { h, defineComponent, computed, ref, watch } from 'vue'
+import { h, defineComponent, ref, shallowRef, watch } from 'vue'
 import type { PropType } from 'vue'
 import { QInput, QBtn, QTabs, QTab, QTabPanels, QTabPanel, QSeparator } from 'quasar'
 import { useFormI18n } from '../vue-plugin'
@@ -16,15 +16,19 @@ export default defineComponent({
   name: 'QJsonFormBuilderSource',
   props: {
     model: { type: Object as PropType<FormModel>, required: true },
+    /** the source is shown: the editors follow the model only then (it is kept alive in a tab) */
+    active: { type: Boolean, default: true },
   },
   emits: ['replace'],
   setup(props, { emit }) {
     const { translate } = useFormI18n()
     const tr = (key: string) => translate(`builder.${key}`)
     const tab = ref('schema')
-    const definition = computed(() => toDefinition(props.model))
+    // the form of the model, refreshed on its changes while the source is shown
+    const definition = shallowRef(toDefinition(props.model))
+    watch(() => (props.active ? props.model : undefined), (model) => { if (model) definition.value = toDefinition(model) }, { deep: true })
 
-    // one editor per part, refreshed from the model when it changes
+    // one editor per part, refreshed from the model when its part changes
     const parts = ['schema', 'uischema', 'translations'] as const
     const texts = { schema: ref(''), uischema: ref(''), translations: ref('') }
     const errors = { schema: ref(''), uischema: ref(''), translations: ref('') }

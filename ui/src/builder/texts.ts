@@ -7,7 +7,7 @@
  * the translations of the form, one per language.
  */
 import type { FormModel, FormNode, JsonObject } from './model'
-import { locations, locate, containerOf, propertyIn } from './model'
+import { locations, locate, containerOf, propertyIn, hasOwn } from './model'
 
 /** Where a text of a node is stored. */
 export interface TextSlot {
@@ -25,6 +25,14 @@ const isObject = (value: unknown): value is JsonObject => typeof value === 'obje
 
 function get(target: JsonObject | undefined, path: (string | number)[]): unknown {
   return path.reduce<any>((current, segment) => (current === undefined || current === null ? undefined : current[segment]), target)
+}
+
+/** Removes the value of a path: deleted, or emptied in an array (`labels`) so that it keeps its length. */
+function unset(target: JsonObject, path: (string | number)[]): void {
+  const last = path[path.length - 1]!
+  const parent = get(target, path.slice(0, -1))
+  if (Array.isArray(parent)) parent[last as number] = ''
+  else if (isObject(parent)) delete parent[last]
 }
 
 function set(target: JsonObject, path: (string | number)[], value: unknown): void {
@@ -87,41 +95,76 @@ export function rawText(model: FormModel, node: FormNode, slot: TextSlot): strin
 
 /** true when the key is defined in at least one language of the form */
 export function isKnownKey(model: FormModel, key: string): boolean {
-  return Object.values(model.translations).some((messages) => key in messages)
+  return Object.values(model.translations).some((messages) => hasOwn(messages, key))
 }
 
 /**
  * The text of a slot in a language: its translation, or the literal stored
  * in the slot when it is not a key of the form; undefined when the slot is
- * empty or its key is not translated in that language.
+ * empty or its key is not translated in that language (a key translated
+ * nowhere, the text having been cleared, is not a literal).
  */
 export function getText(model: FormModel, node: FormNode, slot: TextSlot, locale: string): string | undefined {
   const raw = rawText(model, node, slot)
   if (raw === undefined) return undefined
   const translated = model.translations[locale]?.[raw]
   if (translated !== undefined) return translated
-  return isKnownKey(model, raw) ? undefined : raw
+  return isKnownKey(model, raw) || raw === `${keyPrefix(model, node)}.${slot.name}` ? undefined : raw
 }
 
 /** The dotted prefix of the keys of a control: its path, under the `items` of its lists. */
-function controlPrefix(model: FormModel, node: FormNode): string {
-  const list = locate(model, node.id)?.list
+function controlPrefix(model: FormModel, node: FormNode, listOf: (node: FormNode) => FormNode | undefined = (n) => locate(model, n.id)?.list): string {
+  const list = listOf(node)
   const own = (node.path ?? [node.id]).join('.')
-  return list ? `${controlPrefix(model, list)}.items.${own}` : own
+  return list ? `${controlPrefix(model, list, listOf)}.items.${own}` : own
+}
+
+/** The prefix of the keys held by the slots of a layout or element (`group.1` from `group.1.label`), or undefined. */
+function heldPrefix(model: FormModel, node: FormNode): string | undefined {
+  for (const slot of textSlots(model, node)) {
+    const raw = rawText(model, node, slot)
+    if (raw !== undefined && TEXT_KEY.test(raw) && raw.endsWith(`.${slot.name}`)) return raw.slice(0, -slot.name.length - 1)
+  }
+  return undefined
+}
+
+/**
+ * A prefix neither a node of the tree nor a translation (an orphan kept
+ * until pruned) uses, from the element type: `group.1`, `tabs.2`...
+ */
+function newPrefix(model: FormModel, node: FormNode): string {
+  const stem = String(node.element.type ?? 'element').replace(/Layout$/, '').replace(/[A-Z]/g, (c, i) => (i ? '-' : '') + c.toLowerCase())
+  const used = new Set(usedPrefixes(model))
+  for (const messages of Object.values(model.translations)) {
+    for (const key of Object.keys(messages)) {
+      if (!key.startsWith(`${stem}.`)) continue
+      const number = key.slice(stem.length + 1).split('.')[0]!
+      if (/^\d+$/.test(number)) used.add(`${stem}.${number}`)
+    }
+  }
+  let n = 1
+  while (used.has(`${stem}.${n}`)) n++
+  return `${stem}.${n}`
 }
 
 /** The prefix of the keys of a node: the one of its existing keys, else a new one (`group.1`...). */
 export function keyPrefix(model: FormModel, node: FormNode): string {
   if (node.kind === 'control') return controlPrefix(model, node)
-  for (const slot of textSlots(model, node)) {
-    const raw = rawText(model, node, slot)
-    if (raw !== undefined && TEXT_KEY.test(raw) && raw.endsWith(`.${slot.name}`)) return raw.slice(0, -slot.name.length - 1)
+  return heldPrefix(model, node) ?? newPrefix(model, node)
+}
+
+/**
+ * Gives the layouts and elements of a copied subtree their own keys: the
+ * ones under a prefix shared with the original (`group.1.label`) move to a
+ * new prefix, with their translations copied. Controls keep their keys (they
+ * follow the property).
+ */
+export function renewKeys(model: FormModel, nodes: FormNode[]): void {
+  for (const node of nodes) {
+    if (node.kind === 'control') continue
+    const prefix = heldPrefix(model, node)
+    if (prefix !== undefined) retargetKeys(model, [node], prefix, newPrefix(model, node), true)
   }
-  const stem = String(node.element.type ?? 'element').replace(/Layout$/, '').replace(/[A-Z]/g, (c, i) => (i ? '-' : '') + c.toLowerCase())
-  const used = new Set(usedPrefixes(model))
-  let n = 1
-  while (used.has(`${stem}.${n}`)) n++
-  return `${stem}.${n}`
 }
 
 /** The key of a slot: the one stored, when it is a key of the form, else the generated one. */
@@ -134,29 +177,35 @@ export function textKey(model: FormModel, node: FormNode, slot: TextSlot): strin
 /**
  * Sets the text of a slot in a language: the slot holds the key (generated
  * when it holds nothing or a literal) and the translations hold the text. An
- * empty text removes the translation, the key stays.
+ * empty text removes the translation; the key stays while another language
+ * translates it, else it leaves the slot too (the form would display it).
  */
 export function setText(model: FormModel, node: FormNode, slot: TextSlot, locale: string, text: string): string {
   const key = textKey(model, node, slot)
   const target = slot.target === 'schema' ? schemaOf(model, node) : node.element
   if (!target) return key
-  set(target, slot.path, key)
   const messages = (model.translations[locale] ??= {})
-  if (text === '') delete messages[key]
-  else messages[key] = text
+  if (text !== '') {
+    messages[key] = text
+    set(target, slot.path, key)
+  } else {
+    delete messages[key]
+    if (isKnownKey(model, key)) set(target, slot.path, key)
+    else unset(target, slot.path)
+  }
   return key
 }
 
 /** The key prefixes of every node of the tree. */
 function usedPrefixes(model: FormModel): string[] {
   const prefixes: string[] = []
-  for (const { node } of locations(model)) {
-    if (node.kind === 'control') prefixes.push(controlPrefix(model, node))
+  const all = locations(model)
+  const lists = new Map(all.map(({ node, list }) => [node, list]))
+  for (const { node } of all) {
+    if (node.kind === 'control') prefixes.push(controlPrefix(model, node, (n) => lists.get(n)))
     else {
-      for (const slot of textSlots(model, node)) {
-        const raw = rawText(model, node, slot)
-        if (raw !== undefined && TEXT_KEY.test(raw) && raw.endsWith(`.${slot.name}`)) prefixes.push(raw.slice(0, -slot.name.length - 1))
-      }
+      const prefix = heldPrefix(model, node)
+      if (prefix !== undefined) prefixes.push(prefix)
     }
   }
   return prefixes
@@ -209,7 +258,7 @@ export function collectKeys(model: FormModel, languages: string[], locale: strin
       }
       for (const language of languages) {
         const messages = (model.translations[language] ??= {})
-        if (!(key in messages)) {
+        if (!hasOwn(messages, key)) {
           messages[key] = ''
           added++
         }
@@ -247,13 +296,22 @@ export function pruneTranslations(model: FormModel): string[] {
 export function retargetKeys(model: FormModel, nodes: FormNode[], oldPrefix: string, newPrefix: string, copy = false): void {
   if (oldPrefix === newPrefix) return
   const rename = (key: string) => (key === oldPrefix || key.startsWith(`${oldPrefix}.`) ? newPrefix + key.slice(oldPrefix.length) : key)
-  // the keys held by the slots, resolved before the translations change
+  // the keys held by the slots, resolved before the translations change: the
+  // translated ones, and the generated key of the slot even untranslated (a
+  // cleared text), under its prefix before or after the move; not a literal
   const held: { target: JsonObject; path: (string | number)[]; key: string }[] = []
   for (const node of nodes) {
+    let generated: string | undefined
     for (const slot of textSlots(model, node)) {
       const raw = rawText(model, node, slot)
       const target = slot.target === 'schema' ? schemaOf(model, node) : node.element
-      if (raw !== undefined && target && isKnownKey(model, raw)) held.push({ target, path: slot.path, key: raw })
+      if (raw === undefined || !target || rename(raw) === raw) continue
+      if (!isKnownKey(model, raw)) {
+        generated ??= keyPrefix(model, node)
+        const own = `${generated}.${slot.name}`
+        if (raw !== own && rename(raw) !== own) continue
+      }
+      held.push({ target, path: slot.path, key: raw })
     }
   }
   for (const messages of Object.values(model.translations)) {

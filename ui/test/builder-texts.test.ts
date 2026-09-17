@@ -76,6 +76,26 @@ describe('getText', () => {
     expect(isKnownKey(model, 'name.hint')).toBe(true)
     expect(isKnownKey(model, 'Blue')).toBe(false)
   })
+
+  it('reads a cleared text as empty, not as its key', () => {
+    const single = fromDefinition({ schema: { type: 'object', properties: { name: { type: 'string' } } }, uischema: { type: 'VerticalLayout', elements: [{ type: 'Control', scope: '#/properties/name' }, { type: 'Group', label: 'Literal', elements: [] }] } })
+    const name = control(single, 'name')
+    const group = single.root.children[1]!
+    setText(single, name, slot(single, name, 'title'), 'en', 'Name')
+    setText(single, group, slot(single, group, 'label'), 'en', 'Group')
+    setText(single, name, slot(single, name, 'title'), 'en', '')
+    setText(single, group, slot(single, group, 'label'), 'en', '')
+    // the only translation cleared: the slots are empty, the form displays nothing
+    expect(rawText(single, name, slot(single, name, 'title'))).toBeUndefined()
+    expect(rawText(single, group, slot(single, group, 'label'))).toBeUndefined()
+    expect(getText(single, name, slot(single, name, 'title'), 'en')).toBeUndefined()
+    // a key translated nowhere left by the translations editor is not a literal either
+    single.schema.properties.name.title = 'name.title'
+    expect(getText(single, name, slot(single, name, 'title'), 'en')).toBeUndefined()
+    // and the same key comes back when the text is typed again
+    expect(setText(single, name, slot(single, name, 'title'), 'en', 'Name')).toBe('name.title')
+    expect(setText(single, group, slot(single, group, 'label'), 'en', 'Group')).toBe('group.1.label')
+  })
 })
 
 describe('keys', () => {
@@ -101,6 +121,9 @@ describe('keys', () => {
     expect(keyPrefix(model, stepper)).toBe('stepper.1')
     const vertical = addNode(model, model.root.id, { uischema: { type: 'VerticalLayout', label: '', elements: [] } })!
     expect(keyPrefix(model, vertical)).toBe('vertical.1')
+    // an orphan translation (a removed group, not pruned yet) keeps its prefix
+    model.translations.fr!['group.2.label'] = 'Orphelin'
+    expect(keyPrefix(model, group2)).toBe('group.3')
   })
 })
 
@@ -137,9 +160,16 @@ describe('setText', () => {
     const label = node(model, (n) => n.element.type === 'Label')
     setText(model, label, slot(model, label, 'text'), 'en', 'Hello')
     expect(label.element.text).toBe('label.1.text')
+    setText(model, label, slot(model, label, 'text'), 'fr', 'Bonjour')
     setText(model, label, slot(model, label, 'text'), 'en', '')
+    // still translated in french: the key stays
     expect(label.element.text).toBe('label.1.text')
     expect(model.translations.en!['label.1.text']).toBeUndefined()
+    setText(model, label, slot(model, label, 'text'), 'fr', '')
+    // translated nowhere: the slot is emptied, an array entry kept for its position
+    expect(label.element.text).toBeUndefined()
+    setText(model, tabs, slot(model, tabs, 'labels.1'), 'en', '')
+    expect(tabs.element.labels).toEqual(['tabs.1.labels.0', ''])
     const phone = control(model, 'phone')
     setText(model, phone, slot(model, phone, 'hint'), 'en', 'Digits')
     expect(toDefinition(model).uischema.elements[3].options.items.elements[0].hint).toBe('contacts.items.phone.hint')

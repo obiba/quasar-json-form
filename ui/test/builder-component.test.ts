@@ -164,6 +164,27 @@ describe('QJsonFormBuilder', () => {
     wrapper.unmount()
   })
 
+  it('keeps the scope of a control that is not bound to a property when its raw element is applied', async () => {
+    const wrapper = mountBuilder({
+      modelValue: {
+        schema: { type: 'object', definitions: { name: { type: 'string' } }, properties: { name: { $ref: '#/definitions/name' } } },
+        uischema: { type: 'VerticalLayout', elements: [{ type: 'Control', scope: '#/definitions/name' }] },
+      },
+    })
+    await flush()
+    await rows(wrapper)[1]!.trigger('click')
+    await flush()
+    const raw = wrapper.findAll('label.q-field').find((f: any) => f.find('.q-field__label').exists() && f.find('.q-field__label').text() === 'UI schema element')!
+    expect(JSON.parse(raw.find('textarea').element.value)).toEqual({ type: 'Control', scope: '#/definitions/name' })
+    await raw.find('textarea').setValue('{ "type": "Control", "scope": "#/definitions/name", "hint": "A hint" }')
+    await flush()
+    raw.element.parentElement!.querySelector('button')!.click()
+    await flush()
+    expect(raw.classes()).not.toContain('q-field--error')
+    expect(lastEmitted(wrapper).uischema!.elements[0]).toEqual({ type: 'Control', scope: '#/definitions/name', hint: 'A hint' })
+    wrapper.unmount()
+  })
+
   it('edits the labels of an enum, converting it to oneOf, and keeps the other options', async () => {
     const wrapper = mountBuilder({ modelValue: {
       schema: { type: 'object', properties: { size: { type: 'integer', enum: [1, 2] } } },
@@ -175,6 +196,10 @@ describe('QJsonFormBuilder', () => {
     await flush()
     const fields = (label: string) => wrapper.findAll('label.q-field').filter((f: any) => f.find('.q-field__label').exists() && f.find('.q-field__label').text() === label)
     expect((fields('Label')[0]!.find('input').element as HTMLInputElement).value).toBe('One')
+    // retyping a value as it is leaves the enum alone
+    await fields('Value')[0]!.find('input').setValue('1')
+    await flush()
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
     await fields('Label')[1]!.find('input').setValue('Two')
     await flush()
     let emitted = lastEmitted(wrapper)
@@ -209,6 +234,36 @@ describe('QJsonFormBuilder', () => {
     const table = wrapper.find('.q-builder-translations')
     expect(table.findAll('tbody tr').length).toBe(4)
     expect(table.findAll('td.q-builder-missing').length).toBe(3)
+    wrapper.unmount()
+  })
+
+  it('follows the locale prop when it is one of the languages', async () => {
+    const wrapper = mountBuilder({ locale: 'fr' })
+    await flush()
+    expect(rowLabels(wrapper)[1]).toBe('Nom')
+    await wrapper.setProps({ locale: 'en' })
+    await flush()
+    expect(rowLabels(wrapper)[1]).toBe('Name')
+    await wrapper.setProps({ locale: 'de' })
+    await flush()
+    expect(rowLabels(wrapper)[1]).toBe('Name')
+    // the language of the prop arrives with a form, while the selected one goes
+    await wrapper.setProps({ languages: [], modelValue: { schema: { type: 'object', properties: { name: { type: 'string', title: 'name.title' } } }, translations: { es: { 'name.title': 'Nombre' }, de: { 'name.title': 'Vorname' } } } })
+    await flush()
+    expect(rowLabels(wrapper)[1]).toBe('Vorname')
+    wrapper.unmount()
+  })
+
+  it('clears a text from the preview too', async () => {
+    const wrapper = mountBuilder({ modelValue: { schema: { type: 'object', properties: { name: { type: 'string', title: 'name.title' } } }, translations: { en: { 'name.title': 'Name' } } }, languages: ['en'] })
+    await flush()
+    await rows(wrapper)[1]!.trigger('click')
+    await setInput(wrapper, 'title', '')
+    expect(lastEmitted(wrapper).schema.properties.name.title).toBeUndefined()
+    await wrapper.findAll('.q-tab').find((t: any) => t.text() === 'Preview')!.trigger('click')
+    await flush(5)
+    expect(wrapper.find('.q-builder-preview .q-form-title').exists()).toBe(false)
+    expect(rowLabels(wrapper)[1]).toBe('name')
     wrapper.unmount()
   })
 

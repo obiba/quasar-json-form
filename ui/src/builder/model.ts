@@ -87,6 +87,9 @@ export interface NodeTemplate {
 const clone = <T>(value: T): T => (value === undefined ? value : JSON.parse(JSON.stringify(value)))
 const isObject = (value: unknown): value is JsonObject => typeof value === 'object' && value !== null && !Array.isArray(value)
 
+/** true when the object has the key itself (`in` would find `constructor`, `toString`... on the prototype) */
+export const hasOwn = (object: object, key: string): boolean => Object.prototype.hasOwnProperty.call(object, key)
+
 /** `#/properties/a/properties/b` to `['a', 'b']`; undefined for any other scope */
 export function parseScope(scope: unknown): string[] | undefined {
   if (typeof scope !== 'string' || !scope.startsWith('#/')) return undefined
@@ -316,8 +319,8 @@ export function setRequired(model: FormModel, id: string, required: boolean): vo
 export function uniqueKey(container: JsonObject | undefined, base: string): string {
   const properties = container && isObject(container.properties) ? container.properties : {}
   const stem = isValidKey(base) ? base : 'field'
-  if (!(stem in properties)) return stem
+  if (!hasOwn(properties, stem)) return stem
   let n = 2
-  while (`${stem}${n}` in properties) n++
+  while (hasOwn(properties, `${stem}${n}`)) n++
   return `${stem}${n}`
 }
