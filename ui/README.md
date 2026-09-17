@@ -261,6 +261,22 @@ import { countryCodes } from '@obiba/quasar-ui-json-form'
 `format: "typeahead"` on a string is an input with suggestions from `options.values` (strings or
 `{ label, value }`), or the schema `examples` / `enum`; `options.editable: true` accepts any text.
 
+## Geo
+
+`format: "geo"` on an object is a map (OpenLayers, loaded on demand) on which a point, a line or a
+polygon is drawn; the data is a GeoJSON geometry in WGS84 longitude / latitude, for instance
+`{ "type": "Point", "coordinates": [lon, lat] }`. `options.geometries` restricts the kinds
+(`point`, `linestring`, `polygon`), the toolbar picks the one to draw, locates the user
+(Geolocation API) and clears the value; a point can also be typed as a latitude and a longitude.
+The tiles are those of OpenStreetMap unless `options.tiles` or `config.geo.tiles` (a `{z}/{x}/{y}`
+URL template, or `{ url, attributions }`) selects another source, displayed in a scale of greys unless
+`grayscale: false`; `config.geo` also holds default `center`, `zoom`, `height`, `precision` and
+`grayscale`:
+
+```js
+// <QJsonForm :config="{ geo: { tiles: { url: 'https://.../{z}/{x}/{y}.png', attributions: '...' }, center: [lon, lat], zoom: 6 } }" ... />
+```
+
 ## angular-schema-form compatibility
 
 `@obiba/quasar-ui-json-form/asf` converts a form of the

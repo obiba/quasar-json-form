@@ -11,7 +11,7 @@ const COMPONENTS = [
   'QToggleRenderer', 'QSectionRenderer', 'QListRenderer', 'QLabelRenderer', 'QTabsLayout',
   'QStepperLayout', 'QGridLayout', 'QGroupRenderer', 'QLayoutRenderer', 'QComputedRenderer', 'QLocalizedStringRenderer',
   'QMarkdownRenderer', 'QMarkdownEditor', 'QRadioMatrixRenderer', 'QCountriesRenderer',
-  'QTypeaheadRenderer', 'QImagesRenderer', 'QImageMapRenderer', 'QJsonForm',
+  'QTypeaheadRenderer', 'QImagesRenderer', 'QImageMapRenderer', 'QGeoRenderer', 'QJsonForm',
 ]
 
 describe('vue plugin', () => {

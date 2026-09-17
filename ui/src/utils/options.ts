@@ -53,6 +53,17 @@ export const RENDERER_OPTION_KEYS = [
   'select',
   'outline',
   'maxWidth',
+  'geometries',
+  'tiles',
+  'center',
+  'zoom',
+  'height',
+  'precision',
+  'minPoints',
+  'maxPoints',
+  'inputs',
+  'locate',
+  'grayscale',
 ]
 
 /** Copy of `options` without the given keys (defaults to `RENDERER_OPTION_KEYS`). */

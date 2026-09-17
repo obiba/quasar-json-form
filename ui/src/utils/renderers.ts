@@ -53,6 +53,7 @@ import QCountriesRenderer from '../components/QCountriesRenderer'
 import QTypeaheadRenderer from '../components/QTypeaheadRenderer'
 import QImagesRenderer from '../components/QImagesRenderer'
 import QImageMapRenderer from '../components/QImageMapRenderer'
+import QGeoRenderer from '../components/QGeoRenderer'
 
 const hasOneOfItems = (schema: any): boolean =>
   schema.oneOf !== undefined &&
@@ -167,6 +168,12 @@ const isImageMapControl = and(
   hasFormat('image-map')
 )
 
+const isGeoControl = and(
+  uiTypeIs('Control'),
+  schemaTypeIs('object'),
+  hasFormat('geo', 'geojson')
+)
+
 // Define your custom renderers
 // Priority 3 - higher than default (usually 1-2)
 
@@ -273,6 +280,10 @@ const qRenderers = [
   {
     renderer: QImageMapRenderer,
     tester: rankWith(7, isImageMapControl),
+  },
+  {
+    renderer: QGeoRenderer,
+    tester: rankWith(6, isGeoControl),
   },
   {
     renderer: QSelectRenderer,
