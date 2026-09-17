@@ -141,6 +141,29 @@ describe('QJsonFormBuilder', () => {
     wrapper.unmount()
   })
 
+  it('rejects a raw element whose type would change the kind of the node', async () => {
+    const wrapper = mountBuilder()
+    await flush()
+    await rows(wrapper)[1]!.trigger('click')
+    await flush()
+    const raw = wrapper.findAll('label.q-field').find((f: any) => f.find('.q-field__label').exists() && f.find('.q-field__label').text() === 'UI schema element')!
+    const apply = raw.element.parentElement!.querySelector('button')!
+    await raw.find('textarea').setValue('{ "type": "Group", "label": "x" }')
+    await flush()
+    apply.click()
+    await flush()
+    expect(raw.classes()).toContain('q-field--error')
+    expect(rowLabels(wrapper)[1]).toBe('Name')
+    await raw.find('textarea').setValue('{ "type": "Control", "hint": "name.hint", "options": { "readonly": true } }')
+    await flush()
+    apply.click()
+    await flush()
+    expect(raw.classes()).not.toContain('q-field--error')
+    const emitted = lastEmitted(wrapper)
+    expect(emitted.uischema!.elements[0]).toEqual({ type: 'Control', scope: '#/properties/name', hint: 'name.hint', options: { readonly: true } })
+    wrapper.unmount()
+  })
+
   it('edits the labels of an enum, converting it to oneOf, and keeps the other options', async () => {
     const wrapper = mountBuilder({ modelValue: {
       schema: { type: 'object', properties: { size: { type: 'integer', enum: [1, 2] } } },

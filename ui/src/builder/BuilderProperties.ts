@@ -124,14 +124,20 @@ export default defineComponent({
         h(QBtn, {
           label: tr('apply'), size: 'sm', color: 'primary', unelevated: true, class: 'q-mt-xs',
           onClick: () => {
+            let parsed: unknown
             try {
-              const parsed = JSON.parse(text.value)
+              parsed = JSON.parse(text.value)
               if (!isObject(parsed)) throw new Error('object expected')
-              error.value = ''
-              apply(parsed)
-              changed()
             } catch (e) {
               error.value = `${tr('invalidJson')}: ${(e as Error).message}`
+              return
+            }
+            try {
+              apply(parsed)
+              error.value = ''
+              changed()
+            } catch (e) {
+              error.value = (e as Error).message
             }
           },
         }),
@@ -381,12 +387,24 @@ export default defineComponent({
       return section(tr('rules'), content)
     }
 
+    /** The kind of node a UI schema type makes, from the palette; undefined for an unknown type. */
+    const kindOfType = (type: unknown): FormNode['kind'] | undefined => {
+      if (type === 'Control') return 'control'
+      const known = props.catalog.items.find((i) => !i.schema && i.uischema.type === type)
+      if (!known) return undefined
+      return Array.isArray(known.uischema.elements) ? 'layout' : 'element'
+    }
+
     const renderRaw = (): VNode => {
       const n = node.value!
       const content: (VNode | null)[] = [
         jsonInput(tr('rawElement'), rawElement, (parsed) => {
+          // the structure of the node (its kind, path and items layout) is not editable here
+          const kind = kindOfType(parsed.type)
+          if (kind && kind !== n.kind) throw new Error(tr('rawKindChanged', { type: parsed.type }))
           delete parsed.elements
           delete parsed.scope
+          if (n.detail && isObject(parsed.options)) delete parsed.options.items
           n.element = parsed
         }),
         n.kind === 'control' && schema.value
