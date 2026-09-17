@@ -21,6 +21,23 @@
       <div class="col-12 col-md-3">
         <q-input v-model="languagesText" label="Languages" dense outlined placeholder="en, fr" />
       </div>
+      <div class="col-12 col-md-3">
+        <q-file
+          v-model="translationsFile"
+          label="Translations JSON"
+          dense
+          outlined
+          clearable
+          accept=".json,application/json"
+          :error="!!translationsError"
+          :error-message="translationsError"
+          @update:model-value="loadTranslations"
+        >
+          <template #prepend>
+            <q-icon name="translate" />
+          </template>
+        </q-file>
+      </div>
       <div class="col-auto">
         <q-toggle v-model="readonly" :label="t('readonly')" />
       </div>
@@ -95,9 +112,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { Notify } from 'quasar'
 import { QJsonForm, countryCodes } from 'ui'
 import DocCode from './DocCode.vue'
 import type { DocExampleDef } from '../examples/types'
+import { i18n } from '../boot/i18n'
 
 const { t } = useI18n()
 
@@ -159,6 +178,9 @@ const data = ref<Record<string, unknown>>({})
 const errors = ref<any[]>([])
 const formKey = ref(0)
 
+const translationsFile = ref<File | null>(null)
+const translationsError = ref('')
+
 function parse (text: string, error: { value: string }): Record<string, unknown> | undefined | null {
   if (!text.trim()) {
     error.value = ''
@@ -200,6 +222,27 @@ function filterExamples (needle: string, update: (fn: () => void) => void) {
     const search = needle.toLowerCase()
     exampleNames.value = allExampleNames.filter((name) => name.includes(search))
   })
+}
+
+function loadTranslations (file: File | null) {
+  translationsError.value = ''
+  if (!file) return
+  const reader = new FileReader()
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(String(reader.result))
+      for (const [locale, messages] of Object.entries(parsed)) {
+        i18n.global.mergeLocaleMessage(locale, messages as Record<string, unknown>)
+      }
+      Notify.create({ message: t('translations_loaded'), type: 'positive', timeout: 1500 })
+    } catch (e) {
+      translationsError.value = `${t('invalid_json')}: ${(e as Error).message}`
+    }
+  }
+  reader.onerror = () => {
+    translationsError.value = String(reader.error)
+  }
+  reader.readAsText(file)
 }
 
 function applyData () {
