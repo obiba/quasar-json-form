@@ -120,7 +120,7 @@ export default defineComponent({
             h(QTabPanels, { modelValue: tab.value, animated: true, keepAlive: true, class: 'bg-transparent' }, () => [
               h(QTabPanel, { name: 'properties' }, () => h(BuilderProperties, { model: state.model, catalog: catalog.value, nodeId: selected.value, locale: locale.value })),
               h(QTabPanel, { name: 'preview' }, () => h(BuilderPreview, { model: state.model, locale: locale.value, languages: languages.value, renderers: props.renderers, config: props.config })),
-              h(QTabPanel, { name: 'translations' }, () => h(BuilderTranslations, { model: state.model, languages: languages.value, onAddLanguage: (code: string) => { locale.value = code } })),
+              h(QTabPanel, { name: 'translations' }, () => h(BuilderTranslations, { model: state.model, languages: languages.value, locale: locale.value, onAddLanguage: (code: string) => { locale.value = code } })),
               h(QTabPanel, { name: 'source' }, () => h(BuilderSource, {
                 model: state.model,
                 onReplace: (definition: FormDefinition) => load(fromDefinition(definition)),

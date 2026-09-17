@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect } from 'vitest'
-import { fromDefinition, toDefinition, descendants, addNode, textSlots, rawText, getText, setText, textKey, keyPrefix, isKnownKey, usedKeys, missingTranslations, pruneTranslations } from '../src/builder'
+import { fromDefinition, toDefinition, descendants, addNode, textSlots, rawText, getText, setText, textKey, keyPrefix, isKnownKey, usedKeys, missingTranslations, pruneTranslations, collectKeys, isMissing } from '../src/builder'
 import type { FormDefinition, FormModel, FormNode, TextSlot } from '../src/builder'
 
 const form: FormDefinition = {
@@ -162,5 +162,34 @@ describe('translations', () => {
     // `section.1.description` is a slot without translation: nothing to prune; a stray key under a node prefix stays
     model.translations.en!['section.1.anything'] = 'x'
     expect(pruneTranslations(model)).toEqual([])
+  })
+})
+
+describe('collectKeys', () => {
+  it('turns the literals into keys and adds the missing entries of every language', () => {
+    const model = fromDefinition(form)
+    const result = collectKeys(model, ['en', 'fr'], 'en')
+    // literals: name.description, color.options.b, tags.options.x, the Label text
+    expect(result.converted).toBe(4)
+    expect(model.schema.properties.name.description).toBe('name.description')
+    expect(model.translations.en!['name.description']).toBe('Literal description')
+    expect(model.translations.en!['label.1.text']).toBe('Plain text')
+    expect(model.translations.en!['tags.options.x']).toBe('X')
+    // every key held by a slot has a french entry, empty when missing
+    expect(model.translations.fr!['name.description']).toBe('')
+    expect(model.translations.fr!['group.1.label']).toBe('')
+    expect(model.translations.fr!['name.title']).toBe('Nom')
+    // a key without translation yet is not a literal: it gets empty entries
+    expect(model.translations.en!['section.1.description']).toBe('')
+    expect(model.translations.fr!['section.1.description']).toBe('')
+    expect(isMissing(model, 'group.1.label', 'fr')).toBe(true)
+    expect(isMissing(model, 'name.title', 'fr')).toBe(false)
+    expect(missingTranslations(model, 'fr')).toContain('group.1.label')
+    // empty slots stay empty: no key for a missing hint or label
+    expect(model.translations.en!['color.hint']).toBeUndefined()
+    // the orphan is not collected, and a second pass adds nothing
+    expect(model.translations.fr!['orphan.title']).toBeUndefined()
+    expect(collectKeys(model, ['en', 'fr'], 'en')).toEqual({ converted: 0, added: 0 })
+    expect(usedKeys(model)).toContain('label.1.text')
   })
 })

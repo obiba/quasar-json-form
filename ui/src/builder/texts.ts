@@ -174,12 +174,49 @@ export function usedKeys(model: FormModel): string[] {
   return [...keys]
 }
 
+/** true when a language has no value (or an empty one) for a key */
+export function isMissing(model: FormModel, key: string, locale: string): boolean {
+  const value = model.translations[locale]?.[key]
+  return value === undefined || value === ''
+}
+
 /** The keys of the form (every language) not translated in a language. */
 export function missingTranslations(model: FormModel, locale: string): string[] {
   const all = new Set<string>()
   Object.values(model.translations).forEach((messages) => Object.keys(messages).forEach((key) => all.add(key)))
-  const messages = model.translations[locale] ?? {}
-  return [...all].filter((key) => !(key in messages)).sort()
+  return [...all].filter((key) => isMissing(model, key, locale)).sort()
+}
+
+/**
+ * Collects the texts of the form into the translations: a literal held by a
+ * slot becomes a key with the literal as its value in `locale`, and every
+ * key held by a slot gets an entry (empty when missing) in every language,
+ * so that the translations list every text to translate. Returns the number
+ * of literals converted and of entries added.
+ */
+export function collectKeys(model: FormModel, languages: string[], locale: string): { converted: number; added: number } {
+  let converted = 0
+  let added = 0
+  for (const { node } of locations(model)) {
+    for (const slot of textSlots(model, node)) {
+      const raw = rawText(model, node, slot)
+      if (raw === undefined || raw === '') continue
+      // a literal, unless it is the key the slot would get (a key without translation yet)
+      let key = raw
+      if (!isKnownKey(model, raw) && raw !== textKey(model, node, slot)) {
+        key = setText(model, node, slot, locale, raw)
+        converted++
+      }
+      for (const language of languages) {
+        const messages = (model.translations[language] ??= {})
+        if (!(key in messages)) {
+          messages[key] = ''
+          added++
+        }
+      }
+    }
+  }
+  return { converted, added }
 }
 
 /**

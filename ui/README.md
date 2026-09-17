@@ -372,7 +372,8 @@ works on. The component edits a form bound to `v-model` as `{ schema, uischema, 
 the outline of the form with its palette (drag and drop to reorder and reparent, with sortablejs),
 the properties of the selected node (key, required, texts in the builder language, choices, the
 settings of its renderer from the catalog, validation keywords, filtrex rules, raw JSON), the live
-preview with a language switch, the translations editor (with the translations as a CSV file,
+preview with a language switch, the translations editor (a button collects the texts of the form,
+turning literals into keys and adding the missing entries of every language; the translations as a CSV file,
 `key` then one column per language, downloaded for the translators and uploaded back: the
 non-empty cells update or add keys and languages), and the source with import and export (a
 form, a schema alone, or an angular-schema-form pair).

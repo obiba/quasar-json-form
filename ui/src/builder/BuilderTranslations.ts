@@ -8,7 +8,7 @@ import type { PropType } from 'vue'
 import { QInput, QToggle, QBtn, QMarkupTable, QBadge } from 'quasar'
 import { useFormI18n } from '../vue-plugin'
 import type { FormModel } from './model'
-import { usedKeys, pruneTranslations } from './texts'
+import { usedKeys, pruneTranslations, collectKeys, isMissing as missing } from './texts'
 import { translationsToCsv, mergeCsv } from './csv'
 import { downloadText } from './items'
 
@@ -17,6 +17,8 @@ export default defineComponent({
   props: {
     model: { type: Object as PropType<FormModel>, required: true },
     languages: { type: Array as PropType<string[]>, required: true },
+    /** the language the literals of the form are written in */
+    locale: { type: String, required: true },
   },
   emits: ['change', 'add-language'],
   setup(props, { emit }) {
@@ -26,6 +28,13 @@ export default defineComponent({
     const missingOnly = ref(false)
     const newLanguage = ref('')
     const pruned = ref<number | undefined>(undefined)
+    const collected = ref('')
+
+    const collect = () => {
+      const result = collectKeys(props.model, props.languages, props.locale)
+      collected.value = tr('collected', result)
+      emit('change')
+    }
     const csvStatus = ref('')
     const fileInput = ref<HTMLInputElement | null>(null)
 
@@ -51,7 +60,7 @@ export default defineComponent({
       Object.values(props.model.translations).forEach((messages) => Object.keys(messages).forEach((key) => all.add(key)))
       return [...all].sort()
     })
-    const isMissing = (key: string, locale: string) => props.model.translations[locale]?.[key] === undefined
+    const isMissing = (key: string, locale: string) => missing(props.model, key, locale)
     const rows = computed(() => {
       const needle = filter.value.trim().toLowerCase()
       return keys.value.filter((key) => {
@@ -87,6 +96,10 @@ export default defineComponent({
           'onUpdate:modelValue': (v: string | number | null) => { newLanguage.value = String(v ?? '') },
           onKeyup: (e: KeyboardEvent) => { if (e.key === 'Enter') addLanguage() },
         }, { append: () => h(QBtn, { flat: true, dense: true, round: true, icon: 'add', onClick: addLanguage }) })]),
+        h('div', { class: 'col-auto' }, [
+          h(QBtn, { flat: true, dense: true, size: 'sm', icon: 'playlist_add', label: tr('collect'), onClick: collect }),
+          collected.value ? h('span', { class: 'text-caption text-grey-7 q-ml-sm' }, collected.value) : null,
+        ]),
         h('div', { class: 'col-auto' }, [
           h(QBtn, { flat: true, dense: true, size: 'sm', icon: 'cleaning_services', label: tr('prune'), onClick: () => { pruned.value = pruneTranslations(props.model).length; emit('change') } }),
           pruned.value !== undefined ? h('span', { class: 'text-caption text-grey-7 q-ml-sm' }, tr('pruned', { count: pruned.value })) : null,
