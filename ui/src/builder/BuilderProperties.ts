@@ -76,7 +76,7 @@ export default defineComponent({
     /** a card per section, every input visible */
     const section = (title: string, content: (VNode | null)[]): VNode =>
       h(QCard, { flat: true, bordered: true, class: 'q-builder-section q-mb-md' }, () => [
-        h(QCardSection, { class: 'q-py-xs text-weight-medium' }, () => title),
+        h(QCardSection, { class: 'q-py-xs text-weight-medium bg-grey-3' }, () => title),
         h(QSeparator),
         h(QCardSection, () => content),
       ])
@@ -405,7 +405,6 @@ export default defineComponent({
       if (!node.value) return h('div', { class: 'text-grey-7 q-pa-md' }, tr('noSelection'))
       return h('div', { class: 'q-builder-properties' }, [
         ...renderHeader(),
-        h(QSeparator, { class: 'q-my-sm' }),
         renderTexts(),
         renderChoices(),
         renderSettings(),
