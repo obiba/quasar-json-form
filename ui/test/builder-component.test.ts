@@ -196,6 +196,10 @@ describe('QJsonFormBuilder', () => {
     await flush()
     const fields = (label: string) => wrapper.findAll('label.q-field').filter((f: any) => f.find('.q-field__label').exists() && f.find('.q-field__label').text() === label)
     expect((fields('Label')[0]!.find('input').element as HTMLInputElement).value).toBe('One')
+    // retyping a value as it is leaves the enum alone
+    await fields('Value')[0]!.find('input').setValue('1')
+    await flush()
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
     await fields('Label')[1]!.find('input').setValue('Two')
     await flush()
     let emitted = lastEmitted(wrapper)
@@ -230,6 +234,19 @@ describe('QJsonFormBuilder', () => {
     const table = wrapper.find('.q-builder-translations')
     expect(table.findAll('tbody tr').length).toBe(4)
     expect(table.findAll('td.q-builder-missing').length).toBe(3)
+    wrapper.unmount()
+  })
+
+  it('follows the locale prop when it is one of the languages', async () => {
+    const wrapper = mountBuilder({ locale: 'fr' })
+    await flush()
+    expect(rowLabels(wrapper)[1]).toBe('Nom')
+    await wrapper.setProps({ locale: 'en' })
+    await flush()
+    expect(rowLabels(wrapper)[1]).toBe('Name')
+    await wrapper.setProps({ locale: 'de' })
+    await flush()
+    expect(rowLabels(wrapper)[1]).toBe('Name')
     wrapper.unmount()
   })
 

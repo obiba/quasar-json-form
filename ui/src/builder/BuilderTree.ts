@@ -24,7 +24,7 @@ export default defineComponent({
     selected: { type: String, default: undefined },
     locale: { type: String, required: true },
   },
-  emits: ['select', 'change'],
+  emits: ['select'],
   setup(props, { emit }) {
     const { translate } = useFormI18n()
     const tr = (key: string, named?: Record<string, unknown>) => translate(`builder.${key}`, named)
@@ -51,20 +51,14 @@ export default defineComponent({
 
     const add = (parent: FormNode, item: { schema?: Record<string, any>; uischema: Record<string, any>; name: string }) => {
       const node = addNode(props.model, parent.id, item, undefined, itemKey(item as any))
-      if (node) {
-        emit('change')
-        emit('select', node.id)
-      }
+      if (node) emit('select', node.id)
     }
 
     const remove = (node: FormNode) => {
       const location = locate(props.model, node.id)
       const removed = removeNode(props.model, node.id)
-      if (removed) {
-        emit('change')
-        // the selection was in the removed subtree: select the parent
-        if (location?.parent && descendants(removed).some((n) => n.id === props.selected)) emit('select', location.parent.id)
-      }
+      // the selection was in the removed subtree: select the parent
+      if (removed && location?.parent && descendants(removed).some((n) => n.id === props.selected)) emit('select', location.parent.id)
     }
 
     const renderPalette = (parent: FormNode): VNode =>
@@ -131,7 +125,7 @@ export default defineComponent({
       const id = item.getAttribute('data-id')
       const parentId = to.getAttribute('data-parent')
       if (!id || !parentId) return
-      if (moveNode(props.model, id, parentId, dropIndex(from === to, oldIndex, newIndex))) emit('change')
+      moveNode(props.model, id, parentId, dropIndex(from === to, oldIndex, newIndex))
     }
 
     const syncSortables = () => {

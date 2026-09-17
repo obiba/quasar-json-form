@@ -1,10 +1,12 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { Quasar } from 'quasar'
-import { ref } from 'vue'
+import { defineComponent, ref } from 'vue'
 import QJsonForm from '../src/components/QJsonForm'
 import { I18N_KEY } from '../src/composables/keys'
-import { mountForm, flush } from './utils'
+import { useFormI18n } from '../src/composables/useFormI18n'
+import type { FormI18n } from '../src/composables/useFormI18n'
+import { createTestI18n, mountForm, flush } from './utils'
 
 // every text is a key, resolved by the translations embedded in the form
 const schema = {
@@ -98,6 +100,29 @@ describe('form translations', () => {
     await wrapper.setProps({ modelValue: { name: 'x' } })
     await flush()
     expect(wrapper.find('.q-field__messages').text()).toBe('Doit contenir au moins 2 caractères')
+    wrapper.unmount()
+  })
+
+  it('answers te for the keys t resolves, the fallback locale included', () => {
+    let i18n: FormI18n | undefined
+    const Probe = defineComponent({
+      setup() {
+        i18n = useFormI18n(ref({ locale: 'fr', translations: { en: { 'color.blue': 'Blue' }, fr: { 'color.red': 'Rouge' } } }))
+        return () => null
+      },
+    })
+    const wrapper = mount(Probe, { global: { plugins: [createTestI18n({ en: { app: 'App' } })] } })
+    expect(i18n!.t('color.red')).toBe('Rouge')
+    expect(i18n!.te('color.red')).toBe(true)
+    // only in the fallback locale: t finds it, so does te
+    expect(i18n!.t('color.blue')).toBe('Blue')
+    expect(i18n!.te('color.blue')).toBe(true)
+    expect(i18n!.te('color.blue', 'fr')).toBe(false)
+    expect(i18n!.te('color.blue', 'en')).toBe(true)
+    // the application messages: vue-i18n answers for the form locale (its fallback is not consulted by `te`)
+    expect(i18n!.te('app', 'en')).toBe(true)
+    expect(i18n!.te('app')).toBe(false)
+    expect(i18n!.te('nothing')).toBe(false)
     wrapper.unmount()
   })
 

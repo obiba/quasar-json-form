@@ -69,7 +69,7 @@ readable and stable across languages:
 | A property of a list of objects | `contacts.items.email.title` |
 | Option labels | `role.options.editor` |
 | Messages of the validation rules | `name.validation.0` |
-| Label of a layout, group or category | `group.1.label` |
+| Label of a layout, group or category, label and description of a section | `group.1.label`, `section.1.description` |
 
 This follows the `<path>.error.<keyword>` convention of JSON Forms: a form can also carry its
 own `name.error.minLength` in its translations. The key is not shown unless asked: the property

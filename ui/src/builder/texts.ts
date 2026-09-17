@@ -7,7 +7,7 @@
  * the translations of the form, one per language.
  */
 import type { FormModel, FormNode, JsonObject } from './model'
-import { locations, locate, containerOf, propertyIn } from './model'
+import { locations, locate, containerOf, propertyIn, hasOwn } from './model'
 
 /** Where a text of a node is stored. */
 export interface TextSlot {
@@ -87,7 +87,7 @@ export function rawText(model: FormModel, node: FormNode, slot: TextSlot): strin
 
 /** true when the key is defined in at least one language of the form */
 export function isKnownKey(model: FormModel, key: string): boolean {
-  return Object.values(model.translations).some((messages) => key in messages)
+  return Object.values(model.translations).some((messages) => hasOwn(messages, key))
 }
 
 /**
@@ -105,10 +105,10 @@ export function getText(model: FormModel, node: FormNode, slot: TextSlot, locale
 }
 
 /** The dotted prefix of the keys of a control: its path, under the `items` of its lists. */
-function controlPrefix(model: FormModel, node: FormNode): string {
-  const list = locate(model, node.id)?.list
+function controlPrefix(model: FormModel, node: FormNode, listOf: (node: FormNode) => FormNode | undefined = (n) => locate(model, n.id)?.list): string {
+  const list = listOf(node)
   const own = (node.path ?? [node.id]).join('.')
-  return list ? `${controlPrefix(model, list)}.items.${own}` : own
+  return list ? `${controlPrefix(model, list, listOf)}.items.${own}` : own
 }
 
 /** The prefix of the keys held by the slots of a layout or element (`group.1` from `group.1.label`), or undefined. */
@@ -175,8 +175,10 @@ export function setText(model: FormModel, node: FormNode, slot: TextSlot, locale
 /** The key prefixes of every node of the tree. */
 function usedPrefixes(model: FormModel): string[] {
   const prefixes: string[] = []
-  for (const { node } of locations(model)) {
-    if (node.kind === 'control') prefixes.push(controlPrefix(model, node))
+  const all = locations(model)
+  const lists = new Map(all.map(({ node, list }) => [node, list]))
+  for (const { node } of all) {
+    if (node.kind === 'control') prefixes.push(controlPrefix(model, node, (n) => lists.get(n)))
     else {
       const prefix = heldPrefix(model, node)
       if (prefix !== undefined) prefixes.push(prefix)
@@ -232,7 +234,7 @@ export function collectKeys(model: FormModel, languages: string[], locale: strin
       }
       for (const language of languages) {
         const messages = (model.translations[language] ??= {})
-        if (!(key in messages)) {
+        if (!hasOwn(messages, key)) {
           messages[key] = ''
           added++
         }

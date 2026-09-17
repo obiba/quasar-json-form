@@ -68,6 +68,9 @@ describe('scopes and keys', () => {
     expect(uniqueKey(container, 'other')).toBe('other')
     expect(uniqueKey(container, '')).toBe('field')
     expect(uniqueKey(undefined, 'x')).toBe('x')
+    // names of the object prototype are keys like any other
+    expect(uniqueKey(container, 'constructor')).toBe('constructor')
+    expect(uniqueKey({ properties: { toString: {} } }, 'toString')).toBe('toString2')
   })
 })
 
@@ -465,6 +468,9 @@ describe('renameProperty', () => {
     expect(renameProperty(model, name.id, 'name')).toBe(true)
     expect(renameProperty(model, model.root.id, 'x')).toBe(false)
     expect(Object.keys(model.schema.properties)).toEqual(['name', 'email', 'address', 'contacts'])
+    // a name of the object prototype is not taken
+    expect(renameProperty(model, name.id, 'constructor')).toBe(true)
+    expect(Object.keys(model.schema.properties)).toEqual(['constructor', 'email', 'address', 'contacts'])
   })
 
   it('finds the rules mentioning a property', () => {

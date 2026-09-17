@@ -10,7 +10,7 @@ import type { PropType, VNode } from 'vue'
 import { QInput, QToggle, QBtn, QIcon, QBanner, QChip, QCard, QCardSection, QSeparator } from 'quasar'
 import { useFormI18n, QJsonForm } from '../vue-plugin'
 import type { FormModel, FormNode, JsonObject } from './model'
-import { locate, propertySchema, isRequired, setRequired, containerOf, isValidKey } from './model'
+import { locate, propertySchema, isRequired, setRequired, containerOf, isValidKey, hasOwn } from './model'
 import { renameProperty, ruleReferences } from './operations'
 import { textSlots, getText, setText, keyPrefix } from './texts'
 import type { TextSlot } from './texts'
@@ -27,11 +27,9 @@ export default defineComponent({
     nodeId: { type: String, default: undefined },
     locale: { type: String, required: true },
   },
-  emits: ['change'],
-  setup(props, { emit }) {
+  setup(props) {
     const { translate } = useFormI18n()
     const tr = (key: string, named?: Record<string, unknown>) => translate(`builder.${key}`, named)
-    const changed = () => emit('change')
 
     const location = computed(() => (props.nodeId ? locate(props.model, props.nodeId) : undefined))
     const node = computed<FormNode | undefined>(() => location.value?.node)
@@ -68,7 +66,6 @@ export default defineComponent({
       keyError.value = ''
       const references = ruleReferences(props.model, oldKey)
       mentions.value = { key: oldKey, expressions: references.map((r) => `${r.rule}: ${r.expression}`) }
-      changed()
     }
 
     // --- helpers
@@ -105,7 +102,6 @@ export default defineComponent({
         hideHint: true,
         'onUpdate:modelValue': (value: string | number | null) => {
           setText(props.model, n, slot, props.locale, value === null ? '' : String(value))
-          changed()
         },
       })
     }
@@ -135,7 +131,6 @@ export default defineComponent({
             try {
               apply(parsed)
               error.value = ''
-              changed()
             } catch (e) {
               error.value = (e as Error).message
             }
@@ -167,7 +162,7 @@ export default defineComponent({
             }),
           ]),
           h('div', { class: 'col-auto' }, [
-            h(QToggle, { modelValue: isRequired(props.model, n.id), label: tr('required'), dense: true, 'onUpdate:modelValue': (v: boolean) => { setRequired(props.model, n.id, v); changed() } }),
+            h(QToggle, { modelValue: isRequired(props.model, n.id), label: tr('required'), dense: true, 'onUpdate:modelValue': (v: boolean) => { setRequired(props.model, n.id, v) } }),
           ]),
         ]))
         if (mentions.value.expressions.length > 0) {
@@ -209,26 +204,25 @@ export default defineComponent({
           h('div', { class: 'col-4' }, [h(QInput, {
             modelValue: String(entry.const ?? ''), label: tr('value'), dense: true, outlined: true,
             'onUpdate:modelValue': (v: string | number | null) => {
-              const oneOf = toOneOf()
-              const previous = oneOf[index]!.const
+              const previous = entry.const
               const text = String(v ?? '')
               // the value keeps the type of the previous one when the text allows it
               const next = typeof previous === 'number' && text !== '' && !isNaN(Number(text)) ? Number(text)
                 : typeof previous === 'boolean' && (text === 'true' || text === 'false') ? text === 'true'
                   : text
               if (next === previous) return
+              const oneOf = toOneOf()
               // the label follows the value: its key changes with it
               const prefix = keyPrefix(props.model, n)
               for (const messages of Object.values(props.model.translations)) {
                 const old = `${prefix}.options.${previous}`
-                if (old in messages) {
+                if (hasOwn(messages, old)) {
                   messages[`${prefix}.options.${next}`] = messages[old]!
                   delete messages[old]
                 }
               }
               if (oneOf[index]!.title === `${prefix}.options.${previous}`) oneOf[index]!.title = `${prefix}.options.${next}`
               oneOf[index]!.const = next
-              changed()
             },
           })]),
           h('div', { class: 'col' }, [h(QInput, {
@@ -237,10 +231,9 @@ export default defineComponent({
               toOneOf()
               const current = textSlots(props.model, n).find((s) => s.name === slot.name)
               if (current) setText(props.model, n, current, props.locale, String(v ?? ''))
-              changed()
             },
           })]),
-          h('div', { class: 'col-auto' }, [h(QBtn, { flat: true, dense: true, round: true, size: 'sm', icon: 'delete', onClick: () => { toOneOf().splice(index, 1); changed() } })]),
+          h('div', { class: 'col-auto' }, [h(QBtn, { flat: true, dense: true, round: true, size: 'sm', icon: 'delete', onClick: () => { toOneOf().splice(index, 1) } })]),
         ])
       })
       rows.push(h(QBtn, {
@@ -250,7 +243,6 @@ export default defineComponent({
           let value = `choice${oneOf.length + 1}`
           while (oneOf.some((e) => e.const === value)) value += '_'
           oneOf.push({ const: value, title: `${keyPrefix(props.model, n)}.options.${value}` })
-          changed()
         },
       }))
       return section(tr('choices'), rows)
@@ -280,7 +272,6 @@ export default defineComponent({
             if (JSON.stringify(options) === JSON.stringify(isObject(n.element.options) ? n.element.options : {})) return
             if (Object.keys(options).length > 0) n.element.options = options
             else delete n.element.options
-            changed()
           },
         }))
       }
@@ -308,17 +299,11 @@ export default defineComponent({
           'onUpdate:modelValue': (value: JsonObject) => {
             const target = propertySchema(props.model, n.id)
             if (!target) return
-            let touched = false
             for (const name of names) {
               const v = value?.[name]
-              if (v === undefined || v === null || v === '') {
-                if (target[name] !== undefined) { delete target[name]; touched = true }
-              } else if (target[name] !== v) {
-                target[name] = v
-                touched = true
-              }
+              if (v === undefined || v === null || v === '') delete target[name]
+              else if (target[name] !== v) target[name] = v
             }
-            if (touched) changed()
           },
         }),
       ])
@@ -337,7 +322,6 @@ export default defineComponent({
           if (text.trim()) target[name] = text
           else delete target[name]
           if (Object.keys(target).length === 0) delete n.element.rules
-          changed()
         },
       })
     }
@@ -367,10 +351,10 @@ export default defineComponent({
             h('div', { class: 'col-5' }, [h(QInput, {
               modelValue: expr, label: tr('expression'), dense: true, outlined: true, inputClass: 'q-builder-code',
               error: !!error, errorMessage: error ? `${tr('invalidExpression')}: ${error}` : undefined,
-              'onUpdate:modelValue': (v: string | number | null) => { delete rule.expression; rule.expr = String(v ?? ''); changed() },
+              'onUpdate:modelValue': (v: string | number | null) => { delete rule.expression; rule.expr = String(v ?? '') },
             })]),
             h('div', { class: 'col' }, [slot ? textInput(slot, tr('message')) : null]),
-            h('div', { class: 'col-auto' }, [h(QBtn, { flat: true, dense: true, round: true, size: 'sm', icon: 'delete', onClick: () => { validation.splice(index, 1); if (validation.length === 0) delete rules.validation; if (Object.keys(rules).length === 0) delete n.element.rules; changed() } })]),
+            h('div', { class: 'col-auto' }, [h(QBtn, { flat: true, dense: true, round: true, size: 'sm', icon: 'delete', onClick: () => { validation.splice(index, 1); if (validation.length === 0) delete rules.validation; if (Object.keys(rules).length === 0) delete n.element.rules } })]),
           ]))
         })
         content.push(h(QBtn, {
@@ -380,7 +364,6 @@ export default defineComponent({
             if (!Array.isArray(target.validation)) target.validation = []
             const index = target.validation.length
             target.validation.push({ expr: '', message: `${keyPrefix(props.model, n)}.validation.${index}` })
-            changed()
           },
         }))
       }

@@ -5,7 +5,7 @@
  * step with the tree.
  */
 import type { FormModel, FormNode, JsonObject, NodeLocation, NodeTemplate } from './model'
-import { locate, locations, descendants, containerOf, parentSchemaIn, propertyIn, uniqueKey, isValidKey, toNode } from './model'
+import { locate, locations, descendants, containerOf, parentSchemaIn, propertyIn, uniqueKey, isValidKey, toNode, hasOwn } from './model'
 import { keyPrefix, renewKeys, retargetKeys } from './texts'
 
 const clone = <T>(value: T): T => (value === undefined ? value : JSON.parse(JSON.stringify(value)))
@@ -168,7 +168,7 @@ export function renameProperty(model: FormModel, id: string, key: string): boole
   const oldKey = path[path.length - 1]!
   if (key === oldKey) return true
   const parent = parentSchemaIn(containerOf(model, location.list), path)
-  if (!parent || !isObject(parent.properties) || key in parent.properties) return false
+  if (!parent || !isObject(parent.properties) || hasOwn(parent.properties, key)) return false
   parent.properties = Object.fromEntries(Object.entries(parent.properties).map(([k, v]) => [k === oldKey ? key : k, v]))
   if (Array.isArray(parent.required)) parent.required = parent.required.map((k: string) => (k === oldKey ? key : k))
   const oldPrefix = keyPrefix(model, location.node)
