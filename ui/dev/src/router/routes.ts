@@ -16,6 +16,8 @@ const pages = [
   { path: 'test-file-upload', file: 'TestFileUpload' },
   { path: 'test-mica-widgets', file: 'TestMicaWidgets' },
   { path: 'test-asf-converter', file: 'TestAsfConverter' },
+  { path: 'test-images', file: 'TestImages' },
+  { path: 'test-image-map', file: 'TestImageMap' },
 ]
 
 const children = pages.map(page => ({

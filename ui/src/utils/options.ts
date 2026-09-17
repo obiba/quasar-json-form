@@ -48,6 +48,11 @@ export const RENDERER_OPTION_KEYS = [
   'columnGap',
   'minWidth',
   'captions',
+  'image',
+  'areas',
+  'select',
+  'outline',
+  'maxWidth',
 ]
 
 /** Copy of `options` without the given keys (defaults to `RENDERER_OPTION_KEYS`). */

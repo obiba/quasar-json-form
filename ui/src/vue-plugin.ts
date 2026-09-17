@@ -30,6 +30,8 @@ import QCountriesRenderer from './components/QCountriesRenderer'
 import QTypeaheadRenderer from './components/QTypeaheadRenderer'
 import QImagesRenderer, { isSupportedImage, ratioPadding, IMAGE_MIME_TYPES } from './components/QImagesRenderer'
 import type { ImageEntry, ImageTile } from './components/QImagesRenderer'
+import QImageMapRenderer, { parseArea } from './components/QImageMapRenderer'
+import type { ImageArea, ImageMapImage, ImageRegion } from './components/QImageMapRenderer'
 import QJsonForm from './components/QJsonForm'
 import { messages } from './i18n/messages'
 import { countryCodes } from './data/countries'
@@ -81,6 +83,7 @@ function install(app: App): void {
   app.component(QCountriesRenderer.name!, QCountriesRenderer)
   app.component(QTypeaheadRenderer.name!, QTypeaheadRenderer)
   app.component(QImagesRenderer.name!, QImagesRenderer)
+  app.component(QImageMapRenderer.name!, QImageMapRenderer)
   app.component(QJsonForm.name!, QJsonForm)
 }
 
@@ -114,11 +117,13 @@ export {
   QCountriesRenderer,
   QTypeaheadRenderer,
   QImagesRenderer,
+  QImageMapRenderer,
   QJsonForm,
   messages,
   isSupportedImage,
   ratioPadding,
   IMAGE_MIME_TYPES,
+  parseArea,
   countryCodes,
   createJsonFormsI18n,
   createTranslator,
@@ -164,6 +169,9 @@ export type {
   FileUploadContext,
   ImageEntry,
   ImageTile,
+  ImageArea,
+  ImageMapImage,
+  ImageRegion,
   AsfConvertOptions,
   AsfConvertResult,
   AsfDiagnostic,

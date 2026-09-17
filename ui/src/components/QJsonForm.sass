@@ -142,3 +142,49 @@
 .q-images__label
   min-width: 0
   overflow-wrap: anywhere
+.q-image-map
+  position: relative
+  line-height: 0
+  &.disabled
+    opacity: 0.6
+.q-image-map__image
+  display: block
+  width: 100%
+  height: auto
+  user-select: none
+.q-image-map__overlay
+  overflow: visible
+.q-image-map__area
+  fill: currentColor
+  fill-opacity: 0
+  stroke: currentColor
+  stroke-opacity: 0
+  stroke-width: 2px
+  vector-effect: non-scaling-stroke
+  cursor: pointer
+  outline: none
+  transition: fill-opacity .2s, stroke-opacity .2s
+  &--outlined
+    stroke-opacity: 0.6
+  &:hover:not(.disabled):not(.q-image-map__area--readonly)
+    fill-opacity: 0.2
+    stroke-opacity: 1
+  &:focus-visible
+    stroke-opacity: 1
+    stroke-dasharray: 4 2
+  &--selected
+    fill-opacity: 0.35
+    stroke-opacity: 1
+    stroke-width: 3px
+  &--readonly, &.disabled
+    cursor: default
+.q-image-map__placeholder
+  padding: 24px
+  line-height: normal
+  color: $grey-6
+  background: $grey-3
+.body--dark .q-image-map__placeholder
+  color: $grey-5
+  background: $grey-9
+.q-image-map__select
+  margin-top: 8px
