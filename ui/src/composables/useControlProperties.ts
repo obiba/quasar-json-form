@@ -15,6 +15,8 @@ export interface SelectOption {
   image?: string
   /** grid placement of a `oneOf` entry (`grid` key), for the images control */
   grid?: Record<string, any>
+  /** area of a `oneOf` entry (`area` key), for the image map control */
+  area?: Record<string, any>
 }
 
 export interface ValidationRule {
@@ -386,11 +388,12 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
       return true
     }
 
-    // a `oneOf` entry: its `image` and `grid` keys are kept for the images control
+    // a `oneOf` entry: its `image`, `grid` and `area` keys are kept for the images and image map controls
     const fromEntry = (val: any): SelectOption => {
       const option: SelectOption = { label: t(String(val.title || val.const)), value: val.const }
       if (typeof val.image === 'string') option.image = val.image
       if (val.grid && typeof val.grid === 'object') option.grid = val.grid
+      if (val.area && typeof val.area === 'object') option.area = val.area
       return option
     }
 

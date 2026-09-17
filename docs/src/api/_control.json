@@ -42,7 +42,7 @@
     },
     "format": {
       "type": "String",
-      "desc": "Select a renderer when the schema `format` is not set (`radio`, `checkbox`, `images`, `slider`, `range`, `rating`, `typeahead`, `markdown`, `datepicker`...)."
+      "desc": "Select a renderer when the schema `format` is not set (`radio`, `checkbox`, `images`, `image-map`, `slider`, `range`, `rating`, `typeahead`, `markdown`, `datepicker`...)."
     },
     "validationMessage": {
       "type": "String | Object",

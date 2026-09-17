@@ -1,0 +1,28 @@
+{
+  "name": "QImageMapRenderer",
+  "inherits": "control",
+  "triggers": [
+    { "schema": "{ \"type\": \"string\", \"enum\": [...] } + format: \"image-map\"", "rank": 7, "desc": "One area per `enum` value, the areas come from `options.areas`." },
+    { "schema": "{ \"oneOf\": [{ \"const\", \"title\", \"area\" }] } + format: \"image-map\"", "rank": 7, "desc": "One area per `oneOf` entry, its `area` key is the shape (`rules.visible` on an entry hides it)." },
+    { "schema": "{ \"type\": \"array\", \"uniqueItems\": true, \"items\": { \"enum\" | \"oneOf\" } } + format: \"image-map\"", "rank": 7, "desc": "Multiple choices, the data is an array." }
+  ],
+  "options": {
+    "format": { "type": "String", "desc": "`image-map`, also accepted as the schema `format`." },
+    "image": { "type": "String | Object", "desc": "The image: a URL, or `{ src, width, height }` with its natural size in pixels (read from the loaded image otherwise). JPEG, PNG and WebP, as an http(s) or relative URL or a data URI." },
+    "areas": { "type": "Object", "desc": "Area of each value, keyed by value: `{ shape, coords }`. Wins over the `area` of the `oneOf` entry." },
+    "area": { "type": "Object", "desc": "On a `oneOf` entry or an `areas` entry: `shape` is `rect`, `circle` or `poly`, `coords` are `x1, y1, x2, y2` / `cx, cy, r` / `x1, y1, x2, y2, ...` in the pixels of the image, as an array of numbers or a comma separated string (the HTML `<area>` convention)." },
+    "select": { "type": "Boolean", "default": "true", "desc": "Show a select of the same values under the image, in sync with the areas; the other options (`dense`, `outlined`...) are passed to it. Without it, the error and the hint are displayed under the image." },
+    "maxWidth": { "type": "Number | String", "desc": "Maximum width of the image, in px when a number; the image otherwise fills its container." },
+    "color": { "type": "String", "default": "primary", "desc": "Quasar color of the hovered and selected areas." },
+    "outline": { "type": "Boolean", "default": "false", "desc": "Outline all the areas, not only the hovered and selected ones." }
+  },
+  "data": {
+    "desc": "The selected value, or an array of values for a multiple choice (an empty array when nothing is selected). A second click clears an optional single choice; once `maxItems` values are selected, the other areas are disabled. Read-only, the selection is displayed but ignores clicks; a hidden control (`rules.visible`) loses its value, a value that is no longer an entry is cleared. The areas are focusable, Space or Enter toggles them.",
+    "example": "{ \"room\": \"kitchen\", \"rooms\": [\"kitchen\", \"pool\"] }"
+  },
+  "validation": {
+    "required": { "message": "error.required", "desc": "A required single choice with no value (AJV)." },
+    "minItems": { "message": "error.minItems", "desc": "Lower bound of a multiple choice (AJV)." },
+    "maxItems": { "message": "error.maxItems", "desc": "Upper bound of a multiple choice (AJV); the renderer also disables the other areas once it is reached." }
+  }
+}

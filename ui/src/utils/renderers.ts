@@ -52,6 +52,7 @@ import QRadioMatrixRenderer from '../components/QRadioMatrixRenderer'
 import QCountriesRenderer from '../components/QCountriesRenderer'
 import QTypeaheadRenderer from '../components/QTypeaheadRenderer'
 import QImagesRenderer from '../components/QImagesRenderer'
+import QImageMapRenderer from '../components/QImageMapRenderer'
 
 const hasOneOfItems = (schema: any): boolean =>
   schema.oneOf !== undefined &&
@@ -160,6 +161,12 @@ const isImagesControl = and(
   hasFormat('images')
 )
 
+const isImageMapControl = and(
+  uiTypeIs('Control'),
+  or(isEnumControl, isOneOfEnumControl, isMultiEnumControl),
+  hasFormat('image-map')
+)
+
 // Define your custom renderers
 // Priority 3 - higher than default (usually 1-2)
 
@@ -262,6 +269,10 @@ const qRenderers = [
   {
     renderer: QImagesRenderer,
     tester: rankWith(7, isImagesControl),
+  },
+  {
+    renderer: QImageMapRenderer,
+    tester: rankWith(7, isImageMapControl),
   },
   {
     renderer: QSelectRenderer,
