@@ -223,6 +223,28 @@ describe('QJsonFormBuilder', () => {
   })
 })
 
+describe('import dialog', () => {
+  it('opens from the toolbar whichever tab is shown, and imports a pasted form', async () => {
+    const wrapper = mountBuilder()
+    await flush()
+    const importButton = wrapper.findAll('.q-json-form-builder > .row .q-btn').find((b: any) => b.text().includes('Import'))!
+    await importButton.trigger('click')
+    await flush(5)
+    const dialog = document.body.querySelector('.q-builder-import')
+    expect(dialog).not.toBeNull()
+    const textarea = dialog!.querySelector('textarea')!
+    textarea.value = JSON.stringify({ schema: { type: 'object', properties: { imported: { type: 'string' } } } })
+    textarea.dispatchEvent(new Event('input'))
+    await flush()
+    const buttons = Array.from(dialog!.querySelectorAll('.q-card__actions .q-btn'))
+    ;(buttons[buttons.length - 1] as HTMLElement).click()
+    await flush(5)
+    expect(lastEmitted(wrapper).schema.properties).toEqual({ imported: { type: 'string' } })
+    expect(rowLabels(wrapper)).toEqual(['Form', 'imported'])
+    wrapper.unmount()
+  })
+})
+
 describe('recognize', () => {
   it('tells a form, a schema and an angular-schema-form pair apart', () => {
     expect(recognize(form)).toEqual({ kind: 'form', definition: form })

@@ -20,7 +20,8 @@ import BuilderProperties from './BuilderProperties'
 import BuilderPreview from './BuilderPreview'
 import BuilderTranslations from './BuilderTranslations'
 import BuilderSource from './BuilderSource'
-import type { ImportedForm } from './BuilderSource'
+import BuilderImport from './BuilderImport'
+import type { ImportedForm } from './BuilderImport'
 
 export default defineComponent({
   name: 'QJsonFormBuilder',
@@ -121,15 +122,15 @@ export default defineComponent({
               h(QTabPanel, { name: 'preview' }, () => h(BuilderPreview, { model: state.model, locale: locale.value, languages: languages.value, renderers: props.renderers, config: props.config })),
               h(QTabPanel, { name: 'translations' }, () => h(BuilderTranslations, { model: state.model, languages: languages.value, onAddLanguage: (code: string) => { locale.value = code } })),
               h(QTabPanel, { name: 'source' }, () => h(BuilderSource, {
-                model: state.model, importing: importing.value,
-                'onUpdate:importing': (v: boolean) => { importing.value = v },
+                model: state.model,
                 onReplace: (definition: FormDefinition) => load(fromDefinition(definition)),
-                onImport,
               })),
             ]),
           ]),
         ]),
       ]),
+      // outside the tabs: available whichever tab is shown
+      h(BuilderImport, { modelValue: importing.value, 'onUpdate:modelValue': (v: boolean) => { importing.value = v }, onImport }),
     ])
   },
 })

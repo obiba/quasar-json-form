@@ -10,10 +10,10 @@ import QJsonFormBuilder from './QJsonFormBuilder'
 export { QJsonFormBuilder }
 export { builderCatalog, matchItem, nodeIcon, itemKey, optionsSchema, rawOptions, keywordsSchema, choicesOf, expressionError, fieldNames, dropIndex, downloadText } from './items'
 export type { BuilderCatalog } from './items'
-export { recognize } from './BuilderSource'
+export { recognize } from './BuilderImport'
 export { parseCsv, translationsToCsv, mergeCsv } from './csv'
 export type { CsvImport } from './csv'
-export type { ImportedForm } from './BuilderSource'
+export type { ImportedForm } from './BuilderImport'
 export {
   fromDefinition, toDefinition, fromAsf,
   parseScope, toScope, isValidKey,
