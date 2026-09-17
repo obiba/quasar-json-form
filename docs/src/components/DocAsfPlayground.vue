@@ -18,6 +18,23 @@
       <div class="col-auto">
         <q-toggle v-model="readonly" :label="t('readonly')" />
       </div>
+      <div class="col-12 col-md-3">
+        <q-file
+          v-model="translationsFile"
+          label="Translations JSON"
+          dense
+          outlined
+          clearable
+          accept=".json,application/json"
+          :error="!!translationsError"
+          :error-message="translationsError"
+          @update:model-value="loadTranslations"
+        >
+          <template #prepend>
+            <q-icon name="translate" />
+          </template>
+        </q-file>
+      </div>
       <div class="col-auto">
         <q-btn color="primary" label="Convert" unelevated @click="convertNow" />
       </div>
@@ -113,9 +130,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { Notify } from 'quasar'
 import { QJsonForm, countryCodes, convertAsf } from 'ui'
 import type { AsfConvertResult, AsfDiagnostic } from 'ui'
 import DocCode from './DocCode.vue'
+import { i18n } from '../boot/i18n'
 
 const { t, te } = useI18n()
 
@@ -187,6 +206,8 @@ const data = ref<Record<string, any>>({})
 const errors = ref<any[]>([])
 const formKey = ref(0)
 const config = { countries: countryCodes }
+const translationsFile = ref<File | null>(null)
+const translationsError = ref('')
 
 async function loadFixture (name: string | null) {
   if (!name) return
@@ -196,6 +217,27 @@ async function loadFixture (name: string | null) {
   schemaText.value = JSON.stringify(fixture.schema, null, 2)
   definitionText.value = JSON.stringify(fixture.definition, null, 2)
   convertNow()
+}
+
+function loadTranslations (file: File | null) {
+  translationsError.value = ''
+  if (!file) return
+  const reader = new FileReader()
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(String(reader.result))
+      for (const [locale, messages] of Object.entries(parsed)) {
+        i18n.global.mergeLocaleMessage(locale, messages as Record<string, unknown>)
+      }
+      Notify.create({ message: t('translations_loaded'), type: 'positive', timeout: 1500 })
+    } catch (e) {
+      translationsError.value = `${t('invalid_json')}: ${(e as Error).message}`
+    }
+  }
+  reader.onerror = () => {
+    translationsError.value = String(reader.error)
+  }
+  reader.readAsText(file)
 }
 
 function convertNow () {

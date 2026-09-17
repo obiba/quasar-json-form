@@ -46,6 +46,28 @@ describe('ASF converter', () => {
     expect(schema.properties.name.title).toBe('t(person.name)')
   })
 
+  it('promotes a schema-level required flag (draft-3 style) to the parent required array, at the root and in array items', () => {
+    const legacySchema = {
+      type: 'object',
+      properties: {
+        name: { type: 'string', required: true },
+        email: { type: 'string' },
+        staff: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: { name: { type: 'string', required: true }, role: { type: 'string' } },
+          },
+        },
+      },
+    }
+    const { schema: converted } = convert(legacySchema, ['name', 'email', { key: 'staff', items: ['staff[].name', 'staff[].role'] }], quiet)
+    expect(converted.required).toEqual(['name'])
+    expect(converted.properties.name.required).toBeUndefined()
+    expect(converted.properties.staff.items.required).toEqual(['name'])
+    expect(converted.properties.staff.items.properties.name.required).toBeUndefined()
+  })
+
   it('resolves t() tokens with the translate option, also inside HTML', () => {
     const { schema: converted, uischema } = convert(
       schema,
