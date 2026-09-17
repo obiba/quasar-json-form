@@ -148,6 +148,34 @@ const builds = [
   {
     rollup: {
       input: {
+        input: pathResolve('../src/builder/index.ts')
+      },
+      output: {
+        file: pathResolve('../dist/builder.esm.js'),
+        format: 'es'
+      }
+    },
+    build: {
+      minified: true
+    }
+  },
+  {
+    rollup: {
+      input: {
+        input: pathResolve('../src/builder/index.ts')
+      },
+      output: {
+        file: pathResolve('../dist/builder.common.js'),
+        format: 'cjs'
+      }
+    },
+    build: {
+      minified: true
+    }
+  },
+  {
+    rollup: {
+      input: {
         input: pathResolve('../src/index.umd.ts')
       },
       output: {
