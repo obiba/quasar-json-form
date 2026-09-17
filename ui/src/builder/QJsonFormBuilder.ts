@@ -56,7 +56,7 @@ export default defineComponent({
       return codes.length > 0 ? codes : ['en']
     })
     const locale = ref(props.locale && languages.value.includes(props.locale) ? props.locale : languages.value.includes(String(appLocale.value)) ? String(appLocale.value) : languages.value[0]!)
-    watch(languages, (codes) => { if (!codes.includes(locale.value)) locale.value = codes[0]! })
+    watch(languages, (codes) => { if (!codes.includes(locale.value)) locale.value = props.locale && codes.includes(props.locale) ? props.locale : codes[0]! })
     watch(() => props.locale, (code) => { if (code && languages.value.includes(code)) locale.value = code })
 
     // the definition emitted last, to tell an echo of it from a new value

@@ -27,6 +27,14 @@ function get(target: JsonObject | undefined, path: (string | number)[]): unknown
   return path.reduce<any>((current, segment) => (current === undefined || current === null ? undefined : current[segment]), target)
 }
 
+/** Removes the value of a path: deleted, or emptied in an array (`labels`) so that it keeps its length. */
+function unset(target: JsonObject, path: (string | number)[]): void {
+  const last = path[path.length - 1]!
+  const parent = get(target, path.slice(0, -1))
+  if (Array.isArray(parent)) parent[last as number] = ''
+  else if (isObject(parent)) delete parent[last]
+}
+
 function set(target: JsonObject, path: (string | number)[], value: unknown): void {
   let current: any = target
   for (let i = 0; i < path.length - 1; i++) {
@@ -120,10 +128,20 @@ function heldPrefix(model: FormModel, node: FormNode): string | undefined {
   return undefined
 }
 
-/** A prefix no node of the tree uses, from the element type: `group.1`, `tabs.2`... */
+/**
+ * A prefix neither a node of the tree nor a translation (an orphan kept
+ * until pruned) uses, from the element type: `group.1`, `tabs.2`...
+ */
 function newPrefix(model: FormModel, node: FormNode): string {
   const stem = String(node.element.type ?? 'element').replace(/Layout$/, '').replace(/[A-Z]/g, (c, i) => (i ? '-' : '') + c.toLowerCase())
   const used = new Set(usedPrefixes(model))
+  for (const messages of Object.values(model.translations)) {
+    for (const key of Object.keys(messages)) {
+      if (!key.startsWith(`${stem}.`)) continue
+      const number = key.slice(stem.length + 1).split('.')[0]!
+      if (/^\d+$/.test(number)) used.add(`${stem}.${number}`)
+    }
+  }
   let n = 1
   while (used.has(`${stem}.${n}`)) n++
   return `${stem}.${n}`
@@ -159,16 +177,22 @@ export function textKey(model: FormModel, node: FormNode, slot: TextSlot): strin
 /**
  * Sets the text of a slot in a language: the slot holds the key (generated
  * when it holds nothing or a literal) and the translations hold the text. An
- * empty text removes the translation, the key stays.
+ * empty text removes the translation; the key stays while another language
+ * translates it, else it leaves the slot too (the form would display it).
  */
 export function setText(model: FormModel, node: FormNode, slot: TextSlot, locale: string, text: string): string {
   const key = textKey(model, node, slot)
   const target = slot.target === 'schema' ? schemaOf(model, node) : node.element
   if (!target) return key
-  set(target, slot.path, key)
   const messages = (model.translations[locale] ??= {})
-  if (text === '') delete messages[key]
-  else messages[key] = text
+  if (text !== '') {
+    messages[key] = text
+    set(target, slot.path, key)
+  } else {
+    delete messages[key]
+    if (isKnownKey(model, key)) set(target, slot.path, key)
+    else unset(target, slot.path)
+  }
   return key
 }
 
@@ -272,13 +296,22 @@ export function pruneTranslations(model: FormModel): string[] {
 export function retargetKeys(model: FormModel, nodes: FormNode[], oldPrefix: string, newPrefix: string, copy = false): void {
   if (oldPrefix === newPrefix) return
   const rename = (key: string) => (key === oldPrefix || key.startsWith(`${oldPrefix}.`) ? newPrefix + key.slice(oldPrefix.length) : key)
-  // the keys held by the slots (translated or not), resolved before the translations change
+  // the keys held by the slots, resolved before the translations change: the
+  // translated ones, and the generated key of the slot even untranslated (a
+  // cleared text), under its prefix before or after the move; not a literal
   const held: { target: JsonObject; path: (string | number)[]; key: string }[] = []
   for (const node of nodes) {
+    let generated: string | undefined
     for (const slot of textSlots(model, node)) {
       const raw = rawText(model, node, slot)
       const target = slot.target === 'schema' ? schemaOf(model, node) : node.element
-      if (raw !== undefined && target && rename(raw) !== raw) held.push({ target, path: slot.path, key: raw })
+      if (raw === undefined || !target || rename(raw) === raw) continue
+      if (!isKnownKey(model, raw)) {
+        generated ??= keyPrefix(model, node)
+        const own = `${generated}.${slot.name}`
+        if (raw !== own && rename(raw) !== own) continue
+      }
+      held.push({ target, path: slot.path, key: raw })
     }
   }
   for (const messages of Object.values(model.translations)) {

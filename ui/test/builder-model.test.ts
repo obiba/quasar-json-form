@@ -418,6 +418,10 @@ describe('duplicateNode', () => {
     // editing the copy leaves the original alone
     setText(model, copy, textSlots(model, copy).find((s) => s.name === 'label')!, 'en', 'Copy')
     expect(model.translations.en!['group.1.label']).toBe('Outer')
+    // an orphan translation is not overwritten by the next copy
+    model.translations.en!['group.5.label'] = 'Orphan'
+    expect(duplicateNode(model, group.id)!.element.label).toBe('group.6.label')
+    expect(model.translations.en!['group.5.label']).toBe('Orphan')
   })
 
   it('does not duplicate the root or a detail', () => {
@@ -458,6 +462,21 @@ describe('renameProperty', () => {
     expect(model3.schema.properties.contacts.items.properties.type.oneOf[0].title).toBe('contacts.items.type.options.home')
     expect(model3.translations.en!['contacts.items.type.options.home']).toBe('Home')
     expect(model3.schema.properties.contacts.items.required).toEqual(['phone'])
+  })
+
+  it('renames the generated keys of the control even untranslated, not its key-shaped literals', () => {
+    const model = fromDefinition({
+      schema: { type: 'object', properties: { name: { type: 'string', title: 'name.title', description: 'name.custom' } } },
+      uischema: { type: 'VerticalLayout', elements: [{ type: 'Control', scope: '#/properties/name', hint: 'name.hint' }] },
+      translations: { en: { 'name.title': 'Name' } },
+    })
+    expect(renameProperty(model, model.root.children[0]!.id, 'fullName')).toBe(true)
+    const property = model.schema.properties.fullName
+    expect(property.title).toBe('fullName.title')
+    // the generated `name.hint`, translated nowhere (cleared), follows
+    expect(model.root.children[0]!.element.hint).toBe('fullName.hint')
+    // a literal that merely looks like a key does not
+    expect(property.description).toBe('name.custom')
   })
 
   it('refuses an invalid or taken key, and a non control', () => {

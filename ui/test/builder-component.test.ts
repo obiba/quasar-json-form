@@ -247,6 +247,23 @@ describe('QJsonFormBuilder', () => {
     await wrapper.setProps({ locale: 'de' })
     await flush()
     expect(rowLabels(wrapper)[1]).toBe('Name')
+    // the language of the prop arrives with a form, while the selected one goes
+    await wrapper.setProps({ languages: [], modelValue: { schema: { type: 'object', properties: { name: { type: 'string', title: 'name.title' } } }, translations: { es: { 'name.title': 'Nombre' }, de: { 'name.title': 'Vorname' } } } })
+    await flush()
+    expect(rowLabels(wrapper)[1]).toBe('Vorname')
+    wrapper.unmount()
+  })
+
+  it('clears a text from the preview too', async () => {
+    const wrapper = mountBuilder({ modelValue: { schema: { type: 'object', properties: { name: { type: 'string', title: 'name.title' } } }, translations: { en: { 'name.title': 'Name' } } }, languages: ['en'] })
+    await flush()
+    await rows(wrapper)[1]!.trigger('click')
+    await setInput(wrapper, 'title', '')
+    expect(lastEmitted(wrapper).schema.properties.name.title).toBeUndefined()
+    await wrapper.findAll('.q-tab').find((t: any) => t.text() === 'Preview')!.trigger('click')
+    await flush(5)
+    expect(wrapper.find('.q-builder-preview .q-form-title').exists()).toBe(false)
+    expect(rowLabels(wrapper)[1]).toBe('name')
     wrapper.unmount()
   })
 
