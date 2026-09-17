@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { Quasar } from 'quasar'
 import QJsonFormBuilder from '../src/builder/QJsonFormBuilder'
-import { recognize } from '../src/builder'
+import { recognize, builderApi } from '../src/builder'
 import type { FormDefinition } from '../src/builder'
 import { createTestI18n, flush } from './utils'
 
@@ -278,5 +278,21 @@ describe('recognize', () => {
     expect(recognize([])).toBeUndefined()
     expect(recognize({ foo: 1 })).toBeUndefined()
     expect(recognize('x')).toBeUndefined()
+  })
+})
+
+describe('api description', () => {
+  it('documents every prop and event of the component', () => {
+    const component = QJsonFormBuilder as any
+    expect(builderApi.name).toBe(component.name)
+    expect(builderApi.kind).toBe('form')
+    expect(Object.keys(builderApi.props ?? {}).sort()).toEqual(Object.keys(component.props).sort())
+    expect(Object.keys(builderApi.events ?? {}).sort()).toEqual([...component.emits].sort())
+    for (const section of ['props', 'events'] as const) {
+      for (const [key, entry] of Object.entries(builderApi[section] ?? {})) {
+        expect(entry.desc.length, `${section}.${key}`).toBeGreaterThan(0)
+      }
+    }
+    expect(() => JSON.parse(builderApi.data!.example!)).not.toThrow()
   })
 })

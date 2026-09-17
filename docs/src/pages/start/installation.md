@@ -53,6 +53,20 @@ import '@obiba/quasar-ui-json-form/dist/index.css'
 </script>
 ```
 
+## Entries
+
+The package has separate entries for what a form does not need at runtime; none is registered
+by the plugin or the app extension, import them where they are used:
+
+```js
+import { convert } from '@obiba/quasar-ui-json-form/asf'              // angular-schema-form converter
+import { catalog } from '@obiba/quasar-ui-json-form/catalog'          // renderer descriptions
+import { QJsonFormBuilder } from '@obiba/quasar-ui-json-form/builder' // form builder
+```
+
+The [builder](#/builder/overview) imports the main entry rather than bundling a copy of it (its
+preview is a `QJsonForm`), and its styles are part of `dist/index.css`.
+
 ## Validation messages
 
 Keys missing from the application bundles fall back to the library defaults (english and french),

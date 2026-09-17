@@ -98,7 +98,7 @@ catalogItems.map((item) => item.name)     // 'text', 'textarea', 'email', ..., '
 A custom control describes itself the same way, as a `RendererApi` object: the color control
 above exports `colorApi` next to its renderer entry (see the Code tab of the example), with the
 trigger, the options it passes to `QColor`, the data it writes and a `color` palette item. The
-form builder will take such objects through its `catalog` prop, so that the control appears in
-its palette and its options in the property panel.
+[form builder](#/builder/overview#extending-the-palette) takes such objects through its `catalog`
+prop, so that the control appears in its palette and its options in the property panel.
 
 <DocApi example="custom/color" />

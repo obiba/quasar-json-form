@@ -5,6 +5,7 @@ import DocApi from '@/components/DocApi.vue'
 import DocCode from '@/components/DocCode.vue'
 import DocPlayground from '@/components/DocPlayground.vue'
 import DocAsfPlayground from '@/components/DocAsfPlayground.vue'
+import DocBuilder from '@/components/DocBuilder.vue'
 import DocConditionTranspiler from '@/components/DocConditionTranspiler.vue'
 
 export default defineBoot(({ app }) => {
@@ -15,5 +16,6 @@ export default defineBoot(({ app }) => {
   app.component('DocCode', DocCode)
   app.component('DocPlayground', DocPlayground)
   app.component('DocAsfPlayground', DocAsfPlayground)
+  app.component('DocBuilder', DocBuilder)
   app.component('DocConditionTranspiler', DocConditionTranspiler)
 })
