@@ -1,4 +1,5 @@
 import type { JsonFormsRendererRegistryEntry } from '@jsonforms/core'
+import type { RendererApi } from 'ui/catalog'
 
 /** A live example: the inputs of `QJsonForm`. */
 export interface DocExampleDef {
@@ -10,6 +11,8 @@ export interface DocExampleDef {
   configCode?: string
   /** renderers of the application, passed to the `renderers` prop */
   renderers?: JsonFormsRendererRegistryEntry[]
+  /** description of a custom renderer of the example, displayed with `<DocApi example="group/name" />` */
+  api?: RendererApi
   languages?: string[] | Record<string, string>
   /** translations embedded in the form, keyed by language; the example gets a language switch */
   translations?: Record<string, Record<string, unknown>>

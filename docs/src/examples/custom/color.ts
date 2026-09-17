@@ -1,5 +1,5 @@
 import type { DocExampleDef } from '../types'
-import { colorRenderer } from './QColorRenderer'
+import { colorRenderer, colorApi } from './QColorRenderer'
 import source from './QColorRenderer.ts?raw'
 
 export default {
@@ -20,5 +20,8 @@ export default {
   },
   data: { name: 'Quasar', color: '#1976d2' },
   renderers: [colorRenderer],
-  code: `// <QJsonForm :renderers="[colorRenderer]" ... />\n${source.replace("from 'ui'", "from '@obiba/quasar-ui-json-form'")}`,
+  api: colorApi,
+  code: `// <QJsonForm :renderers="[colorRenderer]" ... />\n${source
+    .replace("from 'ui/catalog'", "from '@obiba/quasar-ui-json-form/catalog'")
+    .replace("from 'ui'", "from '@obiba/quasar-ui-json-form'")}`,
 } satisfies DocExampleDef

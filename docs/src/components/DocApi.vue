@@ -1,7 +1,7 @@
 <template>
   <q-card flat bordered class="doc-api q-my-md">
     <q-card-section class="row items-center q-py-sm doc-card-header">
-      <div class="text-subtitle2">{{ api?.name ?? name }} API</div>
+      <div class="text-subtitle2">{{ api?.name ?? name ?? example }} API</div>
       <q-space />
       <q-input v-model="filter" dense outlined debounce="200" placeholder="Filter" clearable style="width: 200px">
         <template #prepend><q-icon name="search" /></template>
@@ -62,7 +62,7 @@
         </q-tab-panel>
       </q-tab-panels>
     </template>
-    <q-card-section v-else class="text-negative">API not found: {{ name }}</q-card-section>
+    <q-card-section v-else class="text-negative">API not found: {{ name ?? example }}</q-card-section>
   </q-card>
 </template>
 
@@ -73,14 +73,19 @@ import { renderMarkdownInline } from 'ui'
 import { catalog, controlApi } from 'ui/catalog'
 import type { ApiEntry as CatalogEntry, RendererApi } from 'ui/catalog'
 import DocCode from './DocCode.vue'
+import type { DocExampleDef } from '../examples/types'
 
 interface ApiEntry extends CatalogEntry { name: string }
 
-const props = defineProps<{ name: string }>()
+/** `name`: a renderer of the library catalog; `example`: the `api` of an example (a custom renderer) */
+const props = defineProps<{ name?: string; example?: string }>()
 const { t } = useI18n()
 
-// the renderer descriptions come from the library catalog
-const api = computed<RendererApi | undefined>(() => catalog[props.name])
+const examples = import.meta.glob<{ default: DocExampleDef }>('../examples/**/*.ts', { eager: true })
+
+// the renderer descriptions come from the library catalog, or from the example
+const api = computed<RendererApi | undefined>(() =>
+  props.example ? examples[`../examples/${props.example}.ts`]?.default.api : catalog[props.name ?? ''])
 const common = computed(() => (api.value?.inherits === 'control' ? controlApi : undefined))
 
 const filter = ref('')
