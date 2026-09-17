@@ -9,7 +9,7 @@
     "geometries": { "type": "Array | String", "default": "all", "desc": "Kinds of geometry the control accepts, among `point`, `linestring` (or `line`) and `polygon`, as an array or a comma separated string. A `type` property with an `enum` of GeoJSON types in the schema restricts them too. With several kinds, the toolbar selects the one to draw." },
     "tiles": { "type": "String | Object", "default": "OpenStreetMap", "desc": "Tile source of the map: a `{z}/{x}/{y}` URL template, or `{ url, attributions }` with the attributions (markdown) displayed under the map. Defaults to `config.geo.tiles`, then the OpenStreetMap standard tiles." },
     "center": { "type": "Array", "desc": "`[lon, lat]` center of the initial view when there is no value (defaults to `config.geo.center`, then a world view)." },
-    "zoom": { "type": "Number", "desc": "Zoom of the initial view when there is no value (defaults to `config.geo.zoom`, then 12 with a `center`)." },
+    "zoom": { "type": "Number", "desc": "Zoom of the initial view when there is no value (defaults to `config.geo.zoom`, then 12 with a `center`); without a `center`, the zoom of the world view." },
     "height": { "type": "Number | String", "default": "320", "desc": "Height of the map, in px when a number (defaults to `config.geo.height`)." },
     "color": { "type": "String", "default": "primary", "desc": "Quasar color (or any CSS color) of the drawn geometry and of the selected draw mode." },
     "precision": { "type": "Number", "default": "6", "desc": "Number of decimals of the coordinates (defaults to `config.geo.precision`)." },

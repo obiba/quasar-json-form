@@ -26,7 +26,7 @@ control is displayed. The tiles are those of OpenStreetMap by default, with thei
 the map: `options.tiles` (a `{z}/{x}/{y}` URL template, or `{ url, attributions }`) selects another
 source. The tiles are displayed in a scale of greys (inverted in dark mode) so that the geometry stands out,
 `options.grayscale: false` keeps their colors. The initial view fits the value, else `options.center`
-(`[lon, lat]`) and `options.zoom`. The form `config.geo` gives defaults for `tiles`, `center`, `zoom`,
+(`[lon, lat]`) and `options.zoom` (12 by default with a center; a zoom alone applies to the world view). The form `config.geo` gives defaults for `tiles`, `center`, `zoom`,
 `height`, `precision` and `grayscale`:
 `<QJsonForm :config="{ geo: { tiles: { url, attributions }, center: [lon, lat], zoom: 6 } }" />`.
 
