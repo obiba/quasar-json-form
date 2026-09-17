@@ -365,6 +365,38 @@ catalogItems.find((item) => item.name === 'textarea')  // { renderer: 'QStringRe
 `ui/test/catalog.test.ts` checks that every renderer registered by the plugin is described, and
 that every `options.<name>` read by a renderer is documented.
 
+# Form builder model
+
+`@obiba/quasar-ui-json-form/builder` holds the model of a form under construction: a tree of
+nodes mirroring the UI schema (`control`, `layout` or plain `element` nodes, a list of objects
+carrying the layout of its items as `detail`), bound to the JSON schema of the data and to the
+translations of the form.
+
+```js
+import { fromDefinition, toDefinition, addNode, setText, textSlots } from '@obiba/quasar-ui-json-form/builder'
+import { findCatalogItem } from '@obiba/quasar-ui-json-form/catalog'
+
+const model = fromDefinition({ schema, uischema, translations })
+const node = addNode(model, model.root.id, findCatalogItem('textarea'), undefined, 'comment')
+setText(model, node, textSlots(model, node)[0], 'en', 'Your comment')  // schema title: `comment.title`
+const { schema, uischema, translations } = toDefinition(model)
+```
+
+- `fromDefinition` copies the form (a missing UI schema is generated, nested translations are
+  flattened to dotted keys) and reports in `model.diagnostics` what it could not model; the
+  unknown keywords of the schema and of the elements are kept and written back by
+  `toDefinition`. `fromAsf` accepts an angular-schema-form pair.
+- `addNode`, `removeNode`, `moveNode`, `duplicateNode` and `renameProperty` keep the schema in
+  step with the tree: the property of a control is created in its container (the root schema, or
+  the `items` of its list), removed with it unless another control uses it, copied under a new
+  key, or renamed with the scopes of the nested controls. A control cannot move into or out of a
+  list. `ruleReferences` finds the filtrex rules mentioning a property.
+- Every text is a translation key: `textSlots` lists the texts of a node (title, description,
+  label, hint, option labels, messages...), `getText` and `setText` read and write them in a
+  language, the key being generated from the position of the node (`name.title`,
+  `contacts.items.email.hint`, `group.1.label`). `usedKeys`, `missingTranslations` and
+  `pruneTranslations` serve the translations editor.
+
 # Setup
 ```bash
 $ npm install
