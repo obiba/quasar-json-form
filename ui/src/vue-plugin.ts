@@ -28,6 +28,8 @@ import QMarkdownEditor from './components/QMarkdownEditor'
 import QRadioMatrixRenderer from './components/QRadioMatrixRenderer'
 import QCountriesRenderer from './components/QCountriesRenderer'
 import QTypeaheadRenderer from './components/QTypeaheadRenderer'
+import QImagesRenderer, { isSupportedImage, IMAGE_MIME_TYPES } from './components/QImagesRenderer'
+import type { ImageEntry, ImageTile } from './components/QImagesRenderer'
 import QJsonForm from './components/QJsonForm'
 import { messages } from './i18n/messages'
 import { countryCodes } from './data/countries'
@@ -78,6 +80,7 @@ function install(app: App): void {
   app.component(QRadioMatrixRenderer.name!, QRadioMatrixRenderer)
   app.component(QCountriesRenderer.name!, QCountriesRenderer)
   app.component(QTypeaheadRenderer.name!, QTypeaheadRenderer)
+  app.component(QImagesRenderer.name!, QImagesRenderer)
   app.component(QJsonForm.name!, QJsonForm)
 }
 
@@ -110,8 +113,11 @@ export {
   QRadioMatrixRenderer,
   QCountriesRenderer,
   QTypeaheadRenderer,
+  QImagesRenderer,
   QJsonForm,
   messages,
+  isSupportedImage,
+  IMAGE_MIME_TYPES,
   countryCodes,
   createJsonFormsI18n,
   createTranslator,
@@ -155,6 +161,8 @@ export type {
   FileItem,
   FileUploadHooks,
   FileUploadContext,
+  ImageEntry,
+  ImageTile,
   AsfConvertOptions,
   AsfConvertResult,
   AsfDiagnostic,

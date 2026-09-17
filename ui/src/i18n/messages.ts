@@ -73,6 +73,10 @@ const en: FormMessages = {
   radioMatrix: {
     allItemsSelected: 'All options must be selected',
   },
+  images: {
+    moveBefore: 'Move before',
+    moveAfter: 'Move after',
+  },
 }
 
 const fr: FormMessages = {
@@ -131,6 +135,10 @@ const fr: FormMessages = {
   },
   radioMatrix: {
     allItemsSelected: 'Toutes les options doivent être sélectionnées',
+  },
+  images: {
+    moveBefore: 'Déplacer avant',
+    moveAfter: 'Déplacer après',
   },
 }
 

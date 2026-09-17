@@ -47,6 +47,7 @@ const menu: MenuSection[] = [
       { title: 'Toggle', path: 'controls/toggle' },
       { title: 'Select', path: 'controls/select' },
       { title: 'Radio and checkbox', path: 'controls/options' },
+      { title: 'Images', path: 'controls/images' },
       { title: 'Slider', path: 'controls/slider' },
       { title: 'Range', path: 'controls/range' },
       { title: 'Rating', path: 'controls/rating' },

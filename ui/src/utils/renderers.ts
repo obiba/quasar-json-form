@@ -51,6 +51,7 @@ import QMarkdownRenderer from '../components/QMarkdownRenderer'
 import QRadioMatrixRenderer from '../components/QRadioMatrixRenderer'
 import QCountriesRenderer from '../components/QCountriesRenderer'
 import QTypeaheadRenderer from '../components/QTypeaheadRenderer'
+import QImagesRenderer from '../components/QImagesRenderer'
 
 const hasOneOfItems = (schema: any): boolean =>
   schema.oneOf !== undefined &&
@@ -153,6 +154,12 @@ const isMultiEnumControl = and(
   )
 )
 
+const isImagesControl = and(
+  uiTypeIs('Control'),
+  or(isEnumControl, isOneOfEnumControl, isMultiEnumControl),
+  hasFormat('images')
+)
+
 // Define your custom renderers
 // Priority 3 - higher than default (usually 1-2)
 
@@ -251,6 +258,10 @@ const qRenderers = [
   {
     renderer: QOptionsRenderer,
     tester: rankWith(7, and(isMultiEnumControl, or(optionIs('format', 'checkbox'), optionIs('format', 'toggle')))),
+  },
+  {
+    renderer: QImagesRenderer,
+    tester: rankWith(7, isImagesControl),
   },
   {
     renderer: QSelectRenderer,
