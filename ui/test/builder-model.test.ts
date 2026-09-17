@@ -4,6 +4,7 @@ import {
   fromDefinition, toDefinition, fromAsf, parseScope, toScope, isValidKey,
   locate, findNode, descendants, listOf, containerOf, propertySchema, isRequired, setRequired, uniqueKey,
   addNode, removeNode, moveNode, canMove, duplicateNode, renameProperty, ruleReferences, dropIndex,
+  textSlots, setText,
 } from '../src/builder'
 import type { FormDefinition, FormModel } from '../src/builder'
 
@@ -386,6 +387,34 @@ describe('duplicateNode', () => {
     expect(Object.keys(model.schema.properties)).toEqual(['name', 'email', 'address', 'contacts', 'contacts2'])
     const ids = descendants(model.root).map((n) => n.id)
     expect(new Set(ids).size).toBe(ids.length)
+  })
+
+  it('gives a copied layout its own keys, nested layouts included', () => {
+    const model = fromDefinition({
+      schema: { type: 'object', properties: { name: { type: 'string', title: 'name.title' } } },
+      uischema: {
+        type: 'VerticalLayout',
+        elements: [{ type: 'Group', label: 'group.1.label', elements: [
+          { type: 'Control', scope: '#/properties/name' },
+          { type: 'Section', label: 'section.1.label', description: 'section.1.description' },
+          { type: 'Group', label: 'group.2.label', elements: [] },
+        ] }],
+      },
+      translations: { en: { 'name.title': 'Name', 'group.1.label': 'Outer', 'section.1.label': 'Section', 'group.2.label': 'Inner' }, fr: { 'group.1.label': 'Externe' } },
+    })
+    const group = model.root.children[0]!
+    const copy = duplicateNode(model, group.id)!
+    expect(copy.element.label).toBe('group.3.label')
+    expect(copy.children[1]!.element).toEqual({ type: 'Section', label: 'section.2.label', description: 'section.2.description' })
+    expect(copy.children[2]!.element.label).toBe('group.4.label')
+    // the control of the copy keeps its property and its key
+    expect(copy.children[0]!.path).toEqual(['name'])
+    expect(group.element.label).toBe('group.1.label')
+    expect(model.translations.en).toEqual({ 'name.title': 'Name', 'group.1.label': 'Outer', 'section.1.label': 'Section', 'group.2.label': 'Inner', 'group.3.label': 'Outer', 'section.2.label': 'Section', 'group.4.label': 'Inner' })
+    expect(model.translations.fr).toEqual({ 'group.1.label': 'Externe', 'group.3.label': 'Externe' })
+    // editing the copy leaves the original alone
+    setText(model, copy, textSlots(model, copy).find((s) => s.name === 'label')!, 'en', 'Copy')
+    expect(model.translations.en!['group.1.label']).toBe('Outer')
   })
 
   it('does not duplicate the root or a detail', () => {

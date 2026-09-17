@@ -399,11 +399,12 @@ export default defineComponent({
       const n = node.value!
       const content: (VNode | null)[] = [
         jsonInput(tr('rawElement'), rawElement, (parsed) => {
-          // the structure of the node (its kind, path and items layout) is not editable here
+          // the structure of the node (its kind, path and items layout) is not editable here;
+          // a scope that is not a property path stays on the element, editable
           const kind = kindOfType(parsed.type)
           if (kind && kind !== n.kind) throw new Error(tr('rawKindChanged', { type: parsed.type }))
           delete parsed.elements
-          delete parsed.scope
+          if (n.path) delete parsed.scope
           if (n.detail && isObject(parsed.options)) delete parsed.options.items
           n.element = parsed
         }),

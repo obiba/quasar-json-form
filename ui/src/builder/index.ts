@@ -25,6 +25,6 @@ export { addNode, removeNode, moveNode, canMove, duplicateNode, renameProperty, 
 export type { FormDefinition, FormModel, FormNode, NodeKind, NodeLocation, NodeTemplate, ModelDiagnostic, JsonObject } from './model'
 export {
   textSlots, rawText, getText, setText, textKey, keyPrefix, isKnownKey,
-  usedKeys, isMissing, missingTranslations, pruneTranslations, retargetKeys, collectKeys,
+  usedKeys, isMissing, missingTranslations, pruneTranslations, retargetKeys, renewKeys, collectKeys,
 } from './texts'
 export type { TextSlot } from './texts'

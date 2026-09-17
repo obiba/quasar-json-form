@@ -76,6 +76,24 @@ describe('getText', () => {
     expect(isKnownKey(model, 'name.hint')).toBe(true)
     expect(isKnownKey(model, 'Blue')).toBe(false)
   })
+
+  it('reads a cleared text as empty, not as its key', () => {
+    const single = fromDefinition({ schema: { type: 'object', properties: { name: { type: 'string' } } }, uischema: { type: 'VerticalLayout', elements: [{ type: 'Control', scope: '#/properties/name' }, { type: 'Group', label: 'Literal', elements: [] }] } })
+    const name = control(single, 'name')
+    const group = single.root.children[1]!
+    setText(single, name, slot(single, name, 'title'), 'en', 'Name')
+    setText(single, group, slot(single, group, 'label'), 'en', 'Group')
+    setText(single, name, slot(single, name, 'title'), 'en', '')
+    setText(single, group, slot(single, group, 'label'), 'en', '')
+    // the keys stay, translated nowhere
+    expect(rawText(single, name, slot(single, name, 'title'))).toBe('name.title')
+    expect(rawText(single, group, slot(single, group, 'label'))).toBe('group.1.label')
+    expect(getText(single, name, slot(single, name, 'title'), 'en')).toBeUndefined()
+    expect(getText(single, group, slot(single, group, 'label'), 'en')).toBeUndefined()
+    // and get the same key back when the text is typed again
+    expect(setText(single, name, slot(single, name, 'title'), 'en', 'Name')).toBe('name.title')
+    expect(setText(single, group, slot(single, group, 'label'), 'en', 'Group')).toBe('group.1.label')
+  })
 })
 
 describe('keys', () => {

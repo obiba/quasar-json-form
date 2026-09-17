@@ -6,7 +6,7 @@
  */
 import type { FormModel, FormNode, JsonObject, NodeLocation, NodeTemplate } from './model'
 import { locate, locations, descendants, containerOf, parentSchemaIn, propertyIn, uniqueKey, isValidKey, toNode } from './model'
-import { keyPrefix, retargetKeys } from './texts'
+import { keyPrefix, renewKeys, retargetKeys } from './texts'
 
 const clone = <T>(value: T): T => (value === undefined ? value : JSON.parse(JSON.stringify(value)))
 const isObject = (value: unknown): value is JsonObject => typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -127,7 +127,8 @@ function renumber(model: FormModel, node: FormNode): void {
  * last segment of its path) is copied under a new key; the controls of its
  * subtree keep their paths (bound to the copied properties of a list, or to
  * the same properties otherwise), and its translations are copied under the
- * new key. Returns the copy, or undefined.
+ * new key. The layouts and elements of the copy get their own keys, their
+ * translations copied. Returns the copy, or undefined.
  */
 export function duplicateNode(model: FormModel, id: string): FormNode | undefined {
   const location = locate(model, id)
@@ -149,6 +150,7 @@ export function duplicateNode(model: FormModel, id: string): FormNode | undefine
   if (copy.kind === 'control' && copy.path) {
     retargetKeys(model, descendants(copy), keyPrefix(model, location.node), keyPrefix(model, copy), true)
   }
+  renewKeys(model, descendants(copy))
   return copy
 }
 

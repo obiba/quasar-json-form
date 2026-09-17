@@ -164,6 +164,27 @@ describe('QJsonFormBuilder', () => {
     wrapper.unmount()
   })
 
+  it('keeps the scope of a control that is not bound to a property when its raw element is applied', async () => {
+    const wrapper = mountBuilder({
+      modelValue: {
+        schema: { type: 'object', definitions: { name: { type: 'string' } }, properties: { name: { $ref: '#/definitions/name' } } },
+        uischema: { type: 'VerticalLayout', elements: [{ type: 'Control', scope: '#/definitions/name' }] },
+      },
+    })
+    await flush()
+    await rows(wrapper)[1]!.trigger('click')
+    await flush()
+    const raw = wrapper.findAll('label.q-field').find((f: any) => f.find('.q-field__label').exists() && f.find('.q-field__label').text() === 'UI schema element')!
+    expect(JSON.parse(raw.find('textarea').element.value)).toEqual({ type: 'Control', scope: '#/definitions/name' })
+    await raw.find('textarea').setValue('{ "type": "Control", "scope": "#/definitions/name", "hint": "A hint" }')
+    await flush()
+    raw.element.parentElement!.querySelector('button')!.click()
+    await flush()
+    expect(raw.classes()).not.toContain('q-field--error')
+    expect(lastEmitted(wrapper).uischema!.elements[0]).toEqual({ type: 'Control', scope: '#/definitions/name', hint: 'A hint' })
+    wrapper.unmount()
+  })
+
   it('edits the labels of an enum, converting it to oneOf, and keeps the other options', async () => {
     const wrapper = mountBuilder({ modelValue: {
       schema: { type: 'object', properties: { size: { type: 'integer', enum: [1, 2] } } },
