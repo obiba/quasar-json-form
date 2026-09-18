@@ -115,6 +115,10 @@ The errors contain the AJV validation errors (none in `NoValidation` mode) follo
 the renderers themselves, which are always evaluated: `validation` rules (`keyword: "validation"`),
 localized strings not completed (`completed`), word limits (`wordLimit`), file counts (`files`), radio
 matrix (`allItemsSelected`) and date bounds (`date`); their `instancePath` points at the control.
+A control hidden by a `visible` rule (its own, or the rule of an enclosing layout) is not validated:
+its AJV errors (a `required` property shown under a condition, for instance) are left out, as
+angular-schema-form did with non-rendered fields. The rules of the elements of a list item are
+relative to the item and are not considered; a hidden list hides the errors of all its items.
 
 A control can also be read-only through `options.readonly` in the UI schema or `readOnly` in the schema.
 
