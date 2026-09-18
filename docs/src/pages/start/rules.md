@@ -73,13 +73,6 @@ import { ruleEngine } from '@obiba/quasar-ui-json-form'
 ruleEngine.addFunction('isAdult', (age: number) => age >= 18)
 ```
 
-### Migrating from filtrex
-
-Rules used to be [filtrex](https://github.com/cshaa/filtrex) expressions. Rewrite
-`and` / `or` / `not` as `&&` / `||` / `!`, `x in list` as `contains(list, x)`, `mod` as `%`, and
-`if c then a else b` as `c ? a : b`; the functions and the comparison operators are unchanged
-(`==` is now the loose JavaScript equality, `===` the strict one).
-
 ## Options visibility
 
 A `oneOf` entry of a [select](#/controls/select) or [radio](#/controls/options) control can carry
