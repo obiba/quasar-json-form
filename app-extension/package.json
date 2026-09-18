@@ -1,6 +1,6 @@
 {
   "name": "@obiba/quasar-app-extension-json-form",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Quasar app extension for JSON Forms",
   "author": "Yannick Marcon <yannick.marcon@obiba.org>",
   "license": "MIT",
@@ -18,7 +18,7 @@
     "#q-app": "@quasar/app-vite"
   },
   "dependencies": {
-    "@obiba/quasar-ui-json-form": "^0.7.0"
+    "@obiba/quasar-ui-json-form": "^0.7.1"
   },
   "engines": {
     "node": ">= 26 || ^24 || ^22.12"
