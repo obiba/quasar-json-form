@@ -69,6 +69,42 @@ The `readonly` prop renders every control read-only: inputs are not editable and
 buttons are hidden. A single control can also be read-only through `options.readonly` in the UI
 schema or `readOnly` in the schema.
 
+## Config
+
+The `config` prop is the JSON Forms config, forwarded as is to the `JsonForms` component:
+a plain object handed to every renderer, where the application sets the defaults that its
+controls share. A control overrides a config entry with the same key in its `options`, so the
+precedence is `options` on the control element, then `config`, then the built-in default.
+
+```html
+<QJsonForm
+  v-model="data"
+  :schema="schema"
+  :uischema="uischema"
+  :config="{
+    languages: { en: 'English', fr: 'Français' },
+    countries: countryCodes,
+    fileUpload: { upload, remove, downloadUrl },
+    geo: { tiles: 'https://tile.example.org/{z}/{x}/{y}.png', center: [-73.6, 45.5], zoom: 10 },
+  }"
+/>
+```
+
+The built-in renderers read these entries:
+
+| Entry | Read by | Value |
+| --- | --- | --- |
+| `languages` | [localized string](#/controls/localized-string) | Languages of the localized strings, `['en', 'fr']` or `{ en: 'English', fr: 'Français' }`. Looked up after `options.languages` and before the `languages` prop of `QJsonForm`; defaults to `['en']`. |
+| `countries` | [countries](#/controls/countries) | The `[{ code, name }]` list of the country select, or a `{ locale: [...] }` map keyed by language (the current locale is used). Looked up after `options.countries` and before a `jsonforms-countries` provide; the `countryCodes` export holds the ISO 3166-1 alpha-3 codes. |
+| `fileUpload` | [file upload](#/controls/file-upload) | Programmatic upload hooks: `upload(file, context)` returning the file item to store (or the path for a string control), `remove(item, context)` called after a file is removed from the data, and `downloadUrl(item, context)` giving the link of a stored file. `context` holds the `path`, `schema`, `uischema` and `options` of the control. Without `upload`, the declarative `uploadUrl` flow of the control options applies. |
+| `geo` | [geo](#/controls/geo) | Defaults of the map controls: `tiles` (a `{z}/{x}/{y}` URL template or `{ url, attributions }`), `center` (`[lon, lat]`), `zoom`, `height`, `precision` (decimals of the coordinates) and `grayscale`. Each one is overridden by the option of the same name on the control. |
+
+Any other entry is ignored by the built-in renderers but reaches the [custom controls](#/start/custom-controls)
+of the application through the `config` of `useControlProperties`, which makes it the place for
+application-wide settings such as API endpoints or feature flags. The standard JSON Forms entries
+(`restrict`, `trim`, `showUnfocusedDescription`, `hideRequiredAsterisk`) are not honored by the
+Quasar renderers.
+
 ## API
 
 <DocApi name="QJsonForm" />
