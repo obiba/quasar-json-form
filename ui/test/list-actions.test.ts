@@ -152,7 +152,7 @@ describe('list renderer actions', () => {
     wrapper.unmount()
   })
 
-  it('empties the list when hidden and disables the buttons when not enabled', async () => {
+  it('removes the list from the data when hidden and disables the buttons when not enabled', async () => {
     const wrapper = mountForm({
       schema,
       uischema: {
@@ -168,7 +168,7 @@ describe('list renderer actions', () => {
     await wrapper.setProps({ modelValue: { tags: ['a'], show: false } })
     await flush()
     expect(wrapper.find('.q-list-renderer').exists()).toBe(false)
-    expect(lastData(wrapper).tags).toEqual([])
+    expect(lastData(wrapper).tags).toBeUndefined()
     wrapper.unmount()
 
     const disabled = mountForm({

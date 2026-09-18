@@ -13,7 +13,7 @@ export default defineComponent({
     const control = controlResult.control
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, isReadonly, rootClass, options, selectOptions, clearInvalidSelection, renderHeader, renderHint } =
+    const { isVisible, isEnabled, isReadonly, rootClass, options, selectOptions, clearInvalidSelection, hasError, errorMessage, renderHeader, renderHint } =
       useControlProperties(control)
 
     const isMultiple = computed(() => {
@@ -74,7 +74,8 @@ export default defineComponent({
         h(QOptionGroup, {
           ...options.value,
           class: isReadonly.value ? 'q-form-readonly' : undefined,
-          modelValue: control.value.data,
+          // a multiple selection is an array from the first render (the data is set on mount)
+          modelValue: isMultiple.value && !Array.isArray(control.value.data) ? [] : control.value.data,
           options: selectOptions.value,
           type: type,
           disable: !isEnabled.value && !isReadonly.value,
@@ -83,7 +84,12 @@ export default defineComponent({
         }),
       )
 
-      children.push(renderHint())
+      // QOptionGroup has no error state: the message is displayed under the options
+      if (hasError.value && errorMessage.value) {
+        children.push(h('div', { class: 'text-negative text-caption q-mt-xs' }, errorMessage.value))
+      } else {
+        children.push(renderHint())
+      }
 
       return h('div', { class: ['q-options-renderer', rootClass.value] }, children)
     }

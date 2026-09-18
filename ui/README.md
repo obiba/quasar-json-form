@@ -177,7 +177,8 @@ such as localized strings) render as a list with add / remove / reorder buttons.
 one item comes from `options.items` (`Control` scopes relative to the item schema, `#` for the item
 itself), by default one control per property of an object item, or the item itself. Options:
 `addLabel`, `addIcon`, `ordering` (default true), `confirmation` (confirm before removing);
-`minItems` / `maxItems` from the schema (or the `min` / `max` rules) bound the list.
+`minItems` / `maxItems` from the schema (or the `min` / `max` rules) bound the list. A list hidden
+by a `visible` rule is removed from the data, like the other hidden controls.
 
 ## Localized strings
 
