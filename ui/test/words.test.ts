@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { mountForm, flush } from './utils'
-import { filtrexEngine } from '../src/composables/useFiltrexRules'
+import { ruleEngine } from '../src/composables/useRules'
 import { countWords, parseWordLimit } from '../src/utils/words'
 
 const schema = {
@@ -35,12 +35,12 @@ describe('word count', () => {
     expect(parseWordLimit({})).toBeUndefined()
   })
 
-  it('is available to filtrex rules', () => {
-    expect(filtrexEngine.evaluate('wordCount(text) <= 3', { text: 'a b c d' })).toBe(false)
-    expect(filtrexEngine.evaluate('wordCount(text) <= 3', { text: 'a b' })).toBe(true)
-    expect(filtrexEngine.evaluate('contains(list, "x")', { list: ['x', 'y'] })).toBe(true)
-    expect(filtrexEngine.evaluate('contains(list, "z")', { list: ['x', 'y'] })).toBe(false)
-    expect(filtrexEngine.evaluate('contains(list, "z")', {})).toBe(false)
+  it('is available to rules', () => {
+    expect(ruleEngine.evaluate('wordCount(text) <= 3', { text: 'a b c d' })).toBe(false)
+    expect(ruleEngine.evaluate('wordCount(text) <= 3', { text: 'a b' })).toBe(true)
+    expect(ruleEngine.evaluate('contains(list, "x")', { list: ['x', 'y'] })).toBe(true)
+    expect(ruleEngine.evaluate('contains(list, "z")', { list: ['x', 'y'] })).toBe(false)
+    expect(ruleEngine.evaluate('contains(list, "z")', {})).toBe(false)
   })
 })
 

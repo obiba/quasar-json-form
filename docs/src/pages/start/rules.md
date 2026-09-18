@@ -4,7 +4,7 @@ title: Rules
 
 # Rules
 
-<p class="doc-lead">Dynamic behaviour is declared with <a href="https://github.com/m93a/filtrex">filtrex</a> expressions over the form data, on the schema property or on the UI schema element.</p>
+<p class="doc-lead">Dynamic behaviour is declared with expressions over the form data, on the schema property or on the UI schema element.</p>
 
 ```json
 { "type": "Control", "scope": "#/properties/city", "rules": { "visible": "country == \"CA\"" } }
@@ -34,9 +34,16 @@ and sections.
 
 ## Expressions
 
-Filtrex supports arithmetic, comparisons (`==`, `!=`, `<`, `<=`, `>`, `>=`), `and`, `or`, `not`,
-`in` (`"one" in picks`), `if ... then ... else`, and ternaries through `ifElse`. Strings use
-double quotes. The following functions are added:
+Rules are a subset of JavaScript, evaluated by
+[angular-expressions](https://github.com/peerigon/angular-expressions) with the form data as scope:
+
+- `a.b.c` paths into the form data; a missing segment gives `undefined` rather than an error;
+- `"string"` / `'string'`, number, `true`, `false`, `null` and `undefined` literals, `[a, b]` arrays;
+- arithmetic (`+`, `-`, `*`, `/`, `%`), comparisons (`==`, `!=`, `===`, `!==`, `<`, `<=`, `>`, `>=`,
+  with the JavaScript loose / strict distinction), `&&`, `||`, `!` and the `cond ? a : b` ternary;
+- calls of the functions below (only these: methods such as `list.indexOf(v)` are not available).
+
+Assignments and the `this` keyword are rejected, and the data is never mutated by a rule.
 
 | Function | Description |
 |---|---|
@@ -53,8 +60,32 @@ double quotes. The following functions are added:
 | `matches(s, pattern)` | regular expression test (pattern of at most 100 characters) |
 | `wordCount(s)` | number of whitespace-separated words |
 
-An expression that fails to evaluate logs an error and counts as `false` (`true` for `visible`).
-The `filtrexEngine` export lets the application register more functions with `addFunction`.
+An expression that fails to compile or to evaluate logs an error and counts as `false`, except for
+`visible`: an element whose rule is broken stays visible. The values follow JavaScript: `undefined > 3` is `false` and `undefined % 2 == 0` is
+`false` too, so a `validation` rule of an optional field is usually guarded, as in
+`isEmpty(even) || even % 2 == 0`.
+
+## Custom functions
+
+The application registers its own functions on the `ruleEngine` export with `addFunction`; they
+are then available to every rule, on any form, under the same name. Register them once before the
+forms are rendered, in a boot file (Quasar CLI) or next to `app.use(Plugin)`:
+
+```js
+import { ruleEngine } from '@obiba/quasar-ui-json-form'
+
+ruleEngine.addFunction('isAdult', (age) => age >= 18)
+```
+
+A function receives the evaluated arguments of the call (`isAdult(person.age)` passes the value of
+`person.age`, `undefined` when it is not set) and its result is the value of the call: a boolean for
+`visible`, `enabled` and `validation`, anything for `compute`, `min` and `max`. Return plain values
+(primitives, arrays, plain objects): a function is the only way for a rule to reach code, so never
+return a constructor or a prototype. A registered name wins over a form field of the same name, and
+the [builder](#/builder/overview) checks the rules against the registered functions, so an unknown
+function is reported while the form is being designed.
+
+<DocExample name="rules/custom-functions" title="age() and luhn() registered by the application" source />
 
 ## Options visibility
 

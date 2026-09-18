@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { createAjv } from '@jsonforms/core'
 import { mountForm, flush } from './utils'
 import { createDefaultAjv, CUSTOM_FORMATS, isPickerTime, isPickerDateTime } from '../src/components/QJsonForm'
@@ -217,6 +217,26 @@ describe('string renderer visibility', () => {
     await wrapper.setProps({ modelValue: { a: 'x', show: false } })
     await flush()
     expect(lastData(wrapper).a).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it('keeps visible a control whose visibility rule fails to evaluate', async () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const wrapper = mountForm({
+      schema: { type: 'object', properties: { a: { type: 'string', title: 'A' }, b: { type: 'string', title: 'B' } } },
+      uischema: {
+        type: 'VerticalLayout',
+        elements: [
+          { type: 'Control', scope: '#/properties/a', rules: { visible: 'show ==' } },
+          { type: 'Control', scope: '#/properties/b', rules: { visible: 'nope(show)' } },
+        ],
+      },
+      modelValue: { a: 'x', b: 'y' },
+    })
+    await flush()
+    expect(wrapper.findAll('.q-field').length).toBe(2)
+    expect(error).toHaveBeenCalled()
+    error.mockRestore()
     wrapper.unmount()
   })
 

@@ -495,12 +495,12 @@ describe('renameProperty', () => {
   it('finds the rules mentioning a property', () => {
     const model = fromDefinition({
       schema: { type: 'object', properties: { a: { type: 'string', rules: { visible: 'b == "x"' } }, b: { type: 'string' }, bb: { type: 'string' } } },
-      uischema: { type: 'VerticalLayout', rules: { enabled: 'not isEmpty(b)' }, elements: [
+      uischema: { type: 'VerticalLayout', rules: { enabled: '!isEmpty(b)' }, elements: [
         { type: 'Control', scope: '#/properties/a', rules: { validation: [{ expr: 'length(bb) > 2', message: 'm' }, { expression: 'a != b', message: 'm' }] } },
         { type: 'Control', scope: '#/properties/b' },
       ] },
     })
-    expect(ruleReferences(model, 'b').map((r) => `${r.rule}: ${r.expression}`)).toEqual(['enabled: not isEmpty(b)', 'validation: a != b', 'visible: b == "x"'])
+    expect(ruleReferences(model, 'b').map((r) => `${r.rule}: ${r.expression}`)).toEqual(['enabled: !isEmpty(b)', 'validation: a != b', 'visible: b == "x"'])
     expect(ruleReferences(model, 'bb').length).toBe(1)
     expect(ruleReferences(model, 'c')).toEqual([])
   })

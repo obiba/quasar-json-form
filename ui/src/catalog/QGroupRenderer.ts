@@ -46,7 +46,7 @@ export default {
     },
     rules: {
       type: 'Object',
-      desc: '`visible` and `enabled` filtrex rules apply to the whole group.',
+      desc: '`visible` and `enabled` rules apply to the whole group.',
     },
   },
   options: {

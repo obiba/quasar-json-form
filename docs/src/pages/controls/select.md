@@ -22,7 +22,7 @@ render [checkboxes](#/controls/options) instead.
 
 ## Dynamic options
 
-A `oneOf` entry accepts its own `rules.visible` [filtrex rule](#/start/rules): the option is
+A `oneOf` entry accepts its own `rules.visible` [rule](#/start/rules): the option is
 listed only when the rule is true, and a selected value that becomes hidden is cleared. This is
 how dependent selects are expressed within the schema.
 

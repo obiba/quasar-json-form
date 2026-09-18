@@ -38,7 +38,7 @@ The builder is an outline tree, a property panel and a live preview.
   required, its texts typed in the builder language, its choices (the labels of an `enum` are
   converted to a `oneOf`), the settings of its renderer as a form generated from the catalog, the
   validation keywords of its property, its `visible`, `enabled` and `validation` rules as
-  [filtrex expressions](#/start/rules) checked with the names of the fields listed, and the raw
+  [rule expressions](#/start/rules) checked with the names of the fields listed, and the raw
   JSON of the element and of the property for everything else.
 - **Preview**: the form as `QJsonForm` renders it, with a language switch, a read-only toggle,
   and the data and errors as in the [playground](#/playground/index).

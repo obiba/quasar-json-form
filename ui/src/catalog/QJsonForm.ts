@@ -26,7 +26,7 @@ export default {
     validationMode: {
       type: 'String',
       default: 'ValidateAndShow',
-      desc: '`ValidateAndShow`: validate against the schema and show the errors on the controls; `ValidateAndHide`: validate without showing; `NoValidation`: skip the schema validation. Filtrex `validation` rules are always evaluated.',
+      desc: '`ValidateAndShow`: validate against the schema and show the errors on the controls; `ValidateAndHide`: validate without showing; `NoValidation`: skip the schema validation. `validation` rules are always evaluated.',
     },
     ajv: {
       type: 'Ajv',
@@ -70,7 +70,7 @@ export default {
       desc: 'Emitted with the new data on every change.',
     },
     'update:errors': {
-      desc: 'Emitted with the AJV validation errors (none in `NoValidation` mode) followed by the errors reported by the renderers themselves: filtrex `validation` rules, localized strings not completed, word limits, file counts, radio matrix and date bounds. Also emitted on mount.',
+      desc: 'Emitted with the AJV validation errors (none in `NoValidation` mode) followed by the errors reported by the renderers themselves: `validation` rules, localized strings not completed, word limits, file counts, radio matrix and date bounds. Also emitted on mount.',
     },
   },
 } satisfies RendererApi

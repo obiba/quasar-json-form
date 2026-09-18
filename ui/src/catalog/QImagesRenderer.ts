@@ -94,7 +94,7 @@ export default {
     },
   },
   data: {
-    desc: 'The selected value, or an array of values for a multiple choice (an empty array when nothing is selected). A second click clears an optional single choice; once `maxItems` values (or the filtrex `max` rule, which wins) are selected, the other images are disabled. Read-only, the selection is displayed but ignores clicks; a hidden control (`rules.visible`) loses its value, a value that is no longer an entry is cleared. The tiles are focusable, Space or Enter toggles them.',
+    desc: 'The selected value, or an array of values for a multiple choice (an empty array when nothing is selected). A second click clears an optional single choice; once `maxItems` values (or the `max` rule, which wins) are selected, the other images are disabled. Read-only, the selection is displayed but ignores clicks; a hidden control (`rules.visible`) loses its value, a value that is no longer an entry is cleared. The tiles are focusable, Space or Enter toggles them.',
     example: '{ "landscape": "forest", "places": ["forest", "lake"] }',
   },
   items: [

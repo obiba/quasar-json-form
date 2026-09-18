@@ -20,7 +20,7 @@ const schema = {
     string: {
       type: 'string',
       rules: {
-        visible: 'integer >= 1 and integer < 10',
+        visible: 'integer >= 1 && integer < 10',
       },
     },
     boolean: {

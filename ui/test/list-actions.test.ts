@@ -136,7 +136,7 @@ describe('list renderer actions', () => {
     single.unmount()
   })
 
-  it('bounds the number of items with filtrex min and max rules', async () => {
+  it('bounds the number of items with min and max rules', async () => {
     const wrapper = mountForm({
       schema,
       uischema: { type: 'Control', scope: '#/properties/tags', rules: { max: 'limit', min: 'limit - 1' } },

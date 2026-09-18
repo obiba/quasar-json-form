@@ -112,7 +112,7 @@ export default defineComponent({
      * data against the schema and shows the errors on the controls,
      * 'ValidateAndHide' validates but does not display errors (they are still
      * emitted with `update:errors`), 'NoValidation' disables schema
-     * validation. Filtrex `validation` rules and the renderers' own checks
+     * validation. `validation` rules and the renderers' own checks
      * (word limits, localized strings completed...) are always evaluated.
      */
     validationMode: {

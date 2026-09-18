@@ -46,7 +46,7 @@ export default {
     },
   },
   data: {
-    desc: 'An array. A new item gets the default value of the item schema. `minItems` / `maxItems` from the schema (or the filtrex `min` / `max` rules) disable the remove / add buttons; AJV also validates them. Read-only, the buttons are hidden. A hidden list (`rules.visible`) is emptied.',
+    desc: 'An array. A new item gets the default value of the item schema. `minItems` / `maxItems` from the schema (or the `min` / `max` rules) disable the remove / add buttons; AJV also validates them. Read-only, the buttons are hidden. A hidden list (`rules.visible`) is emptied.',
     example: '{ "comments": [{ "date": "2024-01-01", "message": "Hello" }], "tags": ["a", "b"] }',
   },
   items: [

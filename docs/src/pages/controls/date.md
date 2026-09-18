@@ -14,7 +14,7 @@ title: Date
 ## Mask and bounds
 
 `datepicker` controls store the date in the `dateFormat` mask (`YYYY-MM-DD` by default; angular-strap
-masks such as `dd/MM/yyyy` are accepted). `min` and `max`, as options or as [filtrex rules](#/start/rules)
+masks such as `dd/MM/yyyy` are accepted). `min` and `max`, as options or as [rules](#/start/rules)
 naming another field, bound the value and the picker; the messages can be customized with
 `validationMessage.dateMin` / `dateMax` / `dateRange` / `dateInvalid`. The options can also be
 nested under `dateOptions`, as in angular-schema-form.

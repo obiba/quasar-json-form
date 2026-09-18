@@ -24,16 +24,16 @@ instance through the `ajv` prop (`createAjv` from `@jsonforms/core`) to change t
 
 The `validationMode` prop of `QJsonForm` is `ValidateAndShow` by default. `ValidateAndHide`
 validates and emits the errors without showing them on the controls. `NoValidation` skips the
-schema validation entirely. The renderer-level checks and the filtrex `validation` rules are
+schema validation entirely. The renderer-level checks and the `validation` rules are
 always evaluated.
 
-<DocExample name="validation/modes" title="NoValidation: only the filtrex rule applies" />
+<DocExample name="validation/modes" title="NoValidation: only the rule applies" />
 
 ## Renderer checks
 
 Some renderers validate what the schema cannot express: word limits on strings, date bounds,
 localized strings completed in every language, file counts, every row of a radio matrix answered,
-and the filtrex `validation` rules of any control. These errors are reported in the `errors` model
+and the `validation` rules of any control. These errors are reported in the `errors` model
 after the AJV errors, with their own `keyword` (`validation`, `wordLimit`, `date`, `completed`,
 `files`, `allItemsSelected`) and an `instancePath` pointing at the control.
 

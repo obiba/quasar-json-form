@@ -22,7 +22,7 @@ controls out, pick a specific renderer, or set the props of the underlying Quasa
   pointing at a schema property through `scope`. The `options` of a control configure the renderer
   and anything else is passed to the Quasar component.
 - **Rules**: `visible`, `enabled`, `min`, `max`, `compute` and `validation` rules written as
-  [filtrex](https://github.com/m93a/filtrex) expressions over the form data, on the schema or the
+  [expressions](#/start/rules) (a JavaScript subset) over the form data, on the schema or the
   UI schema.
 - **i18n**: every title, description, option label, hint and message goes through vue-i18n `t()`,
   so it can be an i18n key or a literal string.

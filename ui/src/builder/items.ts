@@ -6,7 +6,7 @@
  */
 import { catalog, catalogItems, rendererOptions } from '../catalog'
 import type { ApiEntry, CatalogItem, RendererApi } from '../catalog'
-import { filtrexEngine } from '../vue-plugin'
+import { ruleEngine } from '../vue-plugin'
 import type { FormNode, JsonObject } from './model'
 
 export interface BuilderCatalog {
@@ -147,9 +147,9 @@ export function choicesOf(schema: JsonObject | undefined): { entries: JsonObject
   return undefined
 }
 
-/** The error of a filtrex expression, or undefined when it compiles (an empty expression is fine). */
+/** The error of a rule expression, or undefined when it compiles (an empty expression is fine). */
 export function expressionError(expression: string | undefined): string | undefined {
-  return expression ? filtrexEngine.expressionError(expression) : undefined
+  return expression ? ruleEngine.expressionError(expression) : undefined
 }
 
 /** The names the rules of a level can use: the properties of its container object. */

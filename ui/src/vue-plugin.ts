@@ -42,7 +42,7 @@ import { createJsonFormsI18n, createTranslator, errorTranslator, interpolate, lo
 import type { FormTranslations, Messages } from './utils/i18n'
 import { renderMarkdown, renderMarkdownInline } from './utils/markdown'
 import { countWords, parseWordLimit } from './utils/words'
-import { filtrexEngine, FiltrexRuleEngine } from './composables/useFiltrexRules'
+import { ruleEngine, RuleEngine } from './composables/useRules'
 import { createFormErrorRegistry, toInstancePath, useReportedErrors } from './composables/useFormErrors'
 import type { FormErrorRegistry } from './composables/useFormErrors'
 import { normalizeLanguages, useControlProperties } from './composables/useControlProperties'
@@ -148,8 +148,8 @@ export {
   renderMarkdownInline,
   countWords,
   parseWordLimit,
-  filtrexEngine,
-  FiltrexRuleEngine,
+  ruleEngine,
+  RuleEngine,
   createFormErrorRegistry,
   toInstancePath,
   useReportedErrors,

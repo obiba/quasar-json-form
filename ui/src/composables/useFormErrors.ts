@@ -7,7 +7,7 @@ import { FORM_ERRORS_KEY } from './keys'
 export { FORM_ERRORS_KEY }
 
 /**
- * Collects the errors found by the renderers themselves (filtrex `validation`
+ * Collects the errors found by the renderers themselves (`validation`
  * rules, "completed in all languages", word limits, file counts...) so that
  * `QJsonForm` can emit them with `update:errors` next to the AJV errors.
  */

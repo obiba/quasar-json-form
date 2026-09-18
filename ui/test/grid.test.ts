@@ -188,7 +188,7 @@ describe('GridLayout', () => {
         elements: [
           {
             type: 'GridLayout',
-            rules: { visible: 'truthy(show) or truthy(a)' },
+            rules: { visible: '!!show || !!a' },
             elements: [
               { type: 'Control', scope: '#/properties/a' },
               { type: 'Control', scope: '#/properties/b', rules: { visible: 'truthy(show)' } },

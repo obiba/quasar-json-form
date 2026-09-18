@@ -38,7 +38,7 @@ export default defineComponent({
       return control.value.uischema.options?.confirmation ?? false
     })
 
-    // bounds: filtrex `max` / `min` rules, else the schema `maxItems` / `minItems`
+    // bounds: `max` / `min` rules, else the schema `maxItems` / `minItems`
     const maxItems = computed<number | undefined>(() => {
       const value = maxValue.value ?? control.value.schema.maxItems
       return typeof value === 'number' ? value : undefined

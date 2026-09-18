@@ -34,11 +34,11 @@ export default {
     },
     min: {
       type: 'String | Number | Date',
-      desc: 'Lower bound, in the mask format or ISO; the filtrex `min` rule of the control works too.',
+      desc: 'Lower bound, in the mask format or ISO; the `min` rule of the control works too.',
     },
     max: {
       type: 'String | Number | Date',
-      desc: 'Upper bound, in the mask format or ISO; the filtrex `max` rule of the control works too.',
+      desc: 'Upper bound, in the mask format or ISO; the `max` rule of the control works too.',
     },
     yearRef: {
       type: 'String',

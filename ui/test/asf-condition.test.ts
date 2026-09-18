@@ -1,60 +1,62 @@
 import { describe, it, expect } from 'vitest'
 import { transpileCondition, ConditionError } from '../src/asf/condition'
-import { filtrexEngine } from '../src/composables/useFiltrexRules'
+import { ruleEngine } from '../src/composables/useRules'
 
-const evaluate = (condition: string, model: Record<string, unknown>) => filtrexEngine.evaluate(transpileCondition(condition), model)
+const evaluate = (condition: string, model: Record<string, unknown>) => ruleEngine.evaluate(transpileCondition(condition), model)
 
 describe('ASF condition transpiler', () => {
   it('translates the Mica default form conditions', () => {
     expect(transpileCondition("model.modificationNature.indexOf('IA') > -1")).toBe('contains(modificationNature, "IA")')
     expect(transpileCondition('model.dataSources.indexOf("biological_samples")>=0')).toBe('contains(dataSources, "biological_samples")')
-    expect(transpileCondition('!model.hasNoStaff')).toBe('not (truthy(hasNoStaff))')
-    expect(transpileCondition('model.grantSubmission')).toBe('truthy(grantSubmission)')
-    expect(transpileCondition("model.career === 'other'")).toBe('career == "other"')
+    expect(transpileCondition('!model.hasNoStaff')).toBe('!hasNoStaff')
+    expect(transpileCondition('model.grantSubmission')).toBe('!!grantSubmission')
+    expect(transpileCondition("model.career === 'other'")).toBe('career === "other"')
     expect(transpileCondition('model.methods.design=="other"')).toBe('methods.design == "other"')
     expect(transpileCondition("model.access.access_data=='yes' || model.access.access_bio_samples=='yes' || model.access.access_other=='yes'"))
-      .toBe('access.access_data == "yes" or access.access_bio_samples == "yes" or access.access_other == "yes"')
+      .toBe('access.access_data == "yes" || access.access_bio_samples == "yes" || access.access_other == "yes"')
     expect(transpileCondition("model.access_restrictions && (model.access.access_data=='yes' || model.access.access_other=='yes')"))
-      .toBe('truthy(access_restrictions) and (access.access_data == "yes" or access.access_other == "yes")')
+      .toBe('!!access_restrictions && (access.access_data == "yes" || access.access_other == "yes")')
   })
 
   it('maps the indexOf() comparison forms to contains()', () => {
     expect(transpileCondition('model.a.indexOf("x") != -1')).toBe('contains(a, "x")')
     expect(transpileCondition('model.a.indexOf("x") !== -1')).toBe('contains(a, "x")')
-    expect(transpileCondition('model.a.indexOf("x") < 0')).toBe('not (contains(a, "x"))')
-    expect(transpileCondition('model.a.indexOf("x") === -1')).toBe('not (contains(a, "x"))')
+    expect(transpileCondition('model.a.indexOf("x") < 0')).toBe('!contains(a, "x")')
+    expect(transpileCondition('model.a.indexOf("x") === -1')).toBe('!contains(a, "x")')
     expect(transpileCondition('0 <= model.a.indexOf("x")')).toBe('contains(a, "x")')
+    expect(transpileCondition('-1 == model.a.indexOf("x")')).toBe('!contains(a, "x")')
     expect(transpileCondition('model.a.includes("x")')).toBe('contains(a, "x")')
-    expect(transpileCondition('!model.a.includes("x")')).toBe('not (contains(a, "x"))')
+    expect(transpileCondition('!model.a.includes("x")')).toBe('!contains(a, "x")')
     expect(() => transpileCondition('model.a.indexOf("x") > 2')).toThrow(ConditionError)
-    expect(() => transpileCondition('model.a > true')).toThrow(/ordering comparison/)
-    expect(() => transpileCondition('model.a >= null')).toThrow(/ordering comparison/)
-    expect(() => transpileCondition('undefined < model.a')).toThrow(/ordering comparison/)
+    expect(() => transpileCondition('model.a.indexOf("x")')).toThrow(/indexOf/)
+    expect(() => transpileCondition('model.a.indexOf("x") == model.b')).toThrow(/indexOf/)
   })
 
-  it('handles null, booleans, numbers and length', () => {
-    expect(transpileCondition('model.a == null')).toBe('isNull(a)')
-    expect(transpileCondition('model.a == undefined')).toBe('isNull(a)')
-    expect(transpileCondition('model.a === null')).toBe('(isNull(a) and not (isUndefined(a)))')
-    expect(transpileCondition('model.a === undefined')).toBe('isUndefined(a)')
-    expect(transpileCondition('model.a != null')).toBe('not (isNull(a))')
-    expect(transpileCondition('model.a !== undefined')).toBe('not (isUndefined(a))')
-    expect(transpileCondition('null == undefined')).toBe('1 == 1')
-    expect(transpileCondition('null === undefined')).toBe('1 == 0')
-    expect(transpileCondition('model.a == true')).toBe('truthy(a)')
-    expect(transpileCondition('model.a === true')).toBe('(isBoolean(a) and truthy(a))')
-    expect(transpileCondition('model.a == false')).toBe('not (truthy(a))')
-    expect(transpileCondition('model.a === false')).toBe('(isBoolean(a) and not (truthy(a)))')
-    expect(transpileCondition('model.a !== true')).toBe('not ((isBoolean(a) and truthy(a)))')
+  it('keeps the JavaScript literals, operators and precedence', () => {
+    expect(transpileCondition('model.a == null')).toBe('a == null')
+    expect(transpileCondition('model.a == undefined')).toBe('a == undefined')
+    expect(transpileCondition('model.a === null')).toBe('a === null')
+    expect(transpileCondition('model.a !== undefined')).toBe('a !== undefined')
+    expect(transpileCondition('null == undefined')).toBe('null == undefined')
+    expect(transpileCondition('model.a == true')).toBe('a == true')
+    expect(transpileCondition('model.a === false')).toBe('a === false')
     expect(transpileCondition('model.a.length > 0')).toBe('length(a) > 0')
-    expect(transpileCondition('model.n >= 3')).toBe('(isNotEmpty(n) and n >= 3)')
+    expect(transpileCondition('model.n >= 3')).toBe('n >= 3')
     expect(transpileCondition('model.n == -1')).toBe('n == -1')
-    expect(transpileCondition('true')).toBe('1 == 1')
-    // `!` binds tighter than the comparisons
-    expect(transpileCondition('!model.a == false')).toBe('not (not (truthy(a)))')
-    expect(transpileCondition('(model.a == 1) === true')).toBe('a == 1')
-    expect(transpileCondition('!(model.a == 1)')).toBe('not (a == 1)')
-    expect(transpileCondition('!model.a && !model.b')).toBe('not (truthy(a)) and not (truthy(b))')
+    expect(transpileCondition('model.n == +1.5')).toBe('n == 1.5')
+    expect(transpileCondition('true')).toBe('true')
+    expect(transpileCondition('null')).toBe('false')
+    // values used as booleans are coerced, comparisons and `!` are booleans already
+    expect(transpileCondition('model.a || model.b == 1')).toBe('!!a || b == 1')
+    expect(transpileCondition('!model.a && !model.b')).toBe('!a && !b')
+    expect(transpileCondition('!!model.a')).toBe('!!a')
+    expect(transpileCondition('!(model.a == 1)')).toBe('!(a == 1)')
+    // `!` binds tighter than the comparisons, `&&` tighter than `||`
+    expect(transpileCondition('!model.a == false')).toBe('(!a) == false')
+    expect(transpileCondition('(model.a == 1) === true')).toBe('(a == 1) === true')
+    expect(transpileCondition('model.a || model.b && model.c')).toBe('!!a || !!b && !!c')
+    expect(transpileCondition('(model.a || model.b) && model.c')).toBe('(!!a || !!b) && !!c')
+    expect(transpileCondition("model.a == 'it\\'s'")).toBe('a == "it\'s"')
   })
 
   it('rejects what it cannot translate', () => {
@@ -65,12 +67,14 @@ describe('ASF condition transpiler', () => {
     expect(() => transpileCondition('model.a == "unterminated')).toThrow(/unterminated/)
     expect(() => transpileCondition('')).toThrow(/empty/)
     expect(() => transpileCondition('model')).toThrow(ConditionError)
+    expect(() => transpileCondition('model.length')).toThrow(/needs a model property/)
   })
 
-  it('evaluates like JavaScript with the filtrex engine', () => {
+  it('evaluates like JavaScript with the rule engine', () => {
     expect(evaluate('!model.hasNoStaff', {})).toBe(true)
     expect(evaluate('!model.hasNoStaff', { hasNoStaff: true })).toBe(false)
     expect(evaluate('model.grantSubmission', { grantSubmission: true })).toBe(true)
+    expect(evaluate('model.grantSubmission', { grantSubmission: 'yes' })).toBe(true)
     expect(evaluate('model.grantSubmission', {})).toBe(false)
     expect(evaluate("model.modificationNature.indexOf('IA') > -1", { modificationNature: ['IB', 'IA'] })).toBe(true)
     expect(evaluate("model.modificationNature.indexOf('IA') > -1", {})).toBe(false)
@@ -81,6 +85,8 @@ describe('ASF condition transpiler', () => {
       { access_restrictions: true, access: { access_other: 'yes' } })).toBe(true)
     expect(evaluate("model.access_restrictions && (model.access.access_data=='yes' || model.access.access_other=='yes')",
       { access_restrictions: true, access: { access_other: 'no' } })).toBe(false)
+    expect(evaluate('model.a || model.b == 1', { a: 'yes' })).toBe(true)
+    expect(evaluate('model.a || model.b == 1', { a: '', b: 2 })).toBe(false)
     expect(evaluate('model.n >= 3', {})).toBe(false)
     expect(evaluate('model.n >= 3', { n: 3 })).toBe(true)
     expect(evaluate('model.a == null', {})).toBe(true)
@@ -98,11 +104,12 @@ describe('ASF condition transpiler', () => {
     expect(evaluate('model.a === false', { a: false })).toBe(true)
     expect(evaluate('model.a === false', {})).toBe(false)
     expect(evaluate('model.a == true', { a: 1 })).toBe(true)
-    // filtrex equality is strict
+    expect(evaluate('model.a == true', { a: 2 })).toBe(false)
     expect(evaluate('model.a === model.b', { a: '1', b: 1 })).toBe(false)
-    expect(evaluate('model.a === model.b', { a: 1, b: 1 })).toBe(true)
+    expect(evaluate('model.a == model.b', { a: '1', b: 1 })).toBe(true)
     expect(evaluate('!model.a == false', { a: false })).toBe(false)
     expect(evaluate('!model.a == false', { a: true })).toBe(true)
     expect(evaluate('model.a.length > 0', { a: ['x'] })).toBe(true)
+    expect(evaluate('model.a.length > 0', {})).toBe(false)
   })
 })

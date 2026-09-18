@@ -501,7 +501,7 @@
                       }
                     },
                     "rules": {
-                      "visible": "not (truthy(hasNoStaff))"
+                      "visible": "!hasNoStaff"
                     }
                   }
                 ],
@@ -572,7 +572,7 @@
                       }
                     },
                     "rules": {
-                      "visible": "not (truthy(hasNoStudents))"
+                      "visible": "!hasNoStudents"
                     }
                   }
                 ],
@@ -672,7 +672,7 @@
         "type": "Label",
         "text": "<h2>II - data-access-amendment.default.documents.title</h2>",
         "rules": {
-          "visible": "contains(modificationNature, \"IIrdRebResearchProtocol\") or contains(modificationNature, \"IIrdRebDecisionLetter\") or contains(modificationNature, \"IIrdCV\") or contains(modificationNature, \"IIrdPeerReview\")"
+          "visible": "contains(modificationNature, \"IIrdRebResearchProtocol\") || contains(modificationNature, \"IIrdRebDecisionLetter\") || contains(modificationNature, \"IIrdCV\") || contains(modificationNature, \"IIrdPeerReview\")"
         }
       },
       {

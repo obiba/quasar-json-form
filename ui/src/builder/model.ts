@@ -107,7 +107,7 @@ export function toScope(path: string[]): string {
   return '#' + path.map((segment) => '/properties/' + encodeURIComponent(segment.replace(/~/g, '~0').replace(/\//g, '~1'))).join('')
 }
 
-/** A property key usable in scopes, filtrex rules and translation keys. */
+/** A property key usable in scopes, rules and translation keys. */
 export function isValidKey(key: unknown): key is string {
   return typeof key === 'string' && /^[A-Za-z_$][\w$]*$/.test(key)
 }

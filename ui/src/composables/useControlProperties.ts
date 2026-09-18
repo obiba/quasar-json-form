@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { computed, h, inject, ref, watch, unref } from 'vue'
 import type { Ref, ComputedRef, VNode } from 'vue'
-import { useFiltrexRules } from './useFiltrexRules'
+import { useRules } from './useRules'
 import { useFormI18n } from './useFormI18n'
 import { useReportedErrors } from './useFormErrors'
 import { DATA_KEY, READONLY_KEY, LANGUAGES_KEY } from './keys'
@@ -147,7 +147,7 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
   // raw value or ref, from QJsonForm or an application-level provide
   const injectedLanguages = inject<unknown>(LANGUAGES_KEY, undefined)
 
-  const { evaluateRule } = useFiltrexRules(injectedFormData)
+  const { evaluateRule } = useRules(injectedFormData)
 
   // Extract rule options from UI schema
   const ruleOptions = computed(() => {
@@ -161,17 +161,11 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
     return rules
   })
 
-  // Visibility rule
+  // Visibility rule: an element whose rule fails to evaluate stays visible
   const isVisible = computed(() => {
     const rule = ruleOptions.value.visible
     if (!rule) return true
-    try {
-      const rval = evaluateRule(rule)
-      return rval === true
-    } catch (error) {
-      console.error('Error evaluating visibility rule:', rule, error)
-      return true
-    }
+    return evaluateRule(rule, true) === true
   })
 
   // Enable rule
@@ -244,7 +238,7 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
     return errors
   })
 
-  // Report the filtrex validation errors of visible controls to the form
+  // Report the `validation` rule errors of visible controls to the form
   useReportedErrors(
     () => control.value.path,
     'validation',
@@ -377,13 +371,7 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
 
     const optionVisible = (val: any): boolean => {
       if (val.rules && val.rules.visible) {
-        try {
-          return evaluateRule(val.rules.visible)
-        }
-        catch (error) {
-          console.error('Error evaluating visibility rule for option:', val, error)
-          return true
-        }
+        return evaluateRule(val.rules.visible, true)
       }
       return true
     }

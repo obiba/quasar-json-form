@@ -160,7 +160,7 @@ describe('ASF converter', () => {
       { key: 'email', condition: 'arrayIndex > 0 && model.name' },
     ], quiet)
     expect(uischema.elements[0].rules).toEqual({ visible: 'gender == "m"' })
-    expect(uischema.elements[1].rules).toEqual({ visible: 'not (truthy(name))' })
+    expect(uischema.elements[1].rules).toEqual({ visible: '!name' })
     expect(uischema.elements[2].rules).toBeUndefined()
     expect(diagnostics).toHaveLength(1)
     expect(diagnostics[0]).toMatchObject({ level: 'warn', key: 'email' })
