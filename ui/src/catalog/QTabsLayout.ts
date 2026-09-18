@@ -30,7 +30,7 @@ export default {
     },
     rules: {
       type: 'Object',
-      desc: '`visible` and `enabled` filtrex rules apply to every tab.',
+      desc: '`visible` and `enabled` rules apply to every tab.',
     },
   },
   items: [

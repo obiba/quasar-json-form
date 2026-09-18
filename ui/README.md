@@ -104,7 +104,7 @@ export default {
 | `schema` | | JSON Schema |
 | `uischema` | generated | JSON Forms UI schema; when omitted, one `Control` per property |
 | `readonly` | `false` | Render every control read-only (inputs are not editable, list/upload buttons are hidden) |
-| `validationMode` | `ValidateAndShow` | `ValidateAndShow`: validate against the schema and show errors on the controls; `ValidateAndHide`: validate, do not show; `NoValidation`: skip schema validation. Filtrex `validation` rules are always evaluated |
+| `validationMode` | `ValidateAndShow` | `ValidateAndShow`: validate against the schema and show errors on the controls; `ValidateAndHide`: validate, do not show; `NoValidation`: skip schema validation. `validation` rules are always evaluated |
 | `ajv` | | Custom AJV instance (`createAjv` from `@jsonforms/core`). The default one knows the custom formats of the renderers and validates `time` and `date-time` as the pickers store them (`HH:mm`, `YYYY-MM-DD HH:mm`, seconds and timezone optional) |
 | `additionalErrors` | `[]` | AJV-shaped errors to display in addition to validation errors (e.g. from a server) |
 | `config` | | JSON Forms config passed to renderers (`languages`, `countries`, `fileUpload`, see below) |
@@ -112,7 +112,7 @@ export default {
 
 Events: `update:modelValue` (data), `update:errors` (AJV-shaped `ErrorObject[]`, also emitted on mount).
 The errors contain the AJV validation errors (none in `NoValidation` mode) followed by the errors found by
-the renderers themselves, which are always evaluated: filtrex `validation` rules (`keyword: "validation"`),
+the renderers themselves, which are always evaluated: `validation` rules (`keyword: "validation"`),
 localized strings not completed (`completed`), word limits (`wordLimit`), file counts (`files`), radio
 matrix (`allItemsSelected`) and date bounds (`date`); their `instancePath` points at the control.
 
@@ -173,7 +173,7 @@ such as localized strings) render as a list with add / remove / reorder buttons.
 one item comes from `options.items` (`Control` scopes relative to the item schema, `#` for the item
 itself), by default one control per property of an object item, or the item itself. Options:
 `addLabel`, `addIcon`, `ordering` (default true), `confirmation` (confirm before removing);
-`minItems` / `maxItems` from the schema (or the filtrex `min` / `max` rules) bound the list.
+`minItems` / `maxItems` from the schema (or the `min` / `max` rules) bound the list.
 
 ## Localized strings
 
@@ -201,7 +201,7 @@ must be completed in every language; a string emptied in every language becomes 
 
 Options: `multiple` (default: yes, unless `maxItems` is 1), `accept`, `emptyMessage` (read-only, no
 file), `validationMessage.missingFiles` / `minItems` / `maxItems`; `minItems` / `maxItems` from the
-schema (or the filtrex `min` / `max` rules) are enforced on object controls.
+schema (or the `min` / `max` rules) are enforced on object controls.
 
 Upload flow, declarative: `uploadUrl` (+ `uploadMethod`, `uploadHeaders`, `fileField`, default
 `file`), then the file item is read from the JSON response (`pathKey`, or the whole body), or, when
@@ -230,7 +230,7 @@ The date renderer (`format: date`, `datepicker`) accepts, directly or under `dat
   `yyyy-MM-dd` are accepted). It applies to `datepicker` / `ymdatepicker` controls: `format: "date"`
   is validated by AJV as an ISO date and keeps `YYYY-MM-DD`. `format: "year-month"` uses `YYYY-MM`
   with a month picker.
-- `min` / `max`: bounds (ISO or mask format; the filtrex `min` / `max` rules work too), with
+- `min` / `max`: bounds (ISO or mask format; the `min` / `max` rules work too), with
   `validationMessage.dateRange` / `dateMin` / `dateMax`; a value that does not match the mask reports
   `validationMessage.dateInvalid`.
 - `yearRef` / `monthRef` (`format: "ymdatepicker"`): names of the year and month fields (siblings of
@@ -242,7 +242,7 @@ The date renderer (`format: date`, `datepicker`) accepts, directly or under `dat
 
 On string controls, `options.wordLimit: "min:max"` (or a maximum), `wordMin`, `wordMax` validate the
 number of words and show a word counter (`validationMessage.wordLimitError` / `wordMinError` /
-`wordMaxError`). The filtrex engine also provides `wordCount(text)` and `contains(list, value)` for
+`wordMaxError`). The rule engine also provides `wordCount(text)` and `contains(list, value)` for
 rules: `{ "validation": [{ "expr": "wordCount(abstract) <= 500", "message": "..." }] }`.
 
 ## Countries and typeahead
@@ -309,7 +309,7 @@ strings, `rowClass` replaces the Bootstrap `row` class (`row q-col-gutter-md` by
 | `help` + `helpvalue` | `Label` (`text`, HTML allowed) |
 | `tabs` | `Categorization` / `Category` |
 | `htmlClass` | `options.class`, with `col-xs-N` → `col-N`, `col-*-offset-N` → `offset-*-N`, `row` → `rowClass` |
-| `condition` | `rules.visible` (filtrex, see below) |
+| `condition` | `rules.visible` (see below) |
 | `notitle` | `label: false` |
 | `title`, `description` | written on the schema property |
 | `titleMap` | `oneOf` (`{ const, title }`) on the property or its items; enum arrays get `uniqueItems` |
@@ -333,15 +333,11 @@ of these are reported in `diagnostics` (`{ level, message, key?, element? }`).
 Conditions (`transpileCondition`) accept the JavaScript subset found in form definitions:
 `model.a.b` paths, string / number / boolean / null literals, `!`, `&&`, `||`, parentheses,
 `==` / `===` / `!=` / `!==` / `<` / `<=` / `>` / `>=`, `model.list.indexOf(v) >= 0` (or `> -1`,
-`!= -1`, and the negative forms), `model.list.includes(v)` and `model.list.length`. JavaScript
-truthiness is kept through the `truthy()` filtrex function (`!model.b` → `not (truthy(b))`),
-`indexOf` becomes `contains(list, v)`, and comparisons with `true` / `false` / `null` / `undefined` use
-the `isBoolean` / `isNull` / `isUndefined` functions with the strict / loose distinction of JavaScript
-(`model.a == null` → `isNull(a)`, `model.a === null` → `(isNull(a) and not (isUndefined(a)))`,
-`model.a === true` → `(isBoolean(a) and truthy(a))`). Known deviations from JavaScript: a loose
-`model.a == true` is JavaScript truthiness (`2 == true` is true here, false in JavaScript), filtrex `==`
-is strict (`'1' == 1` is false), and an ordering comparison is false when the value is null, undefined
-or an empty string. Ordering comparisons with a boolean or null literal are rejected.
+`!= -1`, and the negative forms), `model.list.includes(v)` and `model.list.length`. Rules being a
+JavaScript subset, the literals and operators are kept; `indexOf` / `includes` become
+`contains(list, v)`, `length` becomes `length(list)`, and a value used as a boolean is coerced with
+`!!` so that the rule is a boolean (`model.a && model.b == 1` → `!!a && b == 1`, `!model.b` → `!b`).
+The only deviation from JavaScript is a missing object in a path, `undefined` rather than an error.
 
 The 13 default Mica forms are converted as acceptance fixtures (`test/fixtures/asf`, snapshots in
 `__snapshots__`), and the `ui/dev` page "test-asf-converter" renders any pasted pair.
@@ -371,7 +367,7 @@ that every `options.<name>` read by a renderer is documented.
 works on. The component edits a form bound to `v-model` as `{ schema, uischema, translations }`:
 the outline of the form with its palette (drag and drop to reorder and reparent, with sortablejs),
 the properties of the selected node (key, required, texts in the builder language, choices, the
-settings of its renderer from the catalog, validation keywords, filtrex rules, raw JSON), the live
+settings of its renderer from the catalog, validation keywords, rules, raw JSON), the live
 preview with a language switch, the translations editor (a button collects the texts of the form,
 turning literals into keys and adding the missing entries of every language; the translations as a CSV file,
 `key` then one column per language, downloaded for the translators and uploaded back: the
@@ -421,7 +417,7 @@ const { schema, uischema, translations } = toDefinition(model)
   step with the tree: the property of a control is created in its container (the root schema, or
   the `items` of its list), removed with it unless another control uses it, copied under a new
   key, or renamed with the scopes of the nested controls. A control cannot move into or out of a
-  list. `ruleReferences` finds the filtrex rules mentioning a property.
+  list. `ruleReferences` finds the rules mentioning a property.
 - Every text is a translation key: `textSlots` lists the texts of a node (title, description,
   label, hint, option labels, messages...), `getText` and `setText` read and write them in a
   language, the key being generated from the position of the node (`name.title`,

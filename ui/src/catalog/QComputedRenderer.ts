@@ -8,7 +8,7 @@ export default {
     {
       schema: 'format: "computed" (schema or options) + rules.compute',
       rank: 4,
-      desc: 'A value computed from the other fields with the filtrex `compute` rule, written into the data.',
+      desc: 'A value computed from the other fields with the `compute` rule, written into the data.',
     },
   ],
   options: {

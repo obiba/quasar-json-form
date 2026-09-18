@@ -9,7 +9,7 @@ const schema = {
     even: {
       type: 'integer',
       title: 'Even',
-      rules: { validation: [{ expr: 'even mod 2 == 0', message: 'must-be-even' }] },
+      rules: { validation: [{ expr: 'isEmpty(even) || even % 2 == 0', message: 'must-be-even' }] },
     },
     gated: {
       type: 'string',
@@ -44,7 +44,7 @@ describe('renderer errors', () => {
     expect(registry.errors.value).toEqual([])
   })
 
-  it('emits the filtrex validation errors with the AJV errors', async () => {
+  it('emits the validation rule errors with the AJV errors', async () => {
     const wrapper = mountForm({ schema, modelValue: { even: 3 } })
     await flush()
     const errors = lastErrors(wrapper)

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { computed, h, inject, ref, watch, unref } from 'vue'
 import type { Ref, ComputedRef, VNode } from 'vue'
-import { useFiltrexRules } from './useFiltrexRules'
+import { useRules } from './useRules'
 import { useFormI18n } from './useFormI18n'
 import { useReportedErrors } from './useFormErrors'
 import { DATA_KEY, READONLY_KEY, LANGUAGES_KEY } from './keys'
@@ -147,7 +147,7 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
   // raw value or ref, from QJsonForm or an application-level provide
   const injectedLanguages = inject<unknown>(LANGUAGES_KEY, undefined)
 
-  const { evaluateRule } = useFiltrexRules(injectedFormData)
+  const { evaluateRule } = useRules(injectedFormData)
 
   // Extract rule options from UI schema
   const ruleOptions = computed(() => {
@@ -244,7 +244,7 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
     return errors
   })
 
-  // Report the filtrex validation errors of visible controls to the form
+  // Report the `validation` rule errors of visible controls to the form
   useReportedErrors(
     () => control.value.path,
     'validation',

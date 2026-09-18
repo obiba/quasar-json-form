@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { ref } from 'vue'
-import { FiltrexRuleEngine, filtrexEngine, useFiltrexRules } from '../src/composables/useFiltrexRules'
+import { ref, reactive } from 'vue'
+import { filters } from 'angular-expressions'
+import { RuleEngine, ruleEngine, useRules } from '../src/composables/useRules'
 
-const evaluate = (expression: string, context: Record<string, unknown> = {}) => filtrexEngine.evaluate(expression, context)
+const evaluate = (expression: string, context: Record<string, unknown> = {}) => ruleEngine.evaluate(expression, context)
 
-describe('FiltrexRuleEngine built-in functions', () => {
+describe('RuleEngine built-in functions', () => {
   afterEach(() => vi.restoreAllMocks())
 
   it('isEmpty / isNotEmpty / isNull / isUndefined', () => {
@@ -86,10 +87,69 @@ describe('FiltrexRuleEngine built-in functions', () => {
   it('supports dot access on nested data, tolerating missing objects', () => {
     expect(evaluate('person.address.city == "Paris"', { person: { address: { city: 'Paris' } } })).toBe(true)
     expect(evaluate('isUndefined(person.address.city)', { person: {} })).toBe(true)
+    expect(evaluate('person.address.city', {})).toBeUndefined()
+  })
+
+  it('functions win over data fields of the same name', () => {
+    expect(evaluate('length(list)', { list: [1, 2, 3], length: 'a field' })).toBe(3)
   })
 })
 
-describe('FiltrexRuleEngine API', () => {
+describe('RuleEngine expression language', () => {
+  afterEach(() => vi.restoreAllMocks())
+
+  it('evaluates JavaScript operators', () => {
+    expect(evaluate('a + b * 2', { a: 1, b: 2 })).toBe(5)
+    expect(evaluate('a % 2 == 0', { a: 4 })).toBe(true)
+    expect(evaluate('-a', { a: 3 })).toBe(-3)
+    expect(evaluate('a > 1 && b == "x"', { a: 2, b: 'x' })).toBe(true)
+    expect(evaluate('a > 1 || b == "x"', { a: 0, b: 'x' })).toBe(true)
+    expect(evaluate('!a', { a: false })).toBe(true)
+    expect(evaluate('a > 1 ? "big" : "small"', { a: 2 })).toBe('big')
+    expect(evaluate('a == null', {})).toBe(true)
+    expect(evaluate('a === undefined', { a: null })).toBe(false)
+    expect(evaluate('a == true', { a: true })).toBe(true)
+    expect(evaluate('contains([1, 2], a)', { a: 2 })).toBe(true)
+  })
+
+  it('compares like JavaScript', () => {
+    expect(evaluate('a == b', { a: '1', b: 1 })).toBe(true)
+    expect(evaluate('a === b', { a: '1', b: 1 })).toBe(false)
+    expect(evaluate('a >= 3', {})).toBe(false)
+    expect(evaluate('a >= 3', { a: null })).toBe(false)
+  })
+
+  it('rejects assignments, this, $locals, filters and method calls', () => {
+    expect(ruleEngine.expressionError('a = 1')).toMatch(/assignment/)
+    expect(ruleEngine.expressionError('this')).toMatch(/this/)
+    expect(ruleEngine.expressionError('$locals')).toMatch(/\$locals/)
+    expect(ruleEngine.expressionError('a | json')).toMatch(/Filter 'json'/)
+    filters.upper = (value: string) => value.toUpperCase()
+    expect(ruleEngine.expressionError('a | upper')).toMatch(/filters are not allowed/)
+    delete filters.upper
+    expect(ruleEngine.expressionError('a.toString()')).toMatch(/only the rule functions/)
+    // a data field is never assigned
+    const data = { a: 1 }
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+    expect(evaluate('a = 2', data)).toBe(false)
+    expect(data.a).toBe(1)
+    expect(error).toHaveBeenCalled()
+  })
+
+  it('does not reach the prototype chain', () => {
+    expect(evaluate('a.constructor', { a: 'x' })).toBeUndefined()
+    expect(evaluate('a.__proto__', { a: {} })).toBeUndefined()
+    expect(evaluate('constructor', {})).toBeUndefined()
+  })
+
+  it('reports the filtrex keywords as syntax errors', () => {
+    expect(ruleEngine.expressionError('a > 1 and b')).toMatch(/'and'/)
+    expect(ruleEngine.expressionError('not a')).toMatch(/'a'/)
+    expect(ruleEngine.expressionError('"x" in a')).toMatch(/'in'/)
+  })
+})
+
+describe('RuleEngine API', () => {
   afterEach(() => vi.restoreAllMocks())
 
   it('returns false and logs when an expression cannot be compiled', () => {
@@ -100,29 +160,47 @@ describe('FiltrexRuleEngine API', () => {
 
   it('validates expressions', () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => {})
-    expect(filtrexEngine.validateExpression('a > 1 and isEmpty(b)')).toBe(true)
-    expect(filtrexEngine.validateExpression('a >')).toBe(false)
+    expect(ruleEngine.validateExpression('a > 1 && isEmpty(b)')).toBe(true)
+    expect(ruleEngine.validateExpression('a >')).toBe(false)
     expect(error).toHaveBeenCalledWith('Invalid expression:', 'a >', expect.anything())
   })
 
+  it('reports unknown functions at compile time', () => {
+    expect(ruleEngine.expressionError('nope(a)')).toBe("unknown function 'nope'")
+    expect(ruleEngine.expressionError('')).toBeUndefined()
+    expect(ruleEngine.expressionError('length(a) > nope(a)')).toBe("unknown function 'nope'")
+  })
+
   it('accepts custom functions on a dedicated engine', () => {
-    const engine = new FiltrexRuleEngine()
+    const engine = new RuleEngine()
     engine.addFunction('double', (value: number) => value * 2)
     expect(engine.evaluate('double(a)', { a: 4 })).toBe(8)
-    // the singleton is not affected: filtrex reports the unknown function as an error value
-    expect(filtrexEngine.evaluate('double(a)', { a: 4 })).toBeInstanceOf(Error)
+    // the singleton is not affected
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+    expect(ruleEngine.evaluate('double(a)', { a: 4 })).toBe(false)
+    expect(error).toHaveBeenCalled()
+    // a function added later is known to the already compiled expressions
+    expect(engine.expressionError('triple(a)')).toBe("unknown function 'triple'")
+    engine.addFunction('triple', (value: number) => value * 3)
+    expect(engine.evaluate('triple(a)', { a: 4 })).toBe(12)
   })
 })
 
-describe('useFiltrexRules', () => {
+describe('useRules', () => {
   it('evaluates against the current form data, reactively', () => {
     const data = ref<Record<string, unknown>>({ a: 1 })
-    const { evaluateRule, evaluateRuleComputed, filtrexEngine: engine } = useFiltrexRules(data)
-    expect(engine).toBe(filtrexEngine)
+    const { evaluateRule, evaluateRuleComputed, ruleEngine: engine } = useRules(data)
+    expect(engine).toBe(ruleEngine)
     expect(evaluateRule('a == 1')).toBe(true)
     const rule = evaluateRuleComputed('a * 2')
     expect(rule.value).toBe(2)
     data.value = { a: 5 }
     expect(rule.value).toBe(10)
+  })
+
+  it('reads reactive form data', () => {
+    const data = ref(reactive({ person: { name: 'x' }, list: ['a'] }))
+    const { evaluateRule } = useRules(data)
+    expect(evaluateRule('person.name == "x" && length(list) == 1')).toBe(true)
   })
 })

@@ -203,7 +203,7 @@
           }
         ],
         "rules": {
-          "visible": "truthy(grantSubmission)"
+          "visible": "!!grantSubmission"
         }
       },
       {
@@ -239,7 +239,7 @@
                     "type": "Control",
                     "scope": "#/properties/careerOther",
                     "rules": {
-                      "visible": "career == \"other\""
+                      "visible": "career === \"other\""
                     }
                   },
                   {
@@ -417,7 +417,7 @@
           }
         ],
         "rules": {
-          "visible": "truthy(includeBiospecimens)"
+          "visible": "!!includeBiospecimens"
         }
       },
       {

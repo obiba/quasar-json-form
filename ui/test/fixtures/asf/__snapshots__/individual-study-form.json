@@ -872,7 +872,7 @@
               "class": "col-12"
             },
             "rules": {
-              "visible": "access.access_data == \"yes\" or access.access_bio_samples == \"yes\" or access.access_other == \"yes\""
+              "visible": "access.access_data == \"yes\" || access.access_bio_samples == \"yes\" || access.access_other == \"yes\""
             }
           },
           {
@@ -974,7 +974,7 @@
               "class": "col-12"
             },
             "rules": {
-              "visible": "truthy(access_restrictions) and (access.access_data == \"yes\" or access.access_bio_samples == \"yes\" or access.access_other == \"yes\")"
+              "visible": "!!access_restrictions && (access.access_data == \"yes\" || access.access_bio_samples == \"yes\" || access.access_other == \"yes\")"
             }
           },
           {
@@ -989,7 +989,7 @@
               "class": "col-12"
             },
             "rules": {
-              "visible": "access.access_data == \"yes\" or access.access_bio_samples == \"yes\" or access.access_other == \"yes\""
+              "visible": "access.access_data == \"yes\" || access.access_bio_samples == \"yes\" || access.access_other == \"yes\""
             }
           },
           {
@@ -1083,7 +1083,7 @@
               "class": "col-12"
             },
             "rules": {
-              "visible": "truthy(access_fees) and (access.access_data == \"yes\" or access.access_bio_samples == \"yes\" or access.access_other == \"yes\")"
+              "visible": "!!access_fees && (access.access_data == \"yes\" || access.access_bio_samples == \"yes\" || access.access_other == \"yes\")"
             }
           },
           {
@@ -1106,7 +1106,7 @@
               "class": "col-12"
             },
             "rules": {
-              "visible": "access.access_data == \"yes\" or access.access_bio_samples == \"yes\" or access.access_other == \"yes\""
+              "visible": "access.access_data == \"yes\" || access.access_bio_samples == \"yes\" || access.access_other == \"yes\""
             }
           }
         ],

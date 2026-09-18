@@ -25,7 +25,7 @@ For a CSS grid with explicit rows, spans and named areas, see the [grid layout](
 
 ## Rules
 
-A layout accepts `rules.visible` and `rules.enabled` [filtrex rules](#/start/rules), applied to
+A layout accepts `rules.visible` and `rules.enabled` [rules](#/start/rules), applied to
 every element it contains. The data of hidden controls is cleared.
 
 <DocExample name="layouts/rules" title="Hidden layout" />

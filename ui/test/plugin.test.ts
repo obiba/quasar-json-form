@@ -46,7 +46,7 @@ describe('vue plugin', () => {
     expect(typeof plugin.toJsonForms).toBe('function')
     expect(typeof plugin.isAsfDefinition).toBe('function')
     expect(typeof plugin.transpileAsfCondition).toBe('function')
-    expect(plugin.filtrexEngine).toBeInstanceOf(plugin.FiltrexRuleEngine)
+    expect(plugin.ruleEngine).toBeInstanceOf(plugin.RuleEngine)
     expect(plugin.AsfConditionError.prototype).toBeInstanceOf(Error)
     expect(plugin.DATA_KEY).toBe('jsonforms-data')
     expect(plugin.READONLY_KEY).toBe('jsonforms-readonly')

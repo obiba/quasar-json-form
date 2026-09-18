@@ -32,7 +32,7 @@ renderer and, for the rest, passed as props to the Quasar component.
 ## Errors
 
 The `errors` model contains the AJV validation errors (none in `NoValidation` mode) followed by
-the errors found by the renderers themselves, which are always evaluated: filtrex `validation`
+the errors found by the renderers themselves, which are always evaluated: `validation`
 rules (`keyword: "validation"`), localized strings not completed (`completed`), word limits
 (`wordLimit`), file counts (`files`), radio matrix (`allItemsSelected`) and date bounds (`date`).
 Their `instancePath` points at the control. The errors are also emitted on mount, so that a

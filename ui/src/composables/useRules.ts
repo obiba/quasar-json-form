@@ -1,10 +1,36 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { compileExpression, useDotAccessOperatorAndOptionalChaining } from 'filtrex'
+import { compile } from 'angular-expressions'
 import { computed } from 'vue'
 import { countWords } from '../utils/words'
 
-export class FiltrexRuleEngine {
+type Evaluator = ReturnType<typeof compile>
+
+/**
+ * Rules are angular-expressions (a JavaScript expression subset) evaluated
+ * with the form data as scope and the engine functions as locals: `a.b.c`
+ * paths (undefined when a segment is missing), literals, arithmetic, `==` /
+ * `===` / `!=` / `!==` and ordering comparisons, `&&`, `||`, `!`, `? :`.
+ *
+ * The interpreter is used (`csp`: no `new Function`), and the syntax tree is
+ * checked so that an expression can neither assign into the form data nor
+ * call anything but the registered functions.
+ */
+// `csp` is read by compile() but missing from its option typings
+const COMPILE_OPTIONS: NonNullable<Parameters<typeof compile>[1]> & { csp: boolean } = { csp: true }
+
+/** Names of the syntax tree nodes that a rule may not use. */
+const FORBIDDEN_SYNTAX: Record<string, string> = {
+  AssignmentExpression: 'assignment is not allowed',
+  ThisExpression: "'this' is not allowed",
+  LocalsExpression: "'$locals' is not allowed",
+  FilterExpression: 'filters are not allowed',
+}
+
+export class RuleEngine {
   customFunctions: Record<string, (...args: any[]) => any>
+
+  /** Compiled and checked expressions, reset when a function is added (or when too many). */
+  private compiled = new Map<string, Evaluator>()
 
   constructor() {
     this.customFunctions = {}
@@ -100,21 +126,48 @@ export class FiltrexRuleEngine {
     // number of whitespace-separated words in a string
     this.addFunction('wordCount', (value: any) => countWords(value))
 
-    // truthy(value): JavaScript truthiness (used by the transpiled ASF conditions)
+    // truthy(value): JavaScript truthiness
     this.addFunction('truthy', (value: any) => !!value)
   }
 
   addFunction(name: string, fn: (...args: any[]) => any): void {
     this.customFunctions[name] = fn
+    this.compiled.clear()
+  }
+
+  /** Compiles an expression and checks its syntax tree, throwing an Error when it is not a valid rule. */
+  private compile(expression: string): Evaluator {
+    let evaluator = this.compiled.get(expression)
+    if (!evaluator) {
+      evaluator = compile(expression, COMPILE_OPTIONS)
+      this.check(evaluator.ast)
+      if (this.compiled.size >= 1000) this.compiled.clear()
+      this.compiled.set(expression, evaluator)
+    }
+    return evaluator
+  }
+
+  private check(node: any): void {
+    if (!node || typeof node !== 'object') return
+    if (Array.isArray(node)) {
+      node.forEach((child) => this.check(child))
+      return
+    }
+    const forbidden = FORBIDDEN_SYNTAX[node.type]
+    if (forbidden) throw new Error(forbidden)
+    if (node.type === 'CallExpression') {
+      const callee = node.callee
+      if (callee?.type !== 'Identifier') throw new Error('only the rule functions can be called')
+      if (!Object.prototype.hasOwnProperty.call(this.customFunctions, callee.name)) {
+        throw new Error(`unknown function '${callee.name}'`)
+      }
+    }
+    Object.values(node).forEach((child) => this.check(child))
   }
 
   evaluate(expression: string, context: Record<string, any>): any {
     try {
-      const compiled = compileExpression(expression, {
-        customProp: useDotAccessOperatorAndOptionalChaining,
-        extraFunctions: this.customFunctions,
-      })
-      return compiled(context)
+      return this.compile(expression)(context, this.customFunctions)
     } catch (error) {
       console.error('Error evaluating expression:', expression, error)
       return false
@@ -125,10 +178,7 @@ export class FiltrexRuleEngine {
   expressionError(expression: string): string | undefined {
     if (!expression.trim()) return undefined
     try {
-      compileExpression(expression, {
-        customProp: useDotAccessOperatorAndOptionalChaining,
-        extraFunctions: this.customFunctions,
-      })
+      this.compile(expression)
       return undefined
     } catch (error) {
       return error instanceof Error ? error.message : String(error)
@@ -137,10 +187,7 @@ export class FiltrexRuleEngine {
 
   validateExpression(expression: string): boolean {
     try {
-      compileExpression(expression, {
-        customProp: useDotAccessOperatorAndOptionalChaining,
-        extraFunctions: this.customFunctions,
-      })
+      this.compile(expression)
       return true
     } catch (error) {
       console.error('Invalid expression:', expression, error)
@@ -150,13 +197,13 @@ export class FiltrexRuleEngine {
 }
 
 // Singleton instance
-export const filtrexEngine = new FiltrexRuleEngine()
+export const ruleEngine = new RuleEngine()
 
 // Composable for reactive rule evaluation
-export function useFiltrexRules(formData: any) {
+export function useRules(formData: any) {
   const evaluateRule = (expression: string): any => {
     const val = formData.value
-    return filtrexEngine.evaluate(expression, val)
+    return ruleEngine.evaluate(expression, val)
   }
 
   const evaluateRuleComputed = (expression: string) => {
@@ -166,6 +213,6 @@ export function useFiltrexRules(formData: any) {
   return {
     evaluateRule,
     evaluateRuleComputed,
-    filtrexEngine,
+    ruleEngine,
   }
 }

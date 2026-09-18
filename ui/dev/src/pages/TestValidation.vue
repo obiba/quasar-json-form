@@ -93,7 +93,7 @@ const schema = {
     even: {
       type: 'integer',
       title: 'Even number',
-      description: 'Filtrex rule, evaluated whatever the validation mode',
+      description: 'Validation rule, evaluated whatever the validation mode',
       rules: {
         validation: [{ expr: 'even mod 2 == 0', message: 'renderers.integer.number_must_be_even' }],
       },

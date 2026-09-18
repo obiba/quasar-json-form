@@ -145,7 +145,7 @@ export default defineComponent({
       }),
     )
 
-    // bound of a multiple choice: the filtrex `max` rule, else the schema `maxItems`
+    // bound of a multiple choice: the `max` rule, else the schema `maxItems`
     const maxItems = computed<number | undefined>(() => {
       const value = maxValue.value ?? control.value.schema.maxItems
       return typeof value === 'number' && !isNaN(value) ? value : undefined

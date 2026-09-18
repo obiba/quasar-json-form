@@ -185,7 +185,7 @@ export function renameProperty(model: FormModel, id: string, key: string): boole
   return true
 }
 
-/** The filtrex rules of the tree mentioning a name (as a whole word), with their node. */
+/** The rules of the tree mentioning a name (as a whole word), with their node. */
 export function ruleReferences(model: FormModel, name: string): { node: FormNode; rule: string; expression: string }[] {
   const pattern = new RegExp(`(^|[^\\w$.])${name.replace(/[$]/g, '\\$')}(?![\\w$])`)
   const result: { node: FormNode; rule: string; expression: string }[] = []

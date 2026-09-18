@@ -29,7 +29,7 @@ export default {
     },
     rules: {
       type: 'Object',
-      desc: '`enabled` filtrex rule applies to every step.',
+      desc: '`enabled` rule applies to every step.',
     },
   },
   items: [

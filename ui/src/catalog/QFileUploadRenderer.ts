@@ -96,7 +96,7 @@ export default {
     },
     minItems: {
       message: 'files.minItems',
-      desc: 'Object controls: fewer files than `minItems` (schema, or the filtrex `min` rule); `validationMessage.minItems`.',
+      desc: 'Object controls: fewer files than `minItems` (schema, or the `min` rule); `validationMessage.minItems`.',
     },
     maxItems: {
       message: 'files.maxItems',

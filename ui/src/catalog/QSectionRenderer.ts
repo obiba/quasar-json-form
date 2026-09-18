@@ -29,7 +29,7 @@ export default {
     },
     rules: {
       type: 'Object',
-      desc: '`visible` filtrex rule.',
+      desc: '`visible` rule.',
     },
   },
   options: {

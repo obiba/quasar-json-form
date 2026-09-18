@@ -9,7 +9,7 @@ const schema = {
     even: {
       type: 'integer',
       title: 'Even',
-      rules: { validation: [{ expr: 'even % 2 == 0', message: 'must-be-even' }] },
+      rules: { validation: [{ expr: 'isEmpty(even) || even % 2 == 0', message: 'must-be-even' }] },
     },
   },
   required: ['name'],
@@ -75,7 +75,20 @@ describe('schema validation', () => {
     wrapper.unmount()
   })
 
-  it('still evaluates filtrex validation rules', async () => {
+  it('reports a rule that is false on an empty value', async () => {
+    // JavaScript semantics: `undefined % 2 == 0` is false, the guard makes the rule pass
+    const unguarded = { ...schema, properties: { ...schema.properties, even: { ...schema.properties.even, rules: { validation: [{ expr: 'even % 2 == 0', message: 'must-be-even' }] } } } }
+    const wrapper = mountForm({ schema: unguarded, modelValue: { name: 'abc' } })
+    await flush()
+    expect(fieldOf(wrapper, 2).classes()).toContain('q-field--error')
+    wrapper.unmount()
+    const guarded = mountForm({ schema, modelValue: { name: 'abc' } })
+    await flush()
+    expect(fieldOf(guarded, 2).classes()).not.toContain('q-field--error')
+    guarded.unmount()
+  })
+
+  it('still evaluates validation rules', async () => {
     const wrapper = mountForm({ schema, modelValue: { name: 'abc', even: 3 } })
     await flush()
     const even = fieldOf(wrapper, 2)

@@ -25,7 +25,7 @@ const pad2 = (n: number): string => String(n).padStart(2, '0')
  * - `dateFormat`: mask of the stored value (`YYYY-MM-DD` by default, `YYYY-MM`
  *   for `format: year-month`; angular-strap masks like `yyyy-MM-dd` accepted);
  *   ignored for `format: date`, which AJV validates as an ISO date,
- * - `min` / `max`: bounds (also the filtrex `min` / `max` rules),
+ * - `min` / `max`: bounds (also the `min` / `max` rules),
  * - `yearRef` / `monthRef` (`format: ymdatepicker`): names of the year and
  *   month fields (siblings, or from the root data) the date must belong to;
  *   the input is disabled until both are set and the value defaults to the

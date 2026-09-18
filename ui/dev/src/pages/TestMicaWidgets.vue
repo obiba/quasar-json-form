@@ -57,7 +57,7 @@ const schema = {
     endDate: { type: 'string', format: 'datepicker', title: 'End date (dd/MM/yyyy, after 2020)' },
     period: { type: 'string', format: 'year-month', title: 'Period (year-month)' },
     abstract: { type: 'string', title: 'Abstract (10 to 50 words)' },
-    justification: { type: 'string', title: 'Justification (filtrex wordCount rule)', rules: { validation: [{ expr: 'wordCount(justification) <= 20', message: 'At most 20 words' }] } },
+    justification: { type: 'string', title: 'Justification (wordCount rule)', rules: { validation: [{ expr: 'wordCount(justification) <= 20', message: 'At most 20 words' }] } },
     country: { type: 'string', format: 'countries', title: 'Country' },
     countriesIso: { type: 'array', format: 'obibaCountriesUiSelect', title: 'Countries', items: { type: 'string' } },
     role: { type: 'string', format: 'typeahead', title: 'Role', examples: ['Principal investigator', 'Co-investigator', 'Data manager', 'Statistician'] },

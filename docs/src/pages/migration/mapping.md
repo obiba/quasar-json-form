@@ -14,7 +14,7 @@ title: Mapping
 | `help` + `helpvalue` | `Label` (`text`, HTML allowed) |
 | `tabs` | `Categorization` / `Category` |
 | `htmlClass` | `options.class`, with `col-xs-N` to `col-N`, `col-*-offset-N` to `offset-*-N`, `row` to `rowClass` |
-| `condition` | `rules.visible` (filtrex, see [Conditions](#/migration/conditions)) |
+| `condition` | `rules.visible` (see [Conditions](#/migration/conditions)) |
 | `notitle` | `label: false` |
 | `title` | written on the schema property (displayed above the control) |
 | `description` | `hint` of the control (displayed under the input, like the ASF help block) |

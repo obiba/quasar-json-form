@@ -1,6 +1,6 @@
 /**
  * Transpiles the JavaScript `condition` expressions of angular-schema-form
- * (ASF) form definitions into filtrex rules understood by the renderers
+ * (ASF) form definitions into the rules understood by the renderers
  * (`rules.visible`).
  *
  * Only the subset of JavaScript actually found in form definitions is
@@ -14,12 +14,10 @@
  *   and `model.list.includes(v)`, mapped to the `contains(list, v)` function;
  * - `model.list.length`, mapped to `length(list)`.
  *
- * filtrex has neither boolean nor null literals and rejects `not undefined`,
- * so JavaScript truthiness is preserved with the `truthy(value)` function
- * where a value is used as a boolean (`!model.b`, `model.a && ...`, loose
- * `== true`), and the comparisons with `true` / `false` / `null` /
- * `undefined` are expressed with the `isBoolean`, `isNull` and `isUndefined`
- * functions, keeping the strict (`===`) and loose (`==`) distinctions.
+ * Rules are a JavaScript expression subset themselves, so the operators and
+ * literals are kept as they are. A rule must evaluate to a boolean, which
+ * `&&` and `||` do not guarantee in JavaScript: a value used as a boolean
+ * (`model.a`, `model.a && ...`) is coerced with `!!`.
  */
 
 export class ConditionError extends Error {
@@ -50,15 +48,9 @@ type Node =
   | { kind: 'contains'; path: Node; arg: Node }
   | { kind: 'length'; path: Node }
 
-/** filtrex has no boolean literals: constant results are expressed as comparisons */
-const TRUE = '1 == 1'
-const FALSE = '1 == 0'
-
 const OPERATORS = ['===', '!==', '==', '!=', '<=', '>=', '&&', '||', '<', '>', '!', '-', '+']
 const IDENT = /^[A-Za-z_$][A-Za-z0-9_$]*/
 const NUMBER = /^\d+(\.\d+)?/
-/** filtrex identifiers: no `$`, no leading digit */
-const FILTREX_IDENT = /^[A-Za-z_][A-Za-z0-9_]*$/
 
 function tokenize(source: string): Token[] {
   const tokens: Token[] = []
@@ -267,24 +259,23 @@ class Parser {
   }
 }
 
+/** A node as a value: a primary expression, or a parenthesized boolean expression. */
 function emitValue(node: Node, source: string): string {
   switch (node.kind) {
     case 'path':
-      node.segments.forEach((segment) => {
-        if (!FILTREX_IDENT.test(segment)) {
-          throw new ConditionError(`property name '${segment}' cannot be used in a filtrex rule`, source)
-        }
-      })
       return node.segments.join('.')
     case 'string':
       return JSON.stringify(node.value)
     case 'number':
       return String(node.value)
+    case 'bool':
+      return String(node.value)
+    case 'nullish':
+      return node.value === null ? 'null' : 'undefined'
     case 'length':
       return `length(${emitValue(node.path, source)})`
-    case 'bool':
-    case 'nullish':
-      throw new ConditionError(`'${node.kind === 'bool' ? node.value : 'null'}' can only be compared with == or !=`, source)
+    case 'contains':
+      return `contains(${emitValue(node.path, source)}, ${emitValue(node.arg, source)})`
     case 'indexOf':
       throw new ConditionError('indexOf() must be compared with 0 or -1', source)
     default:
@@ -292,115 +283,60 @@ function emitValue(node: Node, source: string): string {
   }
 }
 
-function isRelational(op: string): boolean {
-  return op === '<' || op === '<=' || op === '>' || op === '>='
-}
-
 function emitComparison(node: Extract<Node, { kind: 'cmp' }>, source: string): string {
   const { left, right } = node
-  const strict = node.op === '===' || node.op === '!=='
   const op = node.op === '===' ? '==' : node.op === '!==' ? '!=' : node.op
-  const negated = op === '!='
 
-  // list.indexOf(v) >= 0, > -1, != -1 (and < 0, == -1 for the negation)
+  // list.indexOf(v) >= 0, > -1, != -1 (and < 0, <= -1, == -1 for the negation)
   if (left.kind === 'indexOf' && right.kind === 'number') {
-    const contains = `contains(${emitValue(left.path, source)}, ${emitValue(left.arg, source)})`
+    const contains = emitValue({ kind: 'contains', path: left.path, arg: left.arg }, source)
     const positive =
       (op === '>=' && right.value === 0) || (op === '>' && right.value === -1) || (op === '!=' && right.value === -1)
     const negative =
       (op === '<' && right.value === 0) || (op === '<=' && right.value === -1) || (op === '==' && right.value === -1)
     if (positive) return contains
-    if (negative) return `not (${contains})`
+    if (negative) return `!${contains}`
     throw new ConditionError(`unsupported indexOf() comparison '${node.op} ${right.value}'`, source)
   }
   if (right.kind === 'indexOf') {
     // 0 <= list.indexOf(v): swap the operands
-    const swapped: Record<string, string> = { '<': '>', '<=': '>=', '>': '<', '>=': '<=', '==': '==', '!=': '!=' }
-    return emitComparison({ kind: 'cmp', op: swapped[op]!, left: right, right: left }, source)
+    const swapped: Record<string, string> = { '<': '>', '<=': '>=', '>': '<', '>=': '<=' }
+    return emitComparison({ kind: 'cmp', op: swapped[node.op] ?? node.op, left: right, right: left }, source)
   }
 
-  if (op !== '==' && op !== '!=' && !isRelational(op)) {
-    throw new ConditionError(`unsupported operator '${node.op}'`, source)
-  }
-  if (isRelational(op) && [left, right].some((operand) => operand.kind === 'bool' || operand.kind === 'nullish')) {
-    throw new ConditionError(`ordering comparison with a boolean or null literal is not supported ('${node.op}')`, source)
-  }
-
-  // x == null / undefined: loosely, null and undefined are equal to each other only;
-  // strictly, `=== null` and `=== undefined` are distinct
-  if (right.kind === 'nullish' || left.kind === 'nullish') {
-    const literal = right.kind === 'nullish' ? right : (left as Extract<Node, { kind: 'nullish' }>)
-    const other = right.kind === 'nullish' ? left : right
-    if (other.kind === 'nullish') return (other.value === literal.value || !strict) !== negated ? TRUE : FALSE
-    if (other.kind === 'bool') return negated ? TRUE : FALSE
-    const value = emitValue(other, source)
-    let test: string
-    if (!strict) test = `isNull(${value})`
-    else if (literal.value === undefined) test = `isUndefined(${value})`
-    else test = `(isNull(${value}) and not (isUndefined(${value})))`
-    return negated ? `not (${test})` : test
-  }
-
-  // x == true / false: JavaScript truthiness when loose, a boolean of that value when strict
-  if (right.kind === 'bool' || left.kind === 'bool') {
-    const other = right.kind === 'bool' ? left : right
-    const expected = (right.kind === 'bool' ? right : (left as Extract<Node, { kind: 'bool' }>)).value
-    if (other.kind === 'bool') return (other.value === expected) !== negated ? TRUE : FALSE
-    let test: string
-    if (['not', 'and', 'or', 'cmp', 'contains'].includes(other.kind)) {
-      // already a boolean
-      const bool = emitBool(other, source)
-      test = expected ? bool : `not (${bool})`
-    } else {
-      const value = emitValue(other, source)
-      const truthy = `truthy(${value})`
-      test = strict
-        ? `(isBoolean(${value}) and ${expected ? truthy : `not (${truthy})`})`
-        : expected ? truthy : `not (${truthy})`
-    }
-    return negated ? `not (${test})` : test
-  }
-
-  if (isRelational(op)) {
-    // filtrex rejects ordering comparisons on undefined values, JavaScript evaluates them to false
-    const guards = [left, right]
-      .filter((operand) => operand.kind === 'path')
-      .map((operand) => `isNotEmpty(${emitValue(operand, source)})`)
-    const comparison = `${emitValue(left, source)} ${op} ${emitValue(right, source)}`
-    return guards.length > 0 ? `(${[...guards, comparison].join(' and ')})` : comparison
-  }
-
-  return `${emitValue(left, source)} ${op} ${emitValue(right, source)}`
+  return `${emitValue(left, source)} ${node.op} ${emitValue(right, source)}`
 }
 
+/** A node as a boolean expression. */
 function emitBool(node: Node, source: string): string {
   switch (node.kind) {
     case 'or':
-      return `${emitBool(node.left, source)} or ${emitBool(node.right, source)}`
+      return `${emitBool(node.left, source)} || ${emitBool(node.right, source)}`
     case 'and': {
       const left = node.left.kind === 'or' ? `(${emitBool(node.left, source)})` : emitBool(node.left, source)
       const right = node.right.kind === 'or' ? `(${emitBool(node.right, source)})` : emitBool(node.right, source)
-      return `${left} and ${right}`
+      return `${left} && ${right}`
     }
     case 'not':
-      return `not (${emitBool(node.operand, source)})`
+      // `!` yields a boolean whatever the operand
+      return `!${node.operand.kind === 'not' ? emitBool(node.operand, source) : emitValue(node.operand, source)}`
     case 'cmp':
       return emitComparison(node, source)
     case 'contains':
-      return `contains(${emitValue(node.path, source)}, ${emitValue(node.arg, source)})`
+      return emitValue(node, source)
     case 'indexOf':
       throw new ConditionError('indexOf() must be compared with 0 or -1', source)
     case 'bool':
-      return node.value ? TRUE : FALSE
+      return String(node.value)
     case 'nullish':
-      return FALSE
+      return 'false'
     default:
-      return `truthy(${emitValue(node, source)})`
+      return `!!${emitValue(node, source)}`
   }
 }
 
 /**
- * Transpiles an ASF `condition` (JavaScript) into a filtrex expression.
+ * Transpiles an ASF `condition` (JavaScript) into a rule expression.
  * Throws a `ConditionError` when the expression is not supported.
  */
 export function transpileCondition(condition: string): string {

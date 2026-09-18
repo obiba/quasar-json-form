@@ -16,7 +16,7 @@ application.
 ## Item layout and options
 
 `options.items` is the UI schema of one item, with `Control` scopes relative to the item schema
-(`#` for the item itself). `minItems` / `maxItems` from the schema (or the filtrex `min` / `max`
+(`#` for the item itself). `minItems` / `maxItems` from the schema (or the `min` / `max`
 rules) disable the remove and add buttons.
 
 <DocExample name="list/item-layout" title="Horizontal items, confirmation, no reordering" />

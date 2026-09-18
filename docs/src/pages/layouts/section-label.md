@@ -8,7 +8,7 @@ title: Section and label
 
 A `Label` carries its content in `text` (JSON Forms convention). It is first resolved as a vue-i18n
 key, then rendered as markdown with raw HTML allowed (`<h3>`, alert `<div>`s, links...), sanitized
-with DOMPurify. Both accept a `rules.visible` filtrex rule.
+with DOMPurify. Both accept a `rules.visible` rule.
 
 <DocExample name="layouts/section-label" title="Section, HTML label and conditional label" source />
 

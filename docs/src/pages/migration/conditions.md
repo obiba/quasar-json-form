@@ -4,7 +4,7 @@ title: Conditions
 
 # Conditions
 
-<p class="doc-lead">The JavaScript <code>condition</code> expressions of angular-schema-form are transpiled into filtrex <code>rules.visible</code>.</p>
+<p class="doc-lead">The JavaScript <code>condition</code> expressions of angular-schema-form are transpiled into <code>rules.visible</code> <a href="#/start/rules">rules</a>.</p>
 
 `transpileCondition` accepts the JavaScript subset found in form definitions and throws a
 `ConditionError` for anything else. Try it:
@@ -21,25 +21,23 @@ title: Conditions
   `model.list.includes(v)`, mapped to `contains(list, v)`;
 - `model.list.length`, mapped to `length(list)`.
 
-## Truthiness and null checks
+## Booleans
 
-filtrex has neither boolean nor null literals, so JavaScript truthiness is kept through the
-`truthy()` function where a value is used as a boolean (`!model.b` becomes `not (truthy(b))`), and
-comparisons with `true`, `false`, `null` and `undefined` use the `isBoolean`, `isNull` and
-`isUndefined` functions with the strict / loose distinction of JavaScript:
+Rules are a JavaScript subset, so the literals, operators and their loose / strict distinction are
+kept as they are (`model.a === null` becomes `a === null`). A `visible` rule must evaluate to a
+boolean, which `&&` and `||` do not guarantee in JavaScript: a value used as a boolean is coerced
+with `!!`, `!` and the comparisons already being booleans.
 
-| JavaScript | filtrex |
+| JavaScript | Rule |
 |---|---|
-| `model.a == null` | `isNull(a)` |
-| `model.a === null` | `(isNull(a) and not (isUndefined(a)))` |
-| `model.a === undefined` | `isUndefined(a)` |
-| `model.a === true` | `(isBoolean(a) and truthy(a))` |
-| `model.a == true` | `truthy(a)` |
+| `model.a` | `!!a` |
+| `!model.a` | `!a` |
+| `model.a && model.b == 1` | `!!a && b == 1` |
+| `model.a == true` | `a == true` |
+| `model.list.indexOf('x') < 0` | `!contains(list, "x")` |
 
-Known deviations from JavaScript: a loose `model.a == true` is JavaScript truthiness (`2 == true`
-is true here, false in JavaScript), filtrex `==` is strict (`'1' == 1` is false), and an ordering
-comparison is false when the value is null, undefined or an empty string. Ordering comparisons with
-a boolean or null literal are rejected.
+The only deviation from JavaScript is a missing object in a path: `model.a.b` is `undefined`
+rather than an error when `a` is not set.
 
 ## In the converter
 

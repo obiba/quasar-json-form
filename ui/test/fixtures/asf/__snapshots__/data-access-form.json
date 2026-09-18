@@ -418,7 +418,7 @@
                   }
                 },
                 "rules": {
-                  "visible": "not (truthy(hasNoStaff))"
+                  "visible": "!hasNoStaff"
                 }
               }
             ],
@@ -481,7 +481,7 @@
                   }
                 },
                 "rules": {
-                  "visible": "not (truthy(hasNoStudents))"
+                  "visible": "!hasNoStudents"
                 }
               }
             ],

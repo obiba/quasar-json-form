@@ -13,7 +13,7 @@ export default {
     {
       schema: '{ "oneOf": [{ "const": ..., "title": ... }] }',
       rank: 6,
-      desc: 'Single selection among `oneOf` entries: `const` is the value, `title` the label. An entry with `rules.visible` is listed only when its filtrex rule is true.',
+      desc: 'Single selection among `oneOf` entries: `const` is the value, `title` the label. An entry with `rules.visible` is listed only when its rule is true.',
     },
     {
       schema: '{ "type": "array", "uniqueItems": true, "items": { "enum" | "oneOf" } }',

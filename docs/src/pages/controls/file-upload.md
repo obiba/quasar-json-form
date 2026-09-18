@@ -28,7 +28,7 @@ header: the Mica temporary file flow is `uploadUrl: "/ws/files/temp"` and
 `metadataUrl: "/ws/files/temp/{id}"`. Uploaded items get `justUploaded: true`, and removing one
 calls `deleteUrl` when set. `downloadUrl` is a template over the item properties used as link.
 
-`minItems` / `maxItems` from the schema (or the filtrex `min` / `max` rules) bound the number of
+`minItems` / `maxItems` from the schema (or the `min` / `max` rules) bound the number of
 files; `multiple` defaults to true unless `maxItems` is 1. There is no server behind this example:
 picking a file shows the upload failure.
 

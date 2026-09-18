@@ -4,7 +4,7 @@ title: Rules
 
 # Rules
 
-<p class="doc-lead">Dynamic behaviour is declared with <a href="https://github.com/m93a/filtrex">filtrex</a> expressions over the form data, on the schema property or on the UI schema element.</p>
+<p class="doc-lead">Dynamic behaviour is declared with expressions over the form data, on the schema property or on the UI schema element.</p>
 
 ```json
 { "type": "Control", "scope": "#/properties/city", "rules": { "visible": "country == \"CA\"" } }
@@ -34,9 +34,16 @@ and sections.
 
 ## Expressions
 
-Filtrex supports arithmetic, comparisons (`==`, `!=`, `<`, `<=`, `>`, `>=`), `and`, `or`, `not`,
-`in` (`"one" in picks`), `if ... then ... else`, and ternaries through `ifElse`. Strings use
-double quotes. The following functions are added:
+Rules are a subset of JavaScript, evaluated by
+[angular-expressions](https://github.com/peerigon/angular-expressions) with the form data as scope:
+
+- `a.b.c` paths into the form data; a missing segment gives `undefined` rather than an error;
+- `"string"` / `'string'`, number, `true`, `false`, `null` and `undefined` literals, `[a, b]` arrays;
+- arithmetic (`+`, `-`, `*`, `/`, `%`), comparisons (`==`, `!=`, `===`, `!==`, `<`, `<=`, `>`, `>=`,
+  with the JavaScript loose / strict distinction), `&&`, `||`, `!` and the `cond ? a : b` ternary;
+- calls of the functions below (only these: methods such as `list.indexOf(v)` are not available).
+
+Assignments and the `this` keyword are rejected, and the data is never mutated by a rule.
 
 | Function | Description |
 |---|---|
@@ -53,8 +60,25 @@ double quotes. The following functions are added:
 | `matches(s, pattern)` | regular expression test (pattern of at most 100 characters) |
 | `wordCount(s)` | number of whitespace-separated words |
 
-An expression that fails to evaluate logs an error and counts as `false` (`true` for `visible`).
-The `filtrexEngine` export lets the application register more functions with `addFunction`.
+An expression that fails to compile or to evaluate logs an error and counts as `false` (`true` for
+`visible`). The values follow JavaScript: `undefined > 3` is `false` and `undefined % 2 == 0` is
+`false` too, so a `validation` rule of an optional field is usually guarded, as in
+`isEmpty(even) || even % 2 == 0`.
+
+The `ruleEngine` export lets the application register more functions with `addFunction`:
+
+```ts
+import { ruleEngine } from '@obiba/quasar-ui-json-form'
+
+ruleEngine.addFunction('isAdult', (age: number) => age >= 18)
+```
+
+### Migrating from filtrex
+
+Versions before 0.7 evaluated the rules with [filtrex](https://github.com/cshaa/filtrex). Rewrite
+`and` / `or` / `not` as `&&` / `||` / `!`, `x in list` as `contains(list, x)`, `mod` as `%`, and
+`if c then a else b` as `c ? a : b`; the functions and the comparison operators are unchanged
+(`==` is now the loose JavaScript equality, `===` the strict one).
 
 ## Options visibility
 

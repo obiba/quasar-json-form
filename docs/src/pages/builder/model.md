@@ -56,7 +56,7 @@ Every operation keeps the schema in step with the tree:
 | `moveNode(model, id, parentId, index?)`, `canMove(model, id, parentId)` | Reorders or reparents a node. A control stays at its level: it cannot move into or out of the items of a list |
 | `duplicateNode(model, id)` | Copies the node next to itself; the property of a control is copied under a new key, and the layouts of the copy get their own keys, their translations copied |
 | `renameProperty(model, id, key)` | Renames the property of a control and rewrites the scopes of the nested controls; false when the key is invalid or taken |
-| `ruleReferences(model, name)` | The filtrex rules of the form mentioning a property, to review after a rename |
+| `ruleReferences(model, name)` | The rules of the form mentioning a property, to review after a rename |
 | `locate(model, id)`, `findNode`, `locations`, `descendants`, `listOf`, `propertySchema`, `isRequired`, `setRequired` | Navigation and property helpers |
 
 ## Texts
