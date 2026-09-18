@@ -10,6 +10,8 @@ import { vanillaRenderers } from '@jsonforms/vue-vanilla'
 import '@jsonforms/vue-vanilla/vanilla.css'
 import { useFormI18n } from '../composables/useFormI18n'
 import { provideFormErrorRegistry } from '../composables/useFormErrors'
+import { useRules } from '../composables/useRules'
+import { collectHiddenPaths, filterHiddenErrors } from '../utils/visibility'
 import { I18N_KEY, LANGUAGES_KEY, LOCALE_KEY } from '../composables/keys'
 import type { FormI18nOverride } from '../composables/useFormI18n'
 import type { LanguagesInput } from '../composables/useControlProperties'
@@ -233,17 +235,6 @@ export default defineComponent({
     const selectedLocale = ref<string | undefined>(undefined)
     provide(LOCALE_KEY, selectedLocale)
 
-    // Errors found by the renderers themselves, merged with the AJV ones
-    const registry = provideFormErrorRegistry()
-    const ajvErrors = ref<ErrorObject[]>([])
-    const allErrors = computed<ErrorObject[]>(() => [...ajvErrors.value, ...registry.errors.value])
-    watch(allErrors, (errors) => emit('update:errors', errors))
-
-    const onChange = (event: any) => {
-      emit('update:modelValue', event.data)
-      ajvErrors.value = event.errors || []
-    }
-
     const generateDefaultUISchema = (schema: any): any => {
       if (!schema || !schema.properties) return { type: 'VerticalLayout', elements: [] }
       return {
@@ -261,6 +252,31 @@ export default defineComponent({
         ? props.uischema
         : generateDefaultUISchema(props.schema)
     })
+
+    const currentData = ref<any>(props.modelValue)
+    watch(() => props.modelValue, (data) => { currentData.value = data })
+    const { evaluateRule } = useRules(currentData)
+    const hiddenPaths = computed<string[]>(() =>
+      collectHiddenPaths(generatedUischema.value, props.schema, (rule) => evaluateRule(rule, true) === true),
+    )
+
+    // Errors found by the renderers themselves, merged with the AJV ones.
+    // The AJV errors of the controls hidden by a `visible` rule (their own or
+    // the one of an enclosing layout) are left out: a hidden control is not
+    // validated, as with angular-schema-form, so that a `required` property
+    // shown under a condition does not block the form while it is hidden.
+    const registry = provideFormErrorRegistry()
+    const ajvErrors = ref<ErrorObject[]>([])
+    const visibleAjvErrors = computed<ErrorObject[]>(() => filterHiddenErrors(ajvErrors.value, hiddenPaths.value))
+    const allErrors = computed<ErrorObject[]>(() => [...visibleAjvErrors.value, ...registry.errors.value])
+    watch(allErrors, (errors) => emit('update:errors', errors))
+
+    const onChange = (event: any) => {
+      currentData.value = event.data
+      emit('update:modelValue', event.data)
+      ajvErrors.value = event.errors || []
+    }
+
 
     // JSON Forms translation state backed by the form translations and
     // vue-i18n (or the pass-through fallback when it is not installed),
