@@ -60,8 +60,8 @@ Assignments and the `this` keyword are rejected, and the data is never mutated b
 | `matches(s, pattern)` | regular expression test (pattern of at most 100 characters) |
 | `wordCount(s)` | number of whitespace-separated words |
 
-An expression that fails to compile or to evaluate logs an error and counts as `false` (`true` for
-`visible`). The values follow JavaScript: `undefined > 3` is `false` and `undefined % 2 == 0` is
+An expression that fails to compile or to evaluate logs an error and counts as `false`, except for
+`visible`: an element whose rule is broken stays visible. The values follow JavaScript: `undefined > 3` is `false` and `undefined % 2 == 0` is
 `false` too, so a `validation` rule of an optional field is usually guarded, as in
 `isEmpty(even) || even % 2 == 0`.
 

@@ -10,8 +10,8 @@ export default {
         title: 'End',
         rules: {
           validation: [
-            { expr: 'end > start', message: 'The end must be after the start' },
-            { expr: 'end - start <= 10', message: 'At most 10 apart' },
+            { expr: 'isEmpty(end) || end > start', message: 'The end must be after the start' },
+            { expr: 'isEmpty(end) || end - start <= 10', message: 'At most 10 apart' },
           ],
         },
       },

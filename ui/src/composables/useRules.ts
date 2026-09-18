@@ -33,7 +33,8 @@ export class RuleEngine {
   private compiled = new Map<string, Evaluator>()
 
   constructor() {
-    this.customFunctions = {}
+    // null prototype: a registered name never reaches Object.prototype
+    this.customFunctions = Object.create(null)
 
     // Add useful custom functions
     this.addFunction('isEmpty', (value: any) => {
@@ -165,12 +166,16 @@ export class RuleEngine {
     Object.values(node).forEach((child) => this.check(child))
   }
 
-  evaluate(expression: string, context: Record<string, any>): any {
+  /**
+   * The value of an expression on a context. An expression that does not
+   * compile or fails to evaluate logs the error and gives `fallback`.
+   */
+  evaluate(expression: string, context: Record<string, any>, fallback: any = false): any {
     try {
       return this.compile(expression)(context, this.customFunctions)
     } catch (error) {
       console.error('Error evaluating expression:', expression, error)
-      return false
+      return fallback
     }
   }
 
@@ -201,9 +206,9 @@ export const ruleEngine = new RuleEngine()
 
 // Composable for reactive rule evaluation
 export function useRules(formData: any) {
-  const evaluateRule = (expression: string): any => {
+  const evaluateRule = (expression: string, fallback: any = false): any => {
     const val = formData.value
-    return ruleEngine.evaluate(expression, val)
+    return ruleEngine.evaluate(expression, val, fallback)
   }
 
   const evaluateRuleComputed = (expression: string) => {

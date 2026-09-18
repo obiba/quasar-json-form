@@ -161,17 +161,11 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
     return rules
   })
 
-  // Visibility rule
+  // Visibility rule: an element whose rule fails to evaluate stays visible
   const isVisible = computed(() => {
     const rule = ruleOptions.value.visible
     if (!rule) return true
-    try {
-      const rval = evaluateRule(rule)
-      return rval === true
-    } catch (error) {
-      console.error('Error evaluating visibility rule:', rule, error)
-      return true
-    }
+    return evaluateRule(rule, true) === true
   })
 
   // Enable rule
@@ -377,13 +371,7 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
 
     const optionVisible = (val: any): boolean => {
       if (val.rules && val.rules.visible) {
-        try {
-          return evaluateRule(val.rules.visible)
-        }
-        catch (error) {
-          console.error('Error evaluating visibility rule for option:', val, error)
-          return true
-        }
+        return evaluateRule(val.rules.visible, true)
       }
       return true
     }

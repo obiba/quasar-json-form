@@ -95,7 +95,7 @@ const schema = {
       title: 'Even number',
       description: 'Validation rule, evaluated whatever the validation mode',
       rules: {
-        validation: [{ expr: 'even mod 2 == 0', message: 'renderers.integer.number_must_be_even' }],
+        validation: [{ expr: 'isEmpty(even) || even % 2 == 0', message: 'renderers.integer.number_must_be_even' }],
       },
     },
     contacts: {

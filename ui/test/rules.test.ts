@@ -158,6 +158,14 @@ describe('RuleEngine API', () => {
     expect(error).toHaveBeenCalledWith('Error evaluating expression:', 'a ==', expect.anything())
   })
 
+  it('gives the fallback when an expression fails', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    expect(ruleEngine.evaluate('a ==', { a: 1 }, true)).toBe(true)
+    expect(ruleEngine.evaluate('nope(a)', { a: 1 }, null)).toBeNull()
+    expect(ruleEngine.evaluate('a == 1', { a: 1 }, true)).toBe(true)
+    expect(ruleEngine.evaluate('a == 2', { a: 1 }, true)).toBe(false)
+  })
+
   it('validates expressions', () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => {})
     expect(ruleEngine.validateExpression('a > 1 && isEmpty(b)')).toBe(true)
@@ -179,6 +187,11 @@ describe('RuleEngine API', () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => {})
     expect(ruleEngine.evaluate('double(a)', { a: 4 })).toBe(false)
     expect(error).toHaveBeenCalled()
+    // the dictionary has no prototype: a special name is just a function name
+    engine.addFunction('__proto__', () => 'proto')
+    expect(Object.getPrototypeOf(engine.customFunctions)).toBeNull()
+    expect(engine.evaluate('__proto__()', {})).toBe('proto')
+    expect(({} as any).proto).toBeUndefined()
     // a function added later is known to the already compiled expressions
     expect(engine.expressionError('triple(a)')).toBe("unknown function 'triple'")
     engine.addFunction('triple', (value: number) => value * 3)
