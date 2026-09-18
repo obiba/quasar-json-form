@@ -65,13 +65,27 @@ An expression that fails to compile or to evaluate logs an error and counts as `
 `false` too, so a `validation` rule of an optional field is usually guarded, as in
 `isEmpty(even) || even % 2 == 0`.
 
-The `ruleEngine` export lets the application register more functions with `addFunction`:
+## Custom functions
 
-```ts
+The application registers its own functions on the `ruleEngine` export with `addFunction`; they
+are then available to every rule, on any form, under the same name. Register them once before the
+forms are rendered, in a boot file (Quasar CLI) or next to `app.use(Plugin)`:
+
+```js
 import { ruleEngine } from '@obiba/quasar-ui-json-form'
 
-ruleEngine.addFunction('isAdult', (age: number) => age >= 18)
+ruleEngine.addFunction('isAdult', (age) => age >= 18)
 ```
+
+A function receives the evaluated arguments of the call (`isAdult(person.age)` passes the value of
+`person.age`, `undefined` when it is not set) and its result is the value of the call: a boolean for
+`visible`, `enabled` and `validation`, anything for `compute`, `min` and `max`. Return plain values
+(primitives, arrays, plain objects): a function is the only way for a rule to reach code, so never
+return a constructor or a prototype. A registered name wins over a form field of the same name, and
+the [builder](#/builder/overview) checks the rules against the registered functions, so an unknown
+function is reported while the form is being designed.
+
+<DocExample name="rules/custom-functions" title="age() and luhn() registered by the application" source />
 
 ## Options visibility
 

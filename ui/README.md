@@ -245,6 +245,13 @@ number of words and show a word counter (`validationMessage.wordLimitError` / `w
 `wordMaxError`). The rule engine also provides `wordCount(text)` and `contains(list, value)` for
 rules: `{ "validation": [{ "expr": "wordCount(abstract) <= 500", "message": "..." }] }`.
 
+## Rule functions
+
+The application registers its own rule functions on the `ruleEngine` export, once, before the
+forms are rendered (a boot file in a Quasar CLI project): `ruleEngine.addFunction('isAdult', (age) =>
+age >= 18)` makes `isAdult(person.age)` available to every rule. A function receives the evaluated
+arguments and its result is the value of the call; return plain values only.
+
 ## Countries and typeahead
 
 `format: "countries"` (or `obibaCountriesUiSelect`) is a searchable select of ISO codes, single
