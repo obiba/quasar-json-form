@@ -140,8 +140,9 @@ export default defineComponent({
       default: () => [],
     },
     /**
-     * JSON Forms config object, passed to every renderer (`countries`,
-     * `fileUpload`, `languages`...).
+     * JSON Forms config object, passed to every renderer: the application
+     * defaults that a control overrides with the same key in its `options`
+     * (`languages`, `countries`, `fileUpload` hooks, `geo` map defaults...).
      */
     config: {
       type: Object,

@@ -39,7 +39,7 @@ export default {
     },
     config: {
       type: 'Object',
-      desc: 'JSON Forms config passed to every renderer: `languages`, `countries`, `fileUpload` hooks.',
+      desc: 'JSON Forms config passed to every renderer, the application-wide defaults that a control overrides with the same key in its `options`: `languages` of the localized strings, `countries` of the country select, `fileUpload` hooks (`upload`, `remove`, `downloadUrl`) and `geo` map defaults (`tiles`, `center`, `zoom`, `height`, `precision`, `grayscale`). Other entries reach the custom controls of the application.',
     },
     renderers: {
       type: 'Array',
