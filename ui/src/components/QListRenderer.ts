@@ -140,11 +140,12 @@ export default defineComponent({
       return label ? t(String(label)) : t('add-item')
     })
 
+    // a hidden list is removed from the data, like the other hidden controls
     watch(
       () => isVisible.value,
       (newValue) => {
         if (newValue === false) {
-          controlResult.handleChange(controlResult.control.value.path, [])
+          controlResult.handleChange(controlResult.control.value.path, undefined)
         }
       },
     )
