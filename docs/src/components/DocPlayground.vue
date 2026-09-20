@@ -1,7 +1,7 @@
 <template>
   <div class="doc-wide doc-playground">
     <div class="row q-col-gutter-md items-center q-mb-md">
-      <div class="col-12 col-md-4">
+      <div class="col-12 col-md-3">
         <q-select
           v-model="exampleName"
           :options="exampleNames"
@@ -21,50 +21,62 @@
       <div class="col-12 col-md-3">
         <q-input v-model="languagesText" label="Languages" dense outlined placeholder="en, fr" />
       </div>
-      <div class="col-12 col-md-3">
-        <q-file
-          v-model="translationsFile"
-          label="Translations JSON"
-          dense
-          outlined
-          clearable
-          accept=".json,application/json"
-          :error="!!translationsError"
-          :error-message="translationsError"
-          @update:model-value="loadTranslations"
-        >
-          <template #prepend>
-            <q-icon name="translate" />
-          </template>
-        </q-file>
+      <div class="col-auto">
+        <q-file ref="translationsFileInput" v-model="translationsFile" accept=".json,application/json" class="hidden" @update:model-value="loadTranslations" />
+        <q-btn color="secondary" icon="upload" label="Translations" unelevated @click="translationsFileInput?.pickFiles()">
+          <q-tooltip>Upload a translations JSON file</q-tooltip>
+        </q-btn>
       </div>
       <div class="col-auto">
         <q-toggle v-model="readonly" :label="t('readonly')" />
       </div>
+      <q-space />
+      <div class="col-auto">
+        <q-btn
+          flat
+          dense
+          round
+          :icon="isFullscreen ? 'fullscreen_exit' : 'fullscreen'"
+          :title="isFullscreen ? 'Exit fullscreen' : 'Fullscreen'"
+          @click="toggleFullscreen"
+        />
+      </div>
     </div>
 
-    <div class="row q-col-gutter-md">
+    <div ref="playgroundPanel" class="row q-col-gutter-md doc-playground-panel">
       <div class="col-12 col-md-5">
-        <q-tabs v-model="tab" dense align="left" active-color="primary" narrow-indicator>
-          <q-tab name="schema" :label="t('schema')" />
-          <q-tab name="uischema" :label="t('uischema')" />
-          <q-tab name="data" :label="t('data')" />
-        </q-tabs>
-        <q-separator />
-        <q-tab-panels v-model="tab" animated class="bg-transparent">
-          <q-tab-panel name="schema" class="q-px-none">
-            <q-input v-model="schemaText" filled type="textarea" autogrow class="doc-editor" :error="!!schemaError" :error-message="schemaError" />
-          </q-tab-panel>
-          <q-tab-panel name="uischema" class="q-px-none">
-            <div class="text-caption text-grey-7 q-mb-xs">Leave empty to generate one control per property.</div>
-            <q-input v-model="uischemaText" filled type="textarea" autogrow class="doc-editor" :error="!!uischemaError" :error-message="uischemaError" />
-          </q-tab-panel>
-          <q-tab-panel name="data" class="q-px-none">
-            <div class="text-caption text-grey-7 q-mb-xs">Initial data, applied with the button (the live data is shown under the form).</div>
-            <q-input v-model="dataText" filled type="textarea" autogrow class="doc-editor" :error="!!dataError" :error-message="dataError" />
-            <q-btn color="primary" label="Apply data" size="sm" class="q-mt-sm" unelevated @click="applyData" />
-          </q-tab-panel>
-        </q-tab-panels>
+        <div class="doc-editor-panel q-card--bordered rounded-borders q-pt-md">
+          <q-tabs v-model="tab" dense align="left" active-color="primary" narrow-indicator>
+            <q-tab name="schema" :label="t('schema')" />
+            <q-tab name="uischema" :label="t('uischema')" />
+            <q-tab name="data" :label="t('data')" />
+          </q-tabs>
+          <q-separator />
+          <q-tab-panels v-model="tab" animated class="bg-transparent">
+            <q-tab-panel name="schema" class="q-px-none">
+              <div class="relative-position">
+                <q-input v-model="schemaText" filled type="textarea" autogrow class="doc-editor" :error="!!schemaError" :error-message="schemaError" />
+                <q-btn flat dense round size="sm" icon="content_copy" class="absolute-top-right q-ma-xs text-grey-5" :aria-label="t('copy')" @click="copyText(schemaText)">
+                  <q-tooltip>{{ t('copy') }}</q-tooltip>
+                </q-btn>
+              </div>
+            </q-tab-panel>
+            <q-tab-panel name="uischema" class="q-px-none">
+              <div class="text-caption text-grey-7 q-mb-xs">Leave empty to generate one control per property.</div>
+              <div class="relative-position">
+                <q-input v-model="uischemaText" filled type="textarea" autogrow class="doc-editor" :error="!!uischemaError" :error-message="uischemaError" />
+                <q-btn flat dense round size="sm" icon="content_copy" class="absolute-top-right q-ma-xs text-grey-5" :aria-label="t('copy')" @click="copyText(uischemaText)">
+                  <q-tooltip>{{ t('copy') }}</q-tooltip>
+                </q-btn>
+              </div>
+            </q-tab-panel>
+            <q-tab-panel name="data" class="q-px-none">
+              <div class="text-caption text-grey-7 q-mb-xs">Initial data, applied with the button (the live data is shown under the form).</div>
+              <q-input v-model="dataText" filled type="textarea" autogrow class="doc-editor" :error="!!dataError" :error-message="dataError" />
+              <q-btn color="primary" label="Apply data" size="sm" class="q-mt-sm" unelevated @click="applyData" />
+            </q-tab-panel>
+          </q-tab-panels>
+        </div>
       </div>
 
       <div class="col-12 col-md-7">
@@ -112,13 +124,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Notify } from 'quasar'
+import { AppFullscreen, copyToClipboard, Notify } from 'quasar'
+import type { QFile } from 'quasar'
 import { QJsonForm, countryCodes } from 'ui'
 import DocCode from './DocCode.vue'
 import type { DocExampleDef } from '../examples/types'
-import { i18n } from '../boot/i18n'
+import { loadTranslationsFile } from '../utils/loadTranslations'
 
 const { t } = useI18n()
+
+function copyText (text: string) {
+  copyToClipboard(text).then(() => Notify.create({ message: t('copied'), type: 'positive', timeout: 1000 }))
+}
 
 const modules = import.meta.glob<{ default: DocExampleDef }>('../examples/**/*.ts', { eager: true })
 const allExampleNames = Object.keys(modules)
@@ -179,7 +196,13 @@ const errors = ref<any[]>([])
 const formKey = ref(0)
 
 const translationsFile = ref<File | null>(null)
-const translationsError = ref('')
+const translationsFileInput = ref<QFile>()
+const playgroundPanel = ref<HTMLElement>()
+const isFullscreen = computed(() => AppFullscreen.isActive && AppFullscreen.activeEl === playgroundPanel.value)
+
+function toggleFullscreen () {
+  AppFullscreen.toggle(playgroundPanel.value)
+}
 
 function parse (text: string, error: { value: string }): Record<string, unknown> | undefined | null {
   if (!text.trim()) {
@@ -225,24 +248,7 @@ function filterExamples (needle: string, update: (fn: () => void) => void) {
 }
 
 function loadTranslations (file: File | null) {
-  translationsError.value = ''
-  if (!file) return
-  const reader = new FileReader()
-  reader.onload = () => {
-    try {
-      const parsed = JSON.parse(String(reader.result))
-      for (const [locale, messages] of Object.entries(parsed)) {
-        i18n.global.mergeLocaleMessage(locale, messages as Record<string, unknown>)
-      }
-      Notify.create({ message: t('translations_loaded'), type: 'positive', timeout: 1500 })
-    } catch (e) {
-      translationsError.value = `${t('invalid_json')}: ${(e as Error).message}`
-    }
-  }
-  reader.onerror = () => {
-    translationsError.value = String(reader.error)
-  }
-  reader.readAsText(file)
+  loadTranslationsFile(file, t('invalid_json'), t('translations_loaded'))
 }
 
 function applyData () {

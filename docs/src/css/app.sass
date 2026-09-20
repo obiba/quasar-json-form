@@ -73,10 +73,35 @@
 .doc-page:has(.doc-wide)
   max-width: none
 
+// .q-card--bordered has no dark-mode variant of its own outside the actual QCard component
+.body--dark .doc-editor-panel
+  border-color: rgba(255, 255, 255, .28)
+
 .doc-editor textarea, .doc-editor input
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace
   font-size: 12px
   line-height: 1.5
+  max-height: 50em
+  overflow-y: auto
+
+.doc-playground-panel:fullscreen
+  background: white
+  padding: 16px
+  overflow-y: auto
+
+.body--dark .doc-playground-panel:fullscreen
+  background: $dark-page
+
+.doc-playground-panel:fullscreen .doc-editor textarea
+  max-height: none
+
+.doc-editor-output
+  font-size: 12px
+  max-height: 50em
+  overflow-y: auto
+
+.doc-playground-panel:fullscreen .doc-editor-output
+  max-height: none
 
 .doc-code
   margin: 0

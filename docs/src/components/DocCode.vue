@@ -10,7 +10,7 @@
       :aria-label="t('copy')"
       @click="onCopy"
     >
-      <q-tooltip>{{ t('copy') }}</q-tooltip>
+      <q-tooltip>{{ warning || t('copy') }}</q-tooltip>
     </q-btn>
     <pre :class="`doc-code language-${lang}`"><code :class="`language-${lang}`" v-html="html"></code></pre>
   </div>
@@ -24,7 +24,7 @@ import Prism from 'prismjs'
 import 'prismjs/components/prism-json'
 import 'prismjs/components/prism-javascript'
 
-const props = withDefaults(defineProps<{ code: string; lang?: string }>(), { lang: 'json' })
+const props = withDefaults(defineProps<{ code: string; lang?: string; warning?: string }>(), { lang: 'json' })
 const { t } = useI18n()
 
 const html = computed(() => {
