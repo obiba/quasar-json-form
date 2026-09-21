@@ -17,6 +17,9 @@ export default defineConfig({
     include: ['test/**/*.test.ts'],
     setupFiles: ['test/setup.ts'],
     css: false,
+    // mounting the full Mica forms takes a few seconds under coverage
+    // instrumentation, well past the 5s default
+    testTimeout: 20000,
     coverage: {
       provider: 'v8',
       include: ['src/**/*.ts'],
