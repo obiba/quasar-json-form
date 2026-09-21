@@ -30,22 +30,22 @@
       <div class="col-auto">
         <q-toggle v-model="readonly" :label="t('readonly')" />
       </div>
-      <q-space />
-      <div class="col-auto">
-        <q-btn
-          flat
-          dense
-          round
-          :icon="isFullscreen ? 'fullscreen_exit' : 'fullscreen'"
-          :title="isFullscreen ? 'Exit fullscreen' : 'Fullscreen'"
-          @click="toggleFullscreen"
-        />
-      </div>
     </div>
 
-    <div ref="playgroundPanel" class="row q-col-gutter-md doc-playground-panel">
+    <div class="row q-col-gutter-md">
       <div class="col-12 col-md-5">
-        <div class="doc-editor-panel q-card--bordered rounded-borders q-pt-md">
+        <div ref="editorPanel" class="doc-editor-panel q-card--bordered rounded-borders q-pt-md relative-position">
+          <q-btn
+            flat
+            dense
+            round
+            size="sm"
+            class="absolute-top-right q-ma-xs"
+            style="z-index: 2"
+            :icon="isEditorFullscreen ? 'fullscreen_exit' : 'fullscreen'"
+            :title="isEditorFullscreen ? 'Exit fullscreen' : 'Fullscreen'"
+            @click="toggleEditorFullscreen"
+          />
           <q-tabs v-model="tab" dense align="left" active-color="primary" narrow-indicator>
             <q-tab name="schema" :label="t('schema')" />
             <q-tab name="uischema" :label="t('uischema')" />
@@ -80,7 +80,18 @@
       </div>
 
       <div class="col-12 col-md-7">
-        <q-card flat bordered>
+        <q-card ref="previewPanel" flat bordered class="relative-position doc-preview-panel">
+          <q-btn
+            flat
+            dense
+            round
+            size="sm"
+            class="absolute-top-right q-ma-xs"
+            style="z-index: 2"
+            :icon="isPreviewFullscreen ? 'fullscreen_exit' : 'fullscreen'"
+            :title="isPreviewFullscreen ? 'Exit fullscreen' : 'Fullscreen'"
+            @click="togglePreviewFullscreen"
+          />
           <q-card-section>
             <QJsonForm
               :key="formKey"
@@ -197,11 +208,17 @@ const formKey = ref(0)
 
 const translationsFile = ref<File | null>(null)
 const translationsFileInput = ref<QFile>()
-const playgroundPanel = ref<HTMLElement>()
-const isFullscreen = computed(() => AppFullscreen.isActive && AppFullscreen.activeEl === playgroundPanel.value)
+const editorPanel = ref<HTMLElement>()
+const previewPanel = ref<any>()
+const isEditorFullscreen = computed(() => AppFullscreen.isActive && AppFullscreen.activeEl === editorPanel.value)
+const isPreviewFullscreen = computed(() => AppFullscreen.isActive && AppFullscreen.activeEl === previewPanel.value?.$el)
 
-function toggleFullscreen () {
-  AppFullscreen.toggle(playgroundPanel.value)
+function toggleEditorFullscreen () {
+  AppFullscreen.toggle(editorPanel.value)
+}
+
+function togglePreviewFullscreen () {
+  AppFullscreen.toggle(previewPanel.value?.$el)
 }
 
 function parse (text: string, error: { value: string }): Record<string, unknown> | undefined | null {

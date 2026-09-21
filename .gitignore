@@ -20,3 +20,6 @@ ui/src/**/*.js
 
 # test coverage reports
 ui/coverage
+
+# personal local Claude Code settings
+.claude/settings.local.json

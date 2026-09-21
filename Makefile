@@ -1,11 +1,12 @@
-.PHONY: help install build dev docs docs-build clean release-ui-patch release-ui-minor release-ui-major release-app-ext-patch release-app-ext-minor release-app-ext-major
+.PHONY: help install update build dev docs docs-build clean release-ui-patch release-ui-minor release-ui-major release-app-ext-patch release-app-ext-minor release-app-ext-major
 
 # Default target
 help:
 	@echo "Quasar JSON Form - Development Commands"
 	@echo ""
 	@echo "Development:"
-	@echo "  make install              - Install all dependencies"
+	@echo "  make install              - Install dependencies exactly as locked (npm ci)"
+	@echo "  make update               - Refresh lockfiles from package.json (npm install)"
 	@echo "  make dev                  - Start development server"
 	@echo "  make docs                 - Start documentation site dev server"
 	@echo "  make docs-build           - Build documentation site (docs/dist/spa)"
@@ -23,16 +24,26 @@ help:
 	@echo "  make release-app-ext-major - Bump App Extension major version (X.0.0) and create release"
 	@echo ""
 
-# Install dependencies
+# Install dependencies exactly as locked (fails if package.json and the lockfile disagree)
 install:
 	@echo "Installing UI package dependencies..."
-	cd ui && npm install
+	cd ui && npm ci
 	@echo "Installing UI dev app dependencies..."
-	cd ui/dev && npm install
+	cd ui/dev && npm ci
 	@echo "Installing docs dependencies..."
-	cd docs && npm install
+	cd docs && npm ci
 	@echo "✓ All dependencies installed"
-	
+
+# Refresh lockfiles from package.json (run after editing a dependency version, or to update within existing ranges)
+update:
+	@echo "Updating UI package dependencies..."
+	cd ui && npm install
+	@echo "Updating UI dev app dependencies..."
+	cd ui/dev && npm install
+	@echo "Updating docs dependencies..."
+	cd docs && npm install
+	@echo "✓ All lockfiles updated"
+
 # Development server
 dev:
 	@echo "Starting development server..."
