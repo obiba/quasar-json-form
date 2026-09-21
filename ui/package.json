@@ -1,6 +1,6 @@
 {
   "name": "@obiba/quasar-ui-json-form",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "author": "Yannick Marcon <yannick.marcon@obiba.org>",
   "description": "Quasar components for JSON Forms",
   "license": "MIT",
