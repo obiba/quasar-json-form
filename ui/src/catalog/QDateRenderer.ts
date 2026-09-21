@@ -97,6 +97,7 @@ export default {
         type: 'string',
         format: 'date',
       },
+      formats: ['datepicker', 'ymdatepicker'],
       uischema: {
         type: 'Control',
       },

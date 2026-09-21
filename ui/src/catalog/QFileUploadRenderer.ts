@@ -128,6 +128,7 @@ export default {
         type: 'array',
         format: 'files',
       },
+      formats: ['obibaFiles'],
       uischema: {
         type: 'Control',
       },

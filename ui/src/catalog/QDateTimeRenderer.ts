@@ -35,6 +35,7 @@ export default {
         type: 'string',
         format: 'date-time',
       },
+      formats: ['date-fulltime'],
       uischema: {
         type: 'Control',
       },

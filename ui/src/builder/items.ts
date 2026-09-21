@@ -31,11 +31,18 @@ const isObject = (value: unknown): value is JsonObject => typeof value === 'obje
 
 const optionFormat = (element: JsonObject): unknown => (isObject(element.options) ? element.options.format : undefined)
 
+/** The `format` names an item stands for: its own (schema or `options`) and its aliases. */
+const itemFormats = (item: CatalogItem): unknown[] => [item.schema?.format, optionFormat(item.uischema), ...(item.formats ?? [])].filter((f) => f !== undefined)
+
 /**
  * The palette item a node was most likely made from: for a control, the item
- * whose schema type matches, preferring the same schema `format`, the same
- * `options.format` and the same choice shape (`oneOf` / `enum`, `items`);
- * for a layout or an element, the item of the same UI schema type.
+ * whose schema type matches, preferring the same `format` and the same choice
+ * shape (`oneOf` / `enum`, `items`); for a layout or an element, the item of
+ * the same UI schema type. The `format` is read from the schema, else from
+ * `options`, and matches the item's own or one of its aliases
+ * (`radioGroupCollection` for `radio-matrix`); a known format also matches an
+ * item of another schema type, as the renderers accept several (`files` on an
+ * object or an array).
  */
 export function matchItem(node: FormNode, schema: JsonObject | undefined, items: CatalogItem[]): CatalogItem | undefined {
   if (node.kind !== 'control') {
@@ -43,15 +50,18 @@ export function matchItem(node: FormNode, schema: JsonObject | undefined, items:
   }
   if (!schema) return undefined
   const hasChoices = (s: unknown) => isObject(s) && (Array.isArray(s.oneOf) || Array.isArray(s.enum))
+  const nodeFormat = schema.format ?? optionFormat(node.element)
   let best: CatalogItem | undefined
-  let bestScore = -1
+  let bestScore = -Infinity
   for (const item of items) {
-    if (!item.schema || item.schema.type !== schema.type) continue
-    let score = 0
-    if (item.schema.format === schema.format) score += 4
-    else if (item.schema.format !== undefined || schema.format !== undefined) score -= 2
-    if (optionFormat(item.uischema) === optionFormat(node.element)) score += 3
-    else if (optionFormat(item.uischema) !== undefined) score -= 3
+    if (!item.schema) continue
+    const formats = itemFormats(item)
+    const sameFormat = nodeFormat === undefined ? formats.length === 0 : formats.includes(nodeFormat)
+    const sameType = item.schema.type === schema.type
+    // a known format tells the renderer whatever the type (`files` on an object or an array)
+    if (!sameType && !(sameFormat && nodeFormat !== undefined)) continue
+    let score = sameType ? 1 : 0
+    score += sameFormat ? 4 : -2
     const itemChoices = hasChoices(item.schema) || hasChoices(item.schema.items)
     const nodeChoices = hasChoices(schema) || hasChoices(schema.items)
     if (itemChoices === nodeChoices) score += 2

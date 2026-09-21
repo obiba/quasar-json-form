@@ -45,6 +45,7 @@ export default {
         type: 'object',
         format: 'radio-matrix',
       },
+      formats: ['radioGroupCollection'],
       uischema: {
         type: 'Control',
         options: {

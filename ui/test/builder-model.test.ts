@@ -4,7 +4,7 @@ import {
   fromDefinition, toDefinition, fromAsf, parseScope, toScope, isValidKey,
   locate, findNode, descendants, listOf, containerOf, propertySchema, isRequired, setRequired, uniqueKey,
   addNode, removeNode, moveNode, canMove, duplicateNode, renameProperty, ruleReferences, dropIndex,
-  textSlots, setText,
+  textSlots, setText, builderCatalog, matchItem,
 } from '../src/builder'
 import type { FormDefinition, FormModel } from '../src/builder'
 
@@ -503,5 +503,46 @@ describe('renameProperty', () => {
     expect(ruleReferences(model, 'b').map((r) => `${r.rule}: ${r.expression}`)).toEqual(['enabled: !isEmpty(b)', 'validation: a != b', 'visible: b == "x"'])
     expect(ruleReferences(model, 'bb').length).toBe(1)
     expect(ruleReferences(model, 'c')).toEqual([])
+  })
+})
+
+describe('matchItem', () => {
+  const items = builderCatalog().items
+  const match = (schema: any, options?: any) => {
+    const model = fromDefinition({
+      schema: { type: 'object', properties: { field: schema } },
+      uischema: { type: 'VerticalLayout', elements: [{ type: 'Control', scope: '#/properties/field', options }] },
+    })
+    const node = byScope(model, '#/properties/field')
+    return matchItem(node, propertySchema(model, node.id)!, items)?.name
+  }
+
+  it('matches the item of the schema format', () => {
+    expect(match({ type: 'string' })).toBe('text')
+    expect(match({ type: 'string', format: 'email' })).toBe('email')
+    expect(match({ type: 'object', format: 'geo' })).toBe('geo')
+    expect(match({ type: 'object', format: 'radio-matrix' })).toBe('radio-matrix')
+  })
+
+  it('matches the aliases of a format', () => {
+    expect(match({ type: 'object', format: 'radioGroupCollection' })).toBe('radio-matrix')
+    expect(match({ type: 'object', format: 'geojson' })).toBe('geo')
+    expect(match({ type: 'object', format: 'obibaSimpleMde' })).toBe('localized-string')
+    expect(match({ type: 'string', format: 'obibaCountriesUiSelect' })).toBe('countries')
+    expect(match({ type: 'string', format: 'ymdatepicker' })).toBe('date')
+  })
+
+  it('matches a known format whatever the schema type', () => {
+    expect(match({ type: 'object', format: 'obibaFiles' })).toBe('files')
+    expect(match({ type: 'array', format: 'files' })).toBe('files')
+    expect(match({ type: 'array', format: 'countries' })).toBe('countries')
+    expect(match({ type: 'array', items: { type: 'string' } })).not.toBe('countries')
+  })
+
+  it('reads the format from the options too', () => {
+    expect(match({ type: 'object' }, { format: 'radioGroupCollection' })).toBe('radio-matrix')
+    expect(match({ type: 'integer' }, { format: 'rating' })).toBe('rating')
+    expect(match({ type: 'string', enum: ['a', 'b'] }, { format: 'radio' })).toBe('radio')
+    expect(match({ type: 'string', enum: ['a', 'b'] })).toBe('select')
   })
 })

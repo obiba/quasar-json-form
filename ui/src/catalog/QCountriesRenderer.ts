@@ -39,6 +39,7 @@ export default {
         type: 'string',
         format: 'countries',
       },
+      formats: ['obibaCountriesUiSelect'],
       uischema: {
         type: 'Control',
       },

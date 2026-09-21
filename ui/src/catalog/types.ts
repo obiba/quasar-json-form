@@ -38,6 +38,8 @@ export interface PaletteItem {
   icon: string
   /** schema of the new property, for a control */
   schema?: Record<string, unknown>
+  /** other `format` names the renderer accepts for this item (`radioGroupCollection` for `radio-matrix`) */
+  formats?: string[]
   /** UI schema element (`type`, `options`, `elements`...) */
   uischema: Record<string, unknown>
 }

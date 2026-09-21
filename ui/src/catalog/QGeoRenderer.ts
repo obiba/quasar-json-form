@@ -92,6 +92,7 @@ export default {
         type: 'object',
         format: 'geo',
       },
+      formats: ['geojson'],
       uischema: {
         type: 'Control',
       },

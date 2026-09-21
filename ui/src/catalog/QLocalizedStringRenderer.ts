@@ -54,6 +54,7 @@ export default {
         type: 'object',
         format: 'localizedString',
       },
+      formats: ['localizedstring', 'obibaSimpleMde'],
       uischema: {
         type: 'Control',
       },
