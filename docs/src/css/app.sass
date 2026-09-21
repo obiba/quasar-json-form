@@ -84,15 +84,15 @@
   max-height: 50em
   overflow-y: auto
 
-.doc-playground-panel:fullscreen
+.doc-editor-panel:fullscreen
   background: white
   padding: 16px
   overflow-y: auto
 
-.body--dark .doc-playground-panel:fullscreen
+.body--dark .doc-editor-panel:fullscreen
   background: $dark-page
 
-.doc-playground-panel:fullscreen .doc-editor textarea
+.doc-editor-panel:fullscreen .doc-editor textarea
   max-height: none
 
 .doc-editor-output
@@ -100,8 +100,12 @@
   max-height: 50em
   overflow-y: auto
 
-.doc-playground-panel:fullscreen .doc-editor-output
+.doc-editor-panel:fullscreen .doc-editor-output
   max-height: none
+
+.doc-preview-panel:fullscreen
+  overflow-y: auto
+  padding: 16px
 
 .doc-code
   margin: 0
