@@ -111,7 +111,7 @@ export default defineConfig(() => {
 
     framework: {
       config: {},
-      plugins: ['Notify', 'Dark']
+      plugins: ['Notify', 'Dark', 'AppFullscreen']
     },
 
     animations: []

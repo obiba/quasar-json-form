@@ -8,6 +8,7 @@ export default {
   copy: 'Copy',
   copied: 'Copied',
   invalid_json: 'Invalid JSON',
+  translations_loaded: 'Translations loaded',
   no_errors: 'No error',
   readonly: 'Read-only',
   config: 'Config',

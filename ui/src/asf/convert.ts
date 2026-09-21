@@ -389,9 +389,10 @@ class Converter {
     const merged = isObject(node['x-schema-form']) ? { ...node['x-schema-form'], ...item } : item
     const type = typeof merged.type === 'string' ? merged.type : undefined
 
-    if (merged.required === true) {
+    if (merged.required === true || node.required === true) {
       this.markRequired(resolved)
     }
+    if (node.required === true) delete node.required
     if (typeof merged.title === 'string') node.title = this.text(merged.title)
     if (typeof merged.description === 'string') node.description = this.text(merged.description)
 

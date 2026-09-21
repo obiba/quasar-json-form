@@ -1,7 +1,7 @@
 <template>
   <div class="doc-wide doc-playground">
     <div class="row q-col-gutter-md items-center q-mb-md">
-      <div class="col-12 col-md-4">
+      <div class="col-12 col-md-3">
         <q-select
           v-model="fixtureName"
           :options="fixtureNames"
@@ -13,39 +13,62 @@
         />
       </div>
       <div class="col-auto">
+        <q-toggle v-model="readonly" :label="t('readonly')" />
+      </div>
+      <div class="col-auto">
         <q-toggle v-model="translate" label="Resolve t() with vue-i18n" />
       </div>
       <div class="col-auto">
-        <q-toggle v-model="readonly" :label="t('readonly')" />
+        <q-file ref="translationsFileInput" v-model="translationsFile" accept=".json,application/json" class="hidden" @update:model-value="loadTranslations" />
+        <q-btn color="secondary" icon="upload" label="Translations" unelevated @click="translationsFileInput?.pickFiles()">
+          <q-tooltip>Upload a translations JSON file</q-tooltip>
+        </q-btn>
       </div>
       <div class="col-auto">
         <q-btn color="primary" label="Convert" unelevated @click="convertNow" />
       </div>
+      <q-space />
+      <div class="col-auto">
+        <q-btn
+          flat
+          dense
+          round
+          :icon="isFullscreen ? 'fullscreen_exit' : 'fullscreen'"
+          :title="isFullscreen ? 'Exit fullscreen' : 'Fullscreen'"
+          @click="toggleFullscreen"
+        />
+      </div>
     </div>
 
-    <div class="row q-col-gutter-md">
+    <div ref="playgroundPanel" class="row q-col-gutter-md doc-playground-panel">
       <div class="col-12 col-md-5">
-        <q-tabs v-model="tab" dense align="left" active-color="primary" narrow-indicator no-caps>
-          <q-tab name="schema" label="ASF schema" />
-          <q-tab name="definition" label="ASF definition" />
-          <q-tab name="outSchema" label="Schema" icon="arrow_forward" />
-          <q-tab name="outUischema" label="UI schema" icon="arrow_forward" />
-        </q-tabs>
-        <q-separator />
-        <q-tab-panels v-model="tab" animated class="bg-transparent">
-          <q-tab-panel name="schema" class="q-px-none">
-            <q-input v-model="schemaText" filled type="textarea" autogrow class="doc-editor" />
-          </q-tab-panel>
-          <q-tab-panel name="definition" class="q-px-none">
-            <q-input v-model="definitionText" filled type="textarea" autogrow class="doc-editor" />
-          </q-tab-panel>
-          <q-tab-panel name="outSchema" class="q-pa-none">
-            <DocCode :code="result ? JSON.stringify(result.schema, null, 2) : ''" />
-          </q-tab-panel>
-          <q-tab-panel name="outUischema" class="q-pa-none">
-            <DocCode :code="result ? JSON.stringify(result.uischema, null, 2) : ''" />
-          </q-tab-panel>
-        </q-tab-panels>
+        <div class="doc-editor-panel q-card--bordered rounded-borders q-pt-md">
+          <q-tabs v-model="tab" dense align="left" active-color="primary" narrow-indicator no-caps>
+            <q-tab name="schema" label="ASF schema" />
+            <q-tab name="definition" label="ASF definition" />
+            <q-tab name="outSchema" label="Schema" />
+            <q-tab name="outUischema" label="UI schema" />
+          </q-tabs>
+          <q-separator />
+          <q-tab-panels v-model="tab" animated class="bg-transparent">
+            <q-tab-panel name="schema" class="q-px-none">
+              <q-input v-model="schemaText" filled type="textarea" autogrow class="doc-editor" />
+            </q-tab-panel>
+            <q-tab-panel name="definition" class="q-px-none">
+              <q-input v-model="definitionText" filled type="textarea" autogrow class="doc-editor" />
+            </q-tab-panel>
+            <q-tab-panel name="outSchema" class="q-pa-none">
+              <div class="doc-editor-output">
+                <DocCode :code="result ? JSON.stringify(result.schema, null, 2) : ''" :warning="bakedWarning" />
+              </div>
+            </q-tab-panel>
+            <q-tab-panel name="outUischema" class="q-pa-none">
+              <div class="doc-editor-output">
+                <DocCode :code="result ? JSON.stringify(result.uischema, null, 2) : ''" :warning="bakedWarning" />
+              </div>
+            </q-tab-panel>
+          </q-tab-panels>
+        </div>
         <div v-if="parseError" class="text-negative q-mt-sm">{{ parseError }}</div>
         <q-card v-if="result" flat bordered class="q-mt-md">
           <q-card-section class="q-py-sm doc-card-header text-subtitle2">
@@ -111,11 +134,14 @@
 
 <script setup lang="ts">
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { AppFullscreen, Notify } from 'quasar'
+import type { QFile } from 'quasar'
 import { QJsonForm, countryCodes, convertAsf } from 'ui'
 import type { AsfConvertResult, AsfDiagnostic } from 'ui'
 import DocCode from './DocCode.vue'
+import { loadTranslationsFile } from '../utils/loadTranslations'
 
 const { t, te } = useI18n()
 
@@ -187,6 +213,16 @@ const data = ref<Record<string, any>>({})
 const errors = ref<any[]>([])
 const formKey = ref(0)
 const config = { countries: countryCodes }
+const translationsFile = ref<File | null>(null)
+const translationsFileInput = ref<QFile>()
+const playgroundPanel = ref<HTMLElement>()
+const isFullscreen = computed(() => AppFullscreen.isActive && AppFullscreen.activeEl === playgroundPanel.value)
+const resultIsBaked = ref(false)
+const bakedWarning = computed(() => (resultIsBaked.value ? 'Copies translated text, not i18n keys' : undefined))
+
+function toggleFullscreen () {
+  AppFullscreen.toggle(playgroundPanel.value)
+}
 
 async function loadFixture (name: string | null) {
   if (!name) return
@@ -196,6 +232,10 @@ async function loadFixture (name: string | null) {
   schemaText.value = JSON.stringify(fixture.schema, null, 2)
   definitionText.value = JSON.stringify(fixture.definition, null, 2)
   convertNow()
+}
+
+function loadTranslations (file: File | null) {
+  loadTranslationsFile(file, t('invalid_json'), t('translations_loaded'))
 }
 
 function convertNow () {
@@ -210,6 +250,13 @@ function convertNow () {
     diagnostics.value = result.value.diagnostics
     data.value = {}
     formKey.value++
+    resultIsBaked.value = translate.value
+    const suffix = resultIsBaked.value ? ' — i18n keys replaced with text' : ''
+    if (diagnostics.value.length) {
+      Notify.create({ message: `Conversion completed with ${diagnostics.value.length} issue(s)${suffix}`, type: 'warning', timeout: 3000 })
+    } else {
+      Notify.create({ message: `Conversion completed successfully${suffix}`, type: resultIsBaked.value ? 'warning' : 'positive', timeout: resultIsBaked.value ? 3000 : 1500 })
+    }
   } catch (error) {
     parseError.value = String(error)
   }
