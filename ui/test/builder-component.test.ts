@@ -59,6 +59,23 @@ describe('QJsonFormBuilder', () => {
     wrapper.unmount()
   })
 
+  it('filters the outline by key or label, keeping the ancestors', async () => {
+    const wrapper = mountBuilder()
+    await flush()
+    const shown = () => rows(wrapper).filter((r: any) => r.element.closest('li[style*="none"]') === null).map((r: any) => r.find('.q-builder-label').text())
+    const filter = wrapper.find('.q-builder-tree input')
+    await filter.setValue('ROLE')
+    await flush()
+    expect(shown()).toEqual(['Form', 'Group', 'role'])
+    await filter.setValue('name')
+    await flush()
+    expect(shown()).toEqual(['Form', 'Name'])
+    await filter.setValue('')
+    await flush()
+    expect(shown()).toEqual(['Form', 'Name', 'Group', 'role'])
+    wrapper.unmount()
+  })
+
   it('edits the texts of the selected control and emits the form', async () => {
     const wrapper = mountBuilder()
     await flush()

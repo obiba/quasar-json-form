@@ -6,7 +6,7 @@
  */
 import { h, defineComponent, computed, onMounted, onUpdated, onBeforeUnmount, ref } from 'vue'
 import type { PropType, VNode } from 'vue'
-import { QBtn, QIcon, QMenu, QList, QItem, QItemSection, QItemLabel, QSeparator, QSpace, QTooltip } from 'quasar'
+import { QBtn, QIcon, QInput, QMenu, QList, QItem, QItemSection, QItemLabel, QSeparator, QSpace, QTooltip } from 'quasar'
 import Sortable from 'sortablejs'
 import { useFormI18n } from '../vue-plugin'
 import type { FormModel, FormNode } from './model'
@@ -30,6 +30,7 @@ export default defineComponent({
     const tr = (key: string, named?: Record<string, unknown>) => translate(`builder.${key}`, named)
     const root = ref<HTMLElement | null>(null)
     const dragging = ref(false)
+    const filter = ref('')
 
     const controls = computed(() => props.catalog.items.filter((item) => props.catalog.renderers[item.renderer]?.kind === 'control'))
     const layouts = computed(() => props.catalog.items.filter((item) => props.catalog.renderers[item.renderer]?.kind !== 'control'))
@@ -46,6 +47,22 @@ export default defineComponent({
       if (node.path) return node.path.join('.')
       return String(node.element.type ?? tr('element'))
     }
+
+    /** ids of the nodes matching the filter by key or label, with their ancestors; undefined when no filter */
+    const visible = computed<Set<string> | undefined>(() => {
+      const needle = filter.value.trim().toLowerCase()
+      if (!needle) return undefined
+      const ids = new Set<string>()
+      const walk = (node: FormNode, isDetail = false): boolean => {
+        const kids = node.kind === 'layout' ? node.children : node.detail ? [node.detail] : []
+        let shown = kids.map((child) => walk(child, child === node.detail)).some(Boolean)
+        shown ||= (node.path?.join('.') ?? '').toLowerCase().includes(needle) || labelOf(node, isDetail).toLowerCase().includes(needle)
+        if (shown) ids.add(node.id)
+        return shown
+      }
+      walk(props.model.root)
+      return ids
+    })
 
     const select = (node: FormNode) => emit('select', node.id)
 
@@ -108,7 +125,8 @@ export default defineComponent({
       } else if (node.detail) {
         parts.push(h('ul', {}, [renderNode(node.detail, true)]))
       }
-      return h('li', { key: node.id, 'data-id': node.id }, parts)
+      const hidden = visible.value && node !== props.model.root && !visible.value.has(node.id)
+      return h('li', { key: node.id, 'data-id': node.id, style: hidden ? 'display: none' : undefined }, parts)
     }
 
     // --- drag and drop: one sortable per layout list, refreshed on every render
@@ -169,6 +187,10 @@ export default defineComponent({
     })
 
     return () => h('div', { ref: root, class: ['q-builder-tree', { 'q-builder-dragging': dragging.value }] }, [
+      h(QInput, {
+        modelValue: filter.value, placeholder: tr('search'), dense: true, clearable: true, class: 'q-mb-sm',
+        'onUpdate:modelValue': (v: string | number | null) => { filter.value = String(v ?? '') },
+      }, { prepend: () => h(QIcon, { name: 'search', size: 'xs' }) }),
       h('ul', {}, [renderNode(props.model.root)]),
     ])
   },
