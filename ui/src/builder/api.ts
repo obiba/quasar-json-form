@@ -36,6 +36,11 @@ export const builderApi: RendererApi = {
       type: 'Object',
       desc: 'JSON Forms config passed to the preview form: `countries`, `fileUpload` hooks...',
     },
+    noCaps: {
+      type: 'Boolean',
+      default: 'false',
+      desc: 'No uppercase transform on the import/export buttons and the tab labels.',
+    },
   },
   events: {
     'update:modelValue': {

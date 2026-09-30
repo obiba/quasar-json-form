@@ -38,6 +38,8 @@ export default defineComponent({
     renderers: { type: Array as PropType<JsonFormsRendererRegistryEntry[]>, default: () => [] },
     /** JSON Forms config, for the preview */
     config: { type: Object, default: undefined },
+    /** no uppercase transform on the import/export buttons and the tab labels */
+    noCaps: { type: Boolean, default: false },
   },
   emits: ['update:modelValue'],
   setup(props, { emit, expose }) {
@@ -94,8 +96,8 @@ export default defineComponent({
           'onUpdate:modelValue': (v: string) => { locale.value = v },
         }),
         h(QSpace),
-        h(QBtn, { outline: true, size: 'sm', icon: 'upload', label: tr('import'), onClick: () => { importing.value = true } }),
-        h(QBtnDropdown, { outline: true, size: 'sm', icon: 'download', label: tr('export'), autoClose: true }, () => h(QList, { dense: true }, () => [
+        h(QBtn, { outline: true, noCaps: props.noCaps, size: 'sm', icon: 'upload', label: tr('import'), onClick: () => { importing.value = true } }),
+        h(QBtnDropdown, { outline: true, noCaps: props.noCaps, size: 'sm', icon: 'download', label: tr('export'), autoClose: true }, () => h(QList, { dense: true }, () => [
           h(QItem, { clickable: true, onClick: () => download() }, () => h(QItemSection, () => tr('form'))),
           h(QItem, { clickable: true, onClick: () => download('schema') }, () => h(QItemSection, () => tr('exportSchema'))),
           h(QItem, { clickable: true, onClick: () => download('uischema') }, () => h(QItemSection, () => tr('exportUischema'))),
@@ -111,7 +113,7 @@ export default defineComponent({
         ]),
         h('div', { class: 'col-12 col-md-8' }, [
           h(QCard, { flat: true, bordered: true }, () => [
-            h(QTabs, { modelValue: tab.value, dense: true, align: 'left', activeColor: 'primary', narrowIndicator: true, 'onUpdate:modelValue': (v: string) => { tab.value = v } }, () => [
+            h(QTabs, { modelValue: tab.value, dense: true, noCaps: props.noCaps, align: 'left', activeColor: 'primary', narrowIndicator: true, 'onUpdate:modelValue': (v: string) => { tab.value = v } }, () => [
               h(QTab, { name: 'properties', label: tr('properties') }),
               h(QTab, { name: 'preview', label: tr('preview') }),
               h(QTab, { name: 'translations', label: tr('translations') }),
