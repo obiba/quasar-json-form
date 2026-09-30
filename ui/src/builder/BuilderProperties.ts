@@ -83,11 +83,14 @@ export default defineComponent({
     const columns = (inputs: (VNode | null)[]): VNode =>
       h('div', { class: 'row q-col-gutter-sm' }, inputs.filter((v) => v !== null).map((input) => h('div', { class: 'col-12 col-sm-6' }, [input])))
 
-    /** the UI schema of a settings form: its controls on two columns */
-    const columnsUischema = (schema: JsonObject): JsonObject => ({
-      type: 'VerticalLayout',
-      options: { class: 'row q-col-gutter-sm' },
-      elements: Object.keys(schema.properties).map((key) => ({ type: 'Control', scope: `#/properties/${key}`, options: { class: 'col-12 col-sm-6', dense: true, outlined: true } })),
+    /** the schema and UI schema of a settings form: its controls on two columns, the descriptions as hints below the fields */
+    const columnsForm = (schema: JsonObject): { schema: JsonObject; uischema: JsonObject } => ({
+      schema: { ...schema, properties: Object.fromEntries(Object.entries(schema.properties as JsonObject).map(([key, { description: _, ...property }]) => [key, property])) },
+      uischema: {
+        type: 'VerticalLayout',
+        options: { class: 'row q-col-gutter-sm' },
+        elements: Object.keys(schema.properties).map((key) => ({ type: 'Control', scope: `#/properties/${key}`, hint: schema.properties[key].description, options: { class: 'col-12 col-sm-6', dense: true, outlined: true } })),
+      },
     })
 
     const textInput = (slot: TextSlot, label: string, multiline = false): VNode => {
@@ -198,7 +201,7 @@ export default defineComponent({
       const n = node.value!
       const slots = textSlots(props.model, n).filter((slot) => !slot.name.startsWith('options.') && !slot.name.startsWith('validation.'))
       if (slots.length === 0) return null
-      return section(tr('texts'), [columns(slots.map((slot) => textInput(slot, slot.name.startsWith('labels.') ? `${tr('label')} ${Number(slot.name.slice(7)) + 1}` : slot.name, slot.name === 'description' || slot.name === 'text' || slot.name === 'hint')))])
+      return section(tr('texts'), [h('div', { class: 'text-caption text-grey-7 q-mb-sm' }, tr('textsHelp', { locale: props.locale })), columns(slots.map((slot) => textInput(slot, slot.name.startsWith('labels.') ? `${tr('label')} ${Number(slot.name.slice(7)) + 1}` : slot.name, slot.name === 'description' || slot.name === 'text' || slot.name === 'hint')))])
     }
 
     const renderChoices = (): VNode | null => {
@@ -264,7 +267,7 @@ export default defineComponent({
           oneOf.push({ const: value, title: `${keyPrefix(props.model, n)}.options.${value}` })
         },
       }))
-      return section(tr('choices'), rows)
+      return section(tr('choices'), [h('div', { class: 'text-caption text-grey-7 q-mb-sm' }, tr('choicesHelp', { locale: props.locale })), ...rows])
     }
 
     const renderSettings = (): VNode | null => {
@@ -272,12 +275,11 @@ export default defineComponent({
       const settings = optionsSchema(api.value)
       const others = rawOptions(api.value)
       if (!settings && Object.keys(others).length === 0) return null
-      const content: VNode[] = []
+      const content: VNode[] = [h('div', { class: 'text-caption text-grey-7 q-mb-sm' }, tr('optionsHelp'))]
       if (settings) {
         content.push(h(QJsonForm, {
           modelValue: isObject(n.element.options) ? n.element.options : {},
-          schema: settings,
-          uischema: columnsUischema(settings),
+          ...columnsForm(settings),
           validationMode: 'NoValidation',
           'onUpdate:modelValue': (value: JsonObject) => {
             // the edited fields merged into the options: the others (`format`, arrays, objects...) stay
@@ -310,10 +312,10 @@ export default defineComponent({
       const names = Object.keys(keywords.properties)
       const current = Object.fromEntries(names.filter((name) => schema.value![name] !== undefined).map((name) => [name, schema.value![name]]))
       return section(tr('validation'), [
+        h('div', { class: 'text-caption text-grey-7 q-mb-sm' }, tr('validationKeywordsHelp')),
         h(QJsonForm, {
           modelValue: current,
-          schema: keywords,
-          uischema: columnsUischema(keywords),
+          ...columnsForm(keywords),
           validationMode: 'NoValidation',
           'onUpdate:modelValue': (value: JsonObject) => {
             const target = propertySchema(props.model, n.id)
@@ -328,12 +330,12 @@ export default defineComponent({
       ])
     }
 
-    const ruleInput = (n: FormNode, name: string, label: string): VNode => {
+    const ruleInput = (n: FormNode, name: string, label: string, hint?: string): VNode => {
       const rules: JsonObject = isObject(n.element.rules) ? n.element.rules : {}
       const value = typeof rules[name] === 'string' ? rules[name] : ''
       const error = expressionError(value)
       return h(QInput, {
-        modelValue: value, label, dense: true, outlined: true, inputClass: 'q-builder-code',
+        modelValue: value, label, hint, dense: true, outlined: true, inputClass: 'q-builder-code',
         error: !!error, errorMessage: error ? `${tr('invalidExpression')}: ${error}` : undefined,
         'onUpdate:modelValue': (v: string | number | null) => {
           const text = String(v ?? '')
@@ -350,18 +352,23 @@ export default defineComponent({
       if (n === props.model.root || isDetail.value) return null
       const rules: JsonObject = isObject(n.element.rules) ? n.element.rules : {}
       const content: VNode[] = []
+      content.push(h('div', { class: 'text-caption text-grey-7 q-mb-sm' }, [
+        tr('rulesHelp'), ' ',
+        h('a', { href: 'https://github.com/peerigon/angular-expressions', target: '_blank', rel: 'noopener' }, 'angular-expressions'), '.',
+      ]))
       const names = fieldNames(containerOf(props.model, location.value?.list))
       if (names.length > 0) {
         content.push(h('div', { class: 'text-caption text-grey-7 q-mb-sm' }, [tr('fields'), ': ', ...names.map((name) => h(QChip, { dense: true, size: 'sm', label: name }))]))
       }
       const format = schema.value?.format ?? (isObject(n.element.options) ? n.element.options.format : undefined)
       content.push(columns([
-        ruleInput(n, 'visible', tr('visible')),
-        n.kind === 'control' ? ruleInput(n, 'enabled', tr('enabled')) : null,
+        ruleInput(n, 'visible', tr('visible'), tr('visibleHint')),
+        n.kind === 'control' ? ruleInput(n, 'enabled', tr('enabled'), tr('enabledHint')) : null,
         format === 'computed' ? ruleInput(n, 'compute', tr('compute')) : null,
       ]))
       if (n.kind === 'control') {
         const validation: JsonObject[] = Array.isArray(rules.validation) ? rules.validation : []
+        content.push(h('div', { class: 'text-caption text-grey-7 q-mt-md q-mb-sm' }, tr('validationHelp')))
         validation.forEach((rule, index) => {
           const expr = typeof rule.expr === 'string' ? rule.expr : typeof rule.expression === 'string' ? rule.expression : ''
           const error = expressionError(expr)
