@@ -74,10 +74,10 @@ function tracks(value: number | string | undefined): string | undefined {
   return typeof value === 'string' && value.length > 0 ? value : undefined
 }
 
-/** `['a a', 'b c']` → `"a a" "b c"`, strings as is */
+/** `['a a', 'b c']` and `'a a, b c'` → `"a a" "b c"` */
 function areas(value: string[] | string | undefined): string | undefined {
-  if (Array.isArray(value)) return value.length > 0 ? value.map((row) => `"${row}"`).join(' ') : undefined
-  return typeof value === 'string' && value.length > 0 ? value : undefined
+  const rows = (typeof value === 'string' ? value.split(',') : value ?? []).map((row) => row.trim()).filter(Boolean)
+  return rows.length > 0 ? rows.map((row) => `"${row}"`).join(' ') : undefined
 }
 
 /** `2` → `2`, `'1 / 3'` and `'span 2'` as is */

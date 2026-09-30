@@ -401,6 +401,7 @@ import { QJsonFormBuilder } from '@obiba/quasar-ui-json-form/builder'
 | `locale` | language edited and previewed initially (the vue-i18n locale when it is one of the languages) |
 | `catalog` | `RendererApi` descriptions of the renderers of the application, added to the palette |
 | `renderers`, `config` | passed to the preview form |
+| `no-caps` | no uppercase transform on the import/export buttons and the tab labels (default `false`) |
 
 The labels of the builder come from the `builder.*` keys of the built-in messages (english and
 french), overridable in the application bundles.

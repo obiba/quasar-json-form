@@ -19,6 +19,7 @@ export default {
     geometries: {
       type: 'Array | String',
       default: 'all',
+      values: ['point', 'linestring', 'polygon'],
       desc: 'Kinds of geometry the control accepts, among `point`, `linestring` (or `line`) and `polygon`, as an array or a comma separated string. A `type` property with an `enum` of GeoJSON types in the schema restricts them too. With several kinds, the toolbar selects the one to draw.',
     },
     tiles: {

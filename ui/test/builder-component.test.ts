@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { Quasar } from 'quasar'
 import QJsonFormBuilder from '../src/builder/QJsonFormBuilder'
-import { recognize, builderApi } from '../src/builder'
+import { recognize, builderApi, optionsSchema, rawOptions } from '../src/builder'
+import { catalog } from '../src/catalog'
 import type { FormDefinition } from '../src/builder'
 import { createTestI18n, flush } from './utils'
 
@@ -56,6 +57,47 @@ describe('QJsonFormBuilder', () => {
     // the root is selected: no key input, the palette is on the layouts
     expect(rows(wrapper)[0]!.classes()).toContain('q-builder-selected')
     expect(wrapper.findAll('.q-builder-row .q-btn').length).toBe(2 + 3)
+    wrapper.unmount()
+  })
+
+  it('filters the outline by key or label, keeping the ancestors', async () => {
+    const wrapper = mountBuilder()
+    await flush()
+    const shown = () => rows(wrapper).filter((r: any) => r.element.closest('li[style*="none"]') === null).map((r: any) => r.find('.q-builder-label').text())
+    const filter = wrapper.find('.q-builder-tree input')
+    await filter.setValue('ROLE')
+    await flush()
+    expect(shown()).toEqual(['Form', 'Group', 'role'])
+    await filter.setValue('name')
+    await flush()
+    expect(shown()).toEqual(['Form', 'Name'])
+    await filter.setValue('')
+    await flush()
+    expect(shown()).toEqual(['Form', 'Name', 'Group', 'role'])
+    wrapper.unmount()
+  })
+
+  it('navigates up and down the outline, through the children', async () => {
+    const wrapper = mountBuilder()
+    await flush()
+    const selectedLabel = () => wrapper.find('.q-builder-selected .q-builder-label').text()
+    const navButton = (index: 0 | 1) => wrapper.findAll('.q-builder-properties .q-btn')[index]!
+    const nav = async (index: 0 | 1) => {
+      await navButton(index).trigger('click')
+      await flush()
+    }
+    // the root has nothing before it
+    expect(navButton(0).attributes('disabled')).toBeDefined()
+    for (const label of ['Name', 'Group', 'role']) {
+      await nav(1)
+      expect(selectedLabel()).toBe(label)
+    }
+    // the last node of the outline has nothing after it
+    expect(navButton(1).attributes('disabled')).toBeDefined()
+    for (const label of ['Group', 'Name', 'Form']) {
+      await nav(0)
+      expect(selectedLabel()).toBe(label)
+    }
     wrapper.unmount()
   })
 
@@ -333,6 +375,147 @@ describe('recognize', () => {
     expect(recognize([])).toBeUndefined()
     expect(recognize({ foo: 1 })).toBeUndefined()
     expect(recognize('x')).toBeUndefined()
+  })
+})
+
+describe('settings', () => {
+  it('selects the known values of an option, several when it takes an array', () => {
+    expect(optionsSchema(catalog.QGeoRenderer)!.properties.geometries).toMatchObject({ type: 'array', uniqueItems: true, items: { enum: ['point', 'linestring', 'polygon'] } })
+    expect(rawOptions(catalog.QGeoRenderer).geometries).toBeUndefined()
+  })
+
+  it('shows a comma separated list of values in the select, without rewriting it', async () => {
+    const wrapper = mountBuilder({
+      modelValue: {
+        schema: { type: 'object', properties: { loc: { type: 'object', format: 'geo' } } },
+        uischema: { type: 'VerticalLayout', elements: [{ type: 'Control', scope: '#/properties/loc', options: { geometries: 'point, polygon' } }] },
+      },
+    })
+    await flush()
+    await rows(wrapper)[1]!.trigger('click')
+    await flush()
+    const settings = wrapper.findAll('.q-builder-section').find((c: any) => c.text().startsWith('Settings'))!
+    const select = settings.findAll('.q-select-renderer').find((f: any) => f.text().includes('geometries'))!
+    expect(select.text()).toContain('point')
+    expect(select.text()).toContain('polygon')
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  const gridForm = (areas: unknown): FormDefinition => ({
+    schema: { type: 'object', properties: { a: { type: 'string' } } },
+    uischema: { type: 'VerticalLayout', elements: [{ type: 'GridLayout', options: { areas }, elements: [{ type: 'Control', scope: '#/properties/a' }] }] },
+  })
+  const settingsOf = async (wrapper: any) => {
+    await flush()
+    await rows(wrapper)[1]!.trigger('click')
+    await flush()
+    return wrapper.findAll('.q-builder-section').find((c: any) => c.text().startsWith('Settings'))!
+  }
+
+  it('shows an array of a string option joined with commas', async () => {
+    const wrapper = mountBuilder({ modelValue: gridForm(['a a', 'b c']) })
+    const settings = await settingsOf(wrapper)
+    const field = settings.findAll('.q-string-renderer').find((r: any) => r.find('.q-form-title').text() === 'areas')!
+    expect((field.find('input').element as HTMLInputElement).value).toBe('a a, b c')
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    await field.find('input').setValue('a a, b d')
+    await flush()
+    expect(lastEmitted(wrapper).uischema!.elements[0].options.areas).toBe('a a, b d')
+    wrapper.unmount()
+  })
+
+  it('leaves an object of a string option to the JSON', async () => {
+    const wrapper = mountBuilder({ modelValue: gridForm({ xs: ['a', 'b'], md: ['a b'] }) })
+    const settings = await settingsOf(wrapper)
+    expect(settings.findAll('.q-form-title').map((l: any) => l.text())).not.toContain('areas')
+    expect(settings.findAll('.q-chip').map((c: any) => c.text())).toContain('areas')
+    wrapper.unmount()
+  })
+})
+
+describe('images', () => {
+  const imageForm = (format: string, options: Record<string, any> = {}): FormDefinition => ({
+    schema: { type: 'object', properties: { pic: { type: 'string', oneOf: [{ const: 'a', title: 'A' }, { const: 'b', title: 'B' }] } } },
+    uischema: { type: 'VerticalLayout', elements: [{ type: 'Control', scope: '#/properties/pic', options: { format, ...options } }] },
+  })
+  /** clicks the file button of an image input, the file picker giving a PNG of these bytes */
+  const pickFile = async (bytes: Uint8Array<ArrayBuffer>, click: () => Promise<void>) => {
+    const createElement = document.createElement.bind(document)
+    const spy = vi.spyOn(document, 'createElement').mockImplementation((tag: string, options?: ElementCreationOptions) => {
+      const element = createElement(tag, options)
+      if (tag === 'input') {
+        Object.defineProperty(element, 'files', { value: [new File([bytes], 'b.png', { type: 'image/png' })] })
+        element.click = () => (element as HTMLInputElement).onchange!(new Event('change'))
+      }
+      return element
+    })
+    await click()
+    spy.mockRestore()
+  }
+  const imageField = (wrapper: any, title: string) => wrapper.findAll('.q-builder-section').find((c: any) => c.text().startsWith(title))!
+    .findAll('label.q-field').find((f: any) => f.find('.q-field__label').exists() && f.find('.q-field__label').text() === (title === 'Choices' ? 'Image' : 'image'))
+
+  it('sets the image of each choice of the images control', async () => {
+    const wrapper = mountBuilder({ modelValue: imageForm('images') })
+    await flush()
+    await rows(wrapper)[1]!.trigger('click')
+    await flush()
+    await imageField(wrapper, 'Choices')!.find('input').setValue('https://example.org/a.png')
+    await flush()
+    expect(lastEmitted(wrapper).schema.properties.pic.oneOf[0]).toEqual({ const: 'a', title: 'A', image: 'https://example.org/a.png' })
+    // a local file, read as a data URI
+    const choices = () => wrapper.findAll('.q-builder-section').find((c: any) => c.text().startsWith('Choices'))!
+    await pickFile(new Uint8Array([1, 2, 3]), () => choices().findAll('.q-field__append .q-btn')[1]!.trigger('click'))
+    await vi.waitFor(() => expect(lastEmitted(wrapper).schema.properties.pic.oneOf[1].image).toBe('data:image/png;base64,AQID'))
+    // a file too large to be embedded is refused
+    const emitted = wrapper.emitted('update:modelValue')!.length
+    await pickFile(new Uint8Array(600_000), () => choices().findAll('.q-field__append .q-btn')[0]!.trigger('click'))
+    await flush()
+    expect(wrapper.emitted('update:modelValue')!.length).toBe(emitted)
+    expect(choices().find('.q-field--error').text()).toContain('File too large')
+    wrapper.unmount()
+  })
+
+  it('sets the area of each choice of the image map', async () => {
+    const wrapper = mountBuilder({ modelValue: imageForm('image-map') })
+    await flush()
+    await rows(wrapper)[1]!.trigger('click')
+    await flush()
+    const coords = () => wrapper.findAll('.q-builder-section').find((c: any) => c.text().startsWith('Choices'))!
+      .findAll('label.q-field').filter((f: any) => f.find('.q-field__label').exists() && f.find('.q-field__label').text().startsWith('Coordinates'))
+    await coords()[0]!.find('input').setValue('0, 0, 10, 20')
+    await flush()
+    expect(lastEmitted(wrapper).schema.properties.pic.oneOf[0].area).toEqual({ shape: 'rect', coords: [0, 0, 10, 20] })
+    // a list being typed is kept as text
+    await coords()[1]!.find('input').setValue('5,')
+    await flush()
+    expect(lastEmitted(wrapper).schema.properties.pic.oneOf[1].area).toEqual({ shape: 'rect', coords: '5,' })
+    // numbers without spaces too, the coordinates removed when emptied
+    await coords()[1]!.find('input').setValue('5,6,7')
+    await flush()
+    expect(lastEmitted(wrapper).schema.properties.pic.oneOf[1].area).toEqual({ shape: 'rect', coords: [5, 6, 7] })
+    await coords()[1]!.find('input').setValue('')
+    await flush()
+    expect(lastEmitted(wrapper).schema.properties.pic.oneOf[1].area).toEqual({ shape: 'rect' })
+    wrapper.unmount()
+  })
+
+  it('sets the image of the image map, keeping its size', async () => {
+    const wrapper = mountBuilder({ modelValue: imageForm('image-map', { image: { src: 'old.png', width: 100, height: 50 } }) })
+    await flush()
+    await rows(wrapper)[1]!.trigger('click')
+    await flush()
+    const field = imageField(wrapper, 'Settings')!
+    expect((field.find('input').element as HTMLInputElement).value).toBe('old.png')
+    await field.find('input').setValue('new.png')
+    await flush()
+    expect(lastEmitted(wrapper).uischema!.elements[0].options.image).toEqual({ src: 'new.png', width: 100, height: 50 })
+    // cleared: no image left
+    await field.find('input').setValue('')
+    await flush()
+    expect(lastEmitted(wrapper).uischema!.elements[0].options.image).toBeUndefined()
+    wrapper.unmount()
   })
 })
 

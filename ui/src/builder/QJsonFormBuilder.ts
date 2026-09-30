@@ -38,6 +38,8 @@ export default defineComponent({
     renderers: { type: Array as PropType<JsonFormsRendererRegistryEntry[]>, default: () => [] },
     /** JSON Forms config, for the preview */
     config: { type: Object, default: undefined },
+    /** no uppercase transform on the import/export buttons and the tab labels */
+    noCaps: { type: Boolean, default: false },
   },
   emits: ['update:modelValue'],
   setup(props, { emit, expose }) {
@@ -94,8 +96,8 @@ export default defineComponent({
           'onUpdate:modelValue': (v: string) => { locale.value = v },
         }),
         h(QSpace),
-        h(QBtn, { outline: true, size: 'sm', icon: 'upload', label: tr('import'), onClick: () => { importing.value = true } }),
-        h(QBtnDropdown, { outline: true, size: 'sm', icon: 'download', label: tr('export'), autoClose: true }, () => h(QList, { dense: true }, () => [
+        h(QBtn, { outline: true, noCaps: props.noCaps, size: 'sm', icon: 'upload', label: tr('import'), onClick: () => { importing.value = true } }),
+        h(QBtnDropdown, { outline: true, noCaps: props.noCaps, size: 'sm', icon: 'download', label: tr('export'), autoClose: true }, () => h(QList, { dense: true }, () => [
           h(QItem, { clickable: true, onClick: () => download() }, () => h(QItemSection, () => tr('form'))),
           h(QItem, { clickable: true, onClick: () => download('schema') }, () => h(QItemSection, () => tr('exportSchema'))),
           h(QItem, { clickable: true, onClick: () => download('uischema') }, () => h(QItemSection, () => tr('exportUischema'))),
@@ -111,7 +113,7 @@ export default defineComponent({
         ]),
         h('div', { class: 'col-12 col-md-8' }, [
           h(QCard, { flat: true, bordered: true }, () => [
-            h(QTabs, { modelValue: tab.value, dense: true, align: 'left', activeColor: 'primary', narrowIndicator: true, 'onUpdate:modelValue': (v: string) => { tab.value = v } }, () => [
+            h(QTabs, { modelValue: tab.value, dense: true, noCaps: props.noCaps, align: 'left', activeColor: 'primary', narrowIndicator: true, 'onUpdate:modelValue': (v: string) => { tab.value = v } }, () => [
               h(QTab, { name: 'properties', label: tr('properties') }),
               h(QTab, { name: 'preview', label: tr('preview') }),
               h(QTab, { name: 'translations', label: tr('translations') }),
@@ -119,7 +121,7 @@ export default defineComponent({
             ]),
             h(QSeparator),
             h(QTabPanels, { modelValue: tab.value, animated: true, keepAlive: true, class: 'bg-transparent' }, () => [
-              h(QTabPanel, { name: 'properties' }, () => h(BuilderProperties, { model: state.model, catalog: catalog.value, nodeId: selected.value, locale: locale.value })),
+              h(QTabPanel, { name: 'properties' }, () => h(BuilderProperties, { model: state.model, catalog: catalog.value, nodeId: selected.value, locale: locale.value, onSelect: (id: string) => { selected.value = id } })),
               h(QTabPanel, { name: 'preview' }, () => h(BuilderPreview, { model: state.model, active: tab.value === 'preview', locale: locale.value, languages: languages.value, renderers: props.renderers, config: props.config })),
               h(QTabPanel, { name: 'translations' }, () => h(BuilderTranslations, { model: state.model, languages: languages.value, locale: locale.value, onAddLanguage: (code: string) => { locale.value = code } })),
               h(QTabPanel, { name: 'source' }, () => h(BuilderSource, {

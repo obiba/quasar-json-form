@@ -7,15 +7,18 @@
  */
 import { h, defineComponent, computed, ref, watch } from 'vue'
 import type { PropType, VNode } from 'vue'
-import { QInput, QToggle, QBtn, QIcon, QBanner, QChip, QCard, QCardSection, QSeparator } from 'quasar'
+import { QInput, QSelect, QToggle, QBtn, QIcon, QImg, QSpace, QTooltip, QBanner, QChip, QCard, QCardSection, QSeparator } from 'quasar'
 import { useFormI18n, QJsonForm } from '../vue-plugin'
 import type { FormModel, FormNode, JsonObject } from './model'
-import { locate, propertySchema, isRequired, setRequired, containerOf, isValidKey, hasOwn } from './model'
+import { locate, propertySchema, isRequired, setRequired, containerOf, isValidKey, hasOwn, descendants } from './model'
 import { renameProperty, ruleReferences } from './operations'
 import { textSlots, getText, setText, keyPrefix } from './texts'
 import type { TextSlot } from './texts'
 import { matchItem, optionsSchema, rawOptions, keywordsSchema, choicesOf, expressionError, fieldNames } from './items'
 import type { BuilderCatalog } from './items'
+
+/** size limit of a local image embedded in the form, in bytes */
+const MAX_IMAGE_SIZE = 500_000
 
 const isObject = (value: unknown): value is JsonObject => typeof value === 'object' && value !== null && !Array.isArray(value)
 
@@ -27,7 +30,8 @@ export default defineComponent({
     nodeId: { type: String, default: undefined },
     locale: { type: String, required: true },
   },
-  setup(props) {
+  emits: ['select'],
+  setup(props, { emit }) {
     const { translate } = useFormI18n()
     const tr = (key: string, named?: Record<string, unknown>) => translate(`builder.${key}`, named)
 
@@ -82,12 +86,49 @@ export default defineComponent({
     const columns = (inputs: (VNode | null)[]): VNode =>
       h('div', { class: 'row q-col-gutter-sm' }, inputs.filter((v) => v !== null).map((input) => h('div', { class: 'col-12 col-sm-6' }, [input])))
 
-    /** the UI schema of a settings form: its controls on two columns */
-    const columnsUischema = (schema: JsonObject): JsonObject => ({
-      type: 'VerticalLayout',
-      options: { class: 'row q-col-gutter-sm' },
-      elements: Object.keys(schema.properties).map((key) => ({ type: 'Control', scope: `#/properties/${key}`, options: { class: 'col-12 col-sm-6', dense: true, outlined: true } })),
+    /** the schema and UI schema of a settings form: its controls on two columns, the descriptions as hints below the fields */
+    const columnsForm = (schema: JsonObject): { schema: JsonObject; uischema: JsonObject } => ({
+      schema: { ...schema, properties: Object.fromEntries(Object.entries(schema.properties as JsonObject).map(([key, { description: _, ...property }]) => [key, property])) },
+      uischema: {
+        type: 'VerticalLayout',
+        options: { class: 'row q-col-gutter-sm' },
+        elements: Object.keys(schema.properties).map((key) => ({ type: 'Control', scope: `#/properties/${key}`, hint: schema.properties[key].description, options: { class: 'col-12 col-sm-6', dense: true, outlined: true } })),
+      },
     })
+
+    /** the image input, by id, whose local file was refused as too large */
+    const tooLarge = ref<string>()
+
+    /** an image URL, typed or read from a local file as a data URI (of at most MAX_IMAGE_SIZE bytes) */
+    const imageInput = (id: string, value: string, onChange: (v: string) => void, label = tr('image')): VNode =>
+      h(QInput, {
+        modelValue: value, label, dense: true, outlined: true, clearable: true, placeholder: 'https://',
+        error: tooLarge.value === id, errorMessage: tr('imageTooLarge', { max: `${MAX_IMAGE_SIZE / 1000} KB` }),
+        'onUpdate:modelValue': (v: string | number | null) => {
+          tooLarge.value = undefined
+          onChange(String(v ?? ''))
+        },
+      }, {
+        prepend: value ? () => h(QImg, { src: value, width: '24px', height: '24px', fit: 'contain' }) : undefined,
+        append: () => h(QBtn, {
+          flat: true, dense: true, round: true, size: 'sm', icon: 'upload_file',
+          onClick: () => {
+            const input = document.createElement('input')
+            input.type = 'file'
+            input.accept = 'image/jpeg,image/png,image/webp'
+            input.onchange = () => {
+              const file = input.files?.[0]
+              if (!file) return
+              tooLarge.value = file.size > MAX_IMAGE_SIZE ? id : undefined
+              if (tooLarge.value) return
+              const reader = new FileReader()
+              reader.onload = () => onChange(String(reader.result))
+              reader.readAsDataURL(file)
+            }
+            input.click()
+          },
+        }, () => h(QTooltip, () => tr('imageFile'))),
+      })
 
     const textInput = (slot: TextSlot, label: string, multiline = false): VNode => {
       const n = node.value!
@@ -141,6 +182,21 @@ export default defineComponent({
 
     // --- sections
 
+    /** the node before (-1) or after (1) the selected one in the outline order */
+    const neighbour = (step: 1 | -1): FormNode | undefined => {
+      const nodes = descendants(props.model.root)
+      const index = nodes.findIndex((n) => n.id === props.nodeId)
+      return index < 0 ? undefined : nodes[index + step]
+    }
+
+    const navButton = (step: 1 | -1): VNode => {
+      const target = neighbour(step)
+      return h(QBtn, {
+        flat: true, dense: true, round: true, size: 'sm', icon: step < 0 ? 'arrow_upward' : 'arrow_downward', disable: !target,
+        onClick: () => { if (target) emit('select', target.id) },
+      }, () => h(QTooltip, () => tr(step < 0 ? 'previous' : 'next')))
+    }
+
     const renderHeader = (): VNode[] => {
       const n = node.value!
       const parts: VNode[] = []
@@ -149,6 +205,9 @@ export default defineComponent({
         h(QIcon, { name: item.value?.icon ?? (n.kind === 'control' ? 'input' : 'view_agenda'), class: 'q-mr-sm' }),
         h('span', { class: 'text-subtitle1' }, title),
         api.value ? h('span', { class: 'text-caption text-grey-6 q-ml-sm' }, api.value.name) : null,
+        h(QSpace),
+        navButton(-1),
+        navButton(1),
       ]))
       if (n.kind === 'control' && n.path) {
         parts.push(h('div', { class: 'row items-center q-col-gutter-sm' }, [
@@ -179,7 +238,40 @@ export default defineComponent({
       const n = node.value!
       const slots = textSlots(props.model, n).filter((slot) => !slot.name.startsWith('options.') && !slot.name.startsWith('validation.'))
       if (slots.length === 0) return null
-      return section(tr('texts'), [columns(slots.map((slot) => textInput(slot, slot.name.startsWith('labels.') ? `${tr('label')} ${Number(slot.name.slice(7)) + 1}` : slot.name, slot.name === 'description' || slot.name === 'text' || slot.name === 'hint')))])
+      return section(tr('texts'), [h('div', { class: 'text-caption text-grey-7 q-mb-sm' }, tr('textsHelp', { locale: props.locale })), columns(slots.map((slot) => textInput(slot, slot.name.startsWith('labels.') ? `${tr('label')} ${Number(slot.name.slice(7)) + 1}` : slot.name, slot.name === 'description' || slot.name === 'text' || slot.name === 'hint')))])
+    }
+
+    /** the area of an image map choice: its shape and its coordinates, in the pixels of the image */
+    const areaInputs = (entry: JsonObject, choice: () => JsonObject): VNode[] => {
+      const area: JsonObject = isObject(entry.area) ? entry.area : {}
+      const shape = typeof area.shape === 'string' ? area.shape : 'rect'
+      const coords = Array.isArray(area.coords) ? area.coords.join(', ') : typeof area.coords === 'string' ? area.coords : ''
+      const update = (patch: JsonObject) => {
+        const target = choice()
+        target.area = { shape, ...(isObject(target.area) ? target.area : {}), ...patch }
+      }
+      return [
+        h('div', { class: 'col-2' }, [h(QSelect, {
+          modelValue: shape, options: ['rect', 'circle', 'poly'], label: tr('shape'), dense: true, outlined: true,
+          'onUpdate:modelValue': (v: string) => update({ shape: v }),
+        })]),
+        h('div', { class: 'col-3' }, [h(QInput, {
+          modelValue: coords, label: tr('coords'), dense: true, outlined: true, inputClass: 'q-builder-code',
+          placeholder: shape === 'circle' ? 'cx, cy, r' : shape === 'poly' ? 'x1, y1, x2, y2, x3, y3...' : 'x1, y1, x2, y2',
+          'onUpdate:modelValue': (v: string | number | null) => {
+            const text = String(v ?? '').trim()
+            if (!text) {
+              const target = choice()
+              if (isObject(target.area)) delete target.area.coords
+              return
+            }
+            const numbers = text.split(',').map((c) => Number(c.trim()))
+            // numbers when the text is a clean list of them, spaces aside, else the text as typed (`1.`, `5,`
+            // being typed, kept from being rewritten); both are accepted by the renderer
+            update({ coords: numbers.every(Number.isFinite) && numbers.join(',') === text.replace(/\s+/g, '') ? numbers : text })
+          },
+        })]),
+      ]
     }
 
     const renderChoices = (): VNode | null => {
@@ -195,13 +287,16 @@ export default defineComponent({
         return target.oneOf
       }
       const inItems = target !== schema.value
+      // the images control: an image per choice; the image map: an area per choice
+      const withImages = api.value?.name === 'QImagesRenderer'
+      const withAreas = api.value?.name === 'QImageMapRenderer'
       const rows = entries.map((entry, index) => {
         // the slot of the label; for an `enum` (labels are the values, translated) the one it gets once converted
         const slot = textSlots(props.model, n).find((s) => s.name === `options.${entry.const}`)
           ?? { name: `options.${entry.const}`, target: 'schema' as const, path: inItems ? ['items', 'oneOf', index, 'title'] : ['oneOf', index, 'title'] }
         const label = key === 'enum' ? props.model.translations[props.locale]?.[String(entry.const)] ?? '' : getText(props.model, n, slot, props.locale) ?? ''
         return h('div', { class: 'row items-center q-col-gutter-xs q-mb-xs no-wrap', key: index }, [
-          h('div', { class: 'col-4' }, [h(QInput, {
+          h('div', { class: withImages || withAreas ? 'col-3' : 'col-4' }, [h(QInput, {
             modelValue: String(entry.const ?? ''), label: tr('value'), dense: true, outlined: true,
             'onUpdate:modelValue': (v: string | number | null) => {
               const previous = entry.const
@@ -233,6 +328,12 @@ export default defineComponent({
               if (current) setText(props.model, n, current, props.locale, String(v ?? ''))
             },
           })]),
+          withImages ? h('div', { class: 'col-4' }, [imageInput(`choice-${index}`, typeof entry.image === 'string' ? entry.image : '', (v) => {
+            const choice = toOneOf()[index]!
+            if (v) choice.image = v
+            else delete choice.image
+          })]) : null,
+          ...(withAreas ? areaInputs(entry, () => toOneOf()[index]!) : []),
           h('div', { class: 'col-auto' }, [h(QBtn, { flat: true, dense: true, round: true, size: 'sm', icon: 'delete', onClick: () => { toOneOf().splice(index, 1) } })]),
         ])
       })
@@ -245,31 +346,70 @@ export default defineComponent({
           oneOf.push({ const: value, title: `${keyPrefix(props.model, n)}.options.${value}` })
         },
       }))
-      return section(tr('choices'), rows)
+      return section(tr('choices'), [h('div', { class: 'text-caption text-grey-7 q-mb-sm' }, tr('choicesHelp', { locale: props.locale })), ...rows])
     }
+
+    /**
+     * The settings form of the selected node, computed apart from the rendering so that the form gets
+     * the same schemas and data until the options change.
+     */
+    const settingsForm = computed(() => {
+      const n = node.value
+      if (!n) return undefined
+      const current: JsonObject = isObject(n.element.options) ? n.element.options : {}
+      // a string field would flatten an object (responsive grid `areas`...): such a value is edited in the JSON only
+      const flattened: string[] = []
+      const fields = Object.entries((optionsSchema(api.value)?.properties ?? {}) as JsonObject).filter(([name, property]) => {
+        if (property.type !== 'string' || !isObject(current[name])) return true
+        flattened.push(name)
+        return false
+      })
+      const settings: JsonObject | undefined = fields.length > 0 ? { type: 'object', properties: Object.fromEntries(fields) } : undefined
+      // a comma separated string where the field is a list of values: shown as that list; an array in a string field: shown joined
+      const shown = Object.fromEntries(Object.entries(current).map(([name, v]) => {
+        const type = settings?.properties[name]?.type
+        if (type === 'array' && typeof v === 'string') return [name, v.split(',').map((s) => s.trim()).filter(Boolean)]
+        if (type === 'string' && Array.isArray(v)) return [name, v.join(', ')]
+        return [name, v]
+      }))
+      return { current, flattened, settings, form: settings ? columnsForm(settings) : undefined, shown }
+    })
 
     const renderSettings = (): VNode | null => {
       const n = node.value!
-      const settings = optionsSchema(api.value)
       const others = rawOptions(api.value)
-      if (!settings && Object.keys(others).length === 0) return null
-      const content: VNode[] = []
+      const { current, flattened, settings, form, shown } = settingsForm.value!
+      flattened.forEach((name) => { others[name] = { desc: '' } })
+      // the image of the image map: a URL, or `{ src, width, height }` whose `src` is edited
+      const mapImage = api.value?.name === 'QImageMapRenderer'
+      if (mapImage) delete others.image
+      if (!settings && !mapImage && Object.keys(others).length === 0) return null
+      const content: VNode[] = [h('div', { class: 'text-caption text-grey-7 q-mb-sm' }, tr('optionsHelp'))]
+      if (mapImage) {
+        const image = isObject(n.element.options) ? n.element.options.image : undefined
+        content.push(h('div', { class: 'q-mb-sm' }, [imageInput('map', typeof image === 'string' ? image : isObject(image) && typeof image.src === 'string' ? image.src : '', (v) => {
+          const options: JsonObject = isObject(n.element.options) ? n.element.options : (n.element.options = {})
+          if (!v) delete options.image
+          else if (isObject(options.image)) options.image.src = v
+          else options.image = v
+        }, 'image')]))
+      }
       if (settings) {
         content.push(h(QJsonForm, {
-          modelValue: isObject(n.element.options) ? n.element.options : {},
-          schema: settings,
-          uischema: columnsUischema(settings),
+          modelValue: shown,
+          ...form!,
           validationMode: 'NoValidation',
           'onUpdate:modelValue': (value: JsonObject) => {
             // the edited fields merged into the options: the others (`format`, arrays, objects...) stay
-            const options: JsonObject = { ...(isObject(n.element.options) ? n.element.options : {}) }
+            const options: JsonObject = { ...current }
             for (const name of Object.keys(settings.properties)) {
               const v = value?.[name]
-              if (v === undefined || v === null || v === '') delete options[name]
+              // the form also emits on mount: only a real change is applied
+              if (JSON.stringify(v) === JSON.stringify(shown[name])) continue
+              if (v === undefined || v === null || v === '' || (Array.isArray(v) && v.length === 0)) delete options[name]
               else options[name] = v
             }
-            // the form also emits on mount: only a real change is applied
-            if (JSON.stringify(options) === JSON.stringify(isObject(n.element.options) ? n.element.options : {})) return
+            if (JSON.stringify(options) === JSON.stringify(current)) return
             if (Object.keys(options).length > 0) n.element.options = options
             else delete n.element.options
           },
@@ -291,10 +431,10 @@ export default defineComponent({
       const names = Object.keys(keywords.properties)
       const current = Object.fromEntries(names.filter((name) => schema.value![name] !== undefined).map((name) => [name, schema.value![name]]))
       return section(tr('validation'), [
+        h('div', { class: 'text-caption text-grey-7 q-mb-sm' }, tr('validationKeywordsHelp')),
         h(QJsonForm, {
           modelValue: current,
-          schema: keywords,
-          uischema: columnsUischema(keywords),
+          ...columnsForm(keywords),
           validationMode: 'NoValidation',
           'onUpdate:modelValue': (value: JsonObject) => {
             const target = propertySchema(props.model, n.id)
@@ -309,12 +449,12 @@ export default defineComponent({
       ])
     }
 
-    const ruleInput = (n: FormNode, name: string, label: string): VNode => {
+    const ruleInput = (n: FormNode, name: string, label: string, hint?: string): VNode => {
       const rules: JsonObject = isObject(n.element.rules) ? n.element.rules : {}
       const value = typeof rules[name] === 'string' ? rules[name] : ''
       const error = expressionError(value)
       return h(QInput, {
-        modelValue: value, label, dense: true, outlined: true, inputClass: 'q-builder-code',
+        modelValue: value, label, hint, dense: true, outlined: true, inputClass: 'q-builder-code',
         error: !!error, errorMessage: error ? `${tr('invalidExpression')}: ${error}` : undefined,
         'onUpdate:modelValue': (v: string | number | null) => {
           const text = String(v ?? '')
@@ -331,18 +471,23 @@ export default defineComponent({
       if (n === props.model.root || isDetail.value) return null
       const rules: JsonObject = isObject(n.element.rules) ? n.element.rules : {}
       const content: VNode[] = []
+      content.push(h('div', { class: 'text-caption text-grey-7 q-mb-sm' }, [
+        tr('rulesHelp'), ' ',
+        h('a', { href: 'https://github.com/peerigon/angular-expressions', target: '_blank', rel: 'noopener' }, 'angular-expressions'), '.',
+      ]))
       const names = fieldNames(containerOf(props.model, location.value?.list))
       if (names.length > 0) {
         content.push(h('div', { class: 'text-caption text-grey-7 q-mb-sm' }, [tr('fields'), ': ', ...names.map((name) => h(QChip, { dense: true, size: 'sm', label: name }))]))
       }
       const format = schema.value?.format ?? (isObject(n.element.options) ? n.element.options.format : undefined)
       content.push(columns([
-        ruleInput(n, 'visible', tr('visible')),
-        n.kind === 'control' ? ruleInput(n, 'enabled', tr('enabled')) : null,
-        format === 'computed' ? ruleInput(n, 'compute', tr('compute')) : null,
+        ruleInput(n, 'visible', tr('visible'), tr('visibleHint')),
+        n.kind === 'control' ? ruleInput(n, 'enabled', tr('enabled'), tr('enabledHint')) : null,
+        format === 'computed' ? ruleInput(n, 'compute', tr('compute'), tr('computeHint')) : null,
       ]))
       if (n.kind === 'control') {
         const validation: JsonObject[] = Array.isArray(rules.validation) ? rules.validation : []
+        content.push(h('div', { class: 'text-caption text-grey-7 q-mt-md q-mb-sm' }, tr('validationHelp')))
         validation.forEach((rule, index) => {
           const expr = typeof rule.expr === 'string' ? rule.expr : typeof rule.expression === 'string' ? rule.expression : ''
           const error = expressionError(expr)
@@ -381,6 +526,14 @@ export default defineComponent({
     const renderRaw = (): VNode => {
       const n = node.value!
       const content: (VNode | null)[] = [
+        n.kind === 'control' && schema.value
+          ? jsonInput(tr('rawSchema'), rawSchema, (parsed) => {
+            const target = propertySchema(props.model, n.id)
+            if (!target) return
+            for (const key of Object.keys(target)) delete target[key]
+            Object.assign(target, parsed)
+          })
+          : null,
         jsonInput(tr('rawElement'), rawElement, (parsed) => {
           // the structure of the node (its kind, path and items layout) is not editable here;
           // a scope that is not a property path stays on the element, editable
@@ -391,14 +544,6 @@ export default defineComponent({
           if (n.detail && isObject(parsed.options)) delete parsed.options.items
           n.element = parsed
         }),
-        n.kind === 'control' && schema.value
-          ? jsonInput(tr('rawSchema'), rawSchema, (parsed) => {
-            const target = propertySchema(props.model, n.id)
-            if (!target) return
-            for (const key of Object.keys(target)) delete target[key]
-            Object.assign(target, parsed)
-          })
-          : null,
       ]
       return section(tr('raw'), [columns(content)])
     }

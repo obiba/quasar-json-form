@@ -31,7 +31,7 @@ export default {
     },
     areas: {
       type: 'Array | String',
-      desc: '`grid-template-areas`: one string per row (`["title title", "year month"]`), `.` for an empty cell.',
+      desc: '`grid-template-areas`: one string per row (`["title title", "year month"]`), or a single string of comma separated rows (`title title, year month`); `.` for an empty cell.',
     },
     gap: {
       type: 'Number | String',
