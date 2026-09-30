@@ -277,20 +277,24 @@ export default defineComponent({
       if (!settings && Object.keys(others).length === 0) return null
       const content: VNode[] = [h('div', { class: 'text-caption text-grey-7 q-mb-sm' }, tr('optionsHelp'))]
       if (settings) {
+        const current: JsonObject = isObject(n.element.options) ? n.element.options : {}
+        // a comma separated string where the field is a list of values: shown as that list
+        const shown = Object.fromEntries(Object.entries(current).map(([name, v]) => [name, settings.properties[name]?.type === 'array' && typeof v === 'string' ? v.split(',').map((s) => s.trim()).filter(Boolean) : v]))
         content.push(h(QJsonForm, {
-          modelValue: isObject(n.element.options) ? n.element.options : {},
+          modelValue: shown,
           ...columnsForm(settings),
           validationMode: 'NoValidation',
           'onUpdate:modelValue': (value: JsonObject) => {
             // the edited fields merged into the options: the others (`format`, arrays, objects...) stay
-            const options: JsonObject = { ...(isObject(n.element.options) ? n.element.options : {}) }
+            const options: JsonObject = { ...current }
             for (const name of Object.keys(settings.properties)) {
               const v = value?.[name]
-              if (v === undefined || v === null || v === '') delete options[name]
+              // the form also emits on mount: only a real change is applied
+              if (JSON.stringify(v) === JSON.stringify(shown[name])) continue
+              if (v === undefined || v === null || v === '' || (Array.isArray(v) && v.length === 0)) delete options[name]
               else options[name] = v
             }
-            // the form also emits on mount: only a real change is applied
-            if (JSON.stringify(options) === JSON.stringify(isObject(n.element.options) ? n.element.options : {})) return
+            if (JSON.stringify(options) === JSON.stringify(current)) return
             if (Object.keys(options).length > 0) n.element.options = options
             else delete n.element.options
           },

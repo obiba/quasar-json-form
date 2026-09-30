@@ -92,6 +92,9 @@ const OPTION_TYPES: Record<string, JsonObject> = {
   Boolean: { type: 'boolean' },
   'String | Number': { type: 'string' },
   'Number | String': { type: 'string' },
+  // edited as the string form of the option (comma separated list...), an array shown joined
+  'Array | String': { type: 'string' },
+  'String | Array': { type: 'string' },
 }
 
 /** options managed by the builder itself, or not editable as a field */
@@ -107,7 +110,9 @@ export function optionsSchema(api: RendererApi | undefined): JsonObject | undefi
   const properties: JsonObject = {}
   for (const [name, entry] of Object.entries(rendererOptions(api))) {
     if (MANAGED_OPTIONS.has(name)) continue
-    const type = OPTION_TYPES[entry.type ?? '']
+    const type = entry.values
+      ? entry.type?.includes('Array') ? { type: 'array', uniqueItems: true, items: { type: 'string', enum: entry.values } } : { type: 'string', enum: entry.values }
+      : OPTION_TYPES[entry.type ?? '']
     if (!type) continue
     properties[name] = { ...type, title: name, description: entry.desc }
   }
@@ -117,7 +122,7 @@ export function optionsSchema(api: RendererApi | undefined): JsonObject | undefi
 /** The options of a renderer that the settings form does not edit (arrays, objects...). */
 export function rawOptions(api: RendererApi | undefined): Record<string, ApiEntry> {
   if (!api) return {}
-  return Object.fromEntries(Object.entries(rendererOptions(api)).filter(([name, entry]) => !MANAGED_OPTIONS.has(name) && !OPTION_TYPES[entry.type ?? ''] && name !== '…'))
+  return Object.fromEntries(Object.entries(rendererOptions(api)).filter(([name, entry]) => !MANAGED_OPTIONS.has(name) && !entry.values && !OPTION_TYPES[entry.type ?? ''] && name !== '…'))
 }
 
 /** The validation keywords of a property, by schema type, as a JSON schema for the builder form. */

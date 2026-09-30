@@ -100,5 +100,8 @@ above exports `colorApi` next to its renderer entry (see the Code tab of the exa
 trigger, the options it passes to `QColor`, the data it writes and a `color` palette item. The
 [form builder](#/builder/overview#extending-the-palette) takes such objects through its `catalog`
 prop, so that the control appears in its palette and its options in the property panel.
+An option whose `type` is `String`, `Number`, `Boolean`, `String | Number` or `String | Array` (in
+either order) is a field of the panel; with `values`, the list of its possible values, it is a select, of several values when
+its `type` includes `Array`: `{ type: 'Array | String', values: ['point', 'polygon'], desc: '...' }`.
 
 <DocApi example="custom/color" />

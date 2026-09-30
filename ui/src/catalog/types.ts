@@ -9,6 +9,8 @@ export interface ApiEntry {
   type?: string
   /** default value, as documented */
   default?: string
+  /** possible values of an option, selected in the builder (several when the type includes `Array`) */
+  values?: string[]
   /** i18n key of the message, for a validation check */
   message?: string
   /** description, inline markdown */

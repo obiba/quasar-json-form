@@ -3,7 +3,8 @@ import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { Quasar } from 'quasar'
 import QJsonFormBuilder from '../src/builder/QJsonFormBuilder'
-import { recognize, builderApi } from '../src/builder'
+import { recognize, builderApi, optionsSchema, rawOptions } from '../src/builder'
+import { catalog } from '../src/catalog'
 import type { FormDefinition } from '../src/builder'
 import { createTestI18n, flush } from './utils'
 
@@ -374,6 +375,31 @@ describe('recognize', () => {
     expect(recognize([])).toBeUndefined()
     expect(recognize({ foo: 1 })).toBeUndefined()
     expect(recognize('x')).toBeUndefined()
+  })
+})
+
+describe('settings', () => {
+  it('selects the known values of an option, several when it takes an array', () => {
+    expect(optionsSchema(catalog.QGeoRenderer)!.properties.geometries).toMatchObject({ type: 'array', uniqueItems: true, items: { enum: ['point', 'linestring', 'polygon'] } })
+    expect(rawOptions(catalog.QGeoRenderer).geometries).toBeUndefined()
+  })
+
+  it('shows a comma separated list of values in the select, without rewriting it', async () => {
+    const wrapper = mountBuilder({
+      modelValue: {
+        schema: { type: 'object', properties: { loc: { type: 'object', format: 'geo' } } },
+        uischema: { type: 'VerticalLayout', elements: [{ type: 'Control', scope: '#/properties/loc', options: { geometries: 'point, polygon' } }] },
+      },
+    })
+    await flush()
+    await rows(wrapper)[1]!.trigger('click')
+    await flush()
+    const settings = wrapper.findAll('.q-builder-section').find((c: any) => c.text().startsWith('Settings'))!
+    const select = settings.findAll('.q-select-renderer').find((f: any) => f.text().includes('geometries'))!
+    expect(select.text()).toContain('point')
+    expect(select.text()).toContain('polygon')
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    wrapper.unmount()
   })
 })
 
