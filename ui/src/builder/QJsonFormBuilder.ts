@@ -121,7 +121,7 @@ export default defineComponent({
             ]),
             h(QSeparator),
             h(QTabPanels, { modelValue: tab.value, animated: true, keepAlive: true, class: 'bg-transparent' }, () => [
-              h(QTabPanel, { name: 'properties' }, () => h(BuilderProperties, { model: state.model, catalog: catalog.value, nodeId: selected.value, locale: locale.value })),
+              h(QTabPanel, { name: 'properties' }, () => h(BuilderProperties, { model: state.model, catalog: catalog.value, nodeId: selected.value, locale: locale.value, onSelect: (id: string) => { selected.value = id } })),
               h(QTabPanel, { name: 'preview' }, () => h(BuilderPreview, { model: state.model, active: tab.value === 'preview', locale: locale.value, languages: languages.value, renderers: props.renderers, config: props.config })),
               h(QTabPanel, { name: 'translations' }, () => h(BuilderTranslations, { model: state.model, languages: languages.value, locale: locale.value, onAddLanguage: (code: string) => { locale.value = code } })),
               h(QTabPanel, { name: 'source' }, () => h(BuilderSource, {

@@ -76,6 +76,30 @@ describe('QJsonFormBuilder', () => {
     wrapper.unmount()
   })
 
+  it('navigates up and down the outline, through the children', async () => {
+    const wrapper = mountBuilder()
+    await flush()
+    const selectedLabel = () => wrapper.find('.q-builder-selected .q-builder-label').text()
+    const navButton = (index: 0 | 1) => wrapper.findAll('.q-builder-properties .q-btn')[index]!
+    const nav = async (index: 0 | 1) => {
+      await navButton(index).trigger('click')
+      await flush()
+    }
+    // the root has nothing before it
+    expect(navButton(0).attributes('disabled')).toBeDefined()
+    for (const label of ['Name', 'Group', 'role']) {
+      await nav(1)
+      expect(selectedLabel()).toBe(label)
+    }
+    // the last node of the outline has nothing after it
+    expect(navButton(1).attributes('disabled')).toBeDefined()
+    for (const label of ['Group', 'Name', 'Form']) {
+      await nav(0)
+      expect(selectedLabel()).toBe(label)
+    }
+    wrapper.unmount()
+  })
+
   it('edits the texts of the selected control and emits the form', async () => {
     const wrapper = mountBuilder()
     await flush()

@@ -7,10 +7,10 @@
  */
 import { h, defineComponent, computed, ref, watch } from 'vue'
 import type { PropType, VNode } from 'vue'
-import { QInput, QToggle, QBtn, QIcon, QBanner, QChip, QCard, QCardSection, QSeparator } from 'quasar'
+import { QInput, QToggle, QBtn, QIcon, QSpace, QTooltip, QBanner, QChip, QCard, QCardSection, QSeparator } from 'quasar'
 import { useFormI18n, QJsonForm } from '../vue-plugin'
 import type { FormModel, FormNode, JsonObject } from './model'
-import { locate, propertySchema, isRequired, setRequired, containerOf, isValidKey, hasOwn } from './model'
+import { locate, propertySchema, isRequired, setRequired, containerOf, isValidKey, hasOwn, descendants } from './model'
 import { renameProperty, ruleReferences } from './operations'
 import { textSlots, getText, setText, keyPrefix } from './texts'
 import type { TextSlot } from './texts'
@@ -27,7 +27,8 @@ export default defineComponent({
     nodeId: { type: String, default: undefined },
     locale: { type: String, required: true },
   },
-  setup(props) {
+  emits: ['select'],
+  setup(props, { emit }) {
     const { translate } = useFormI18n()
     const tr = (key: string, named?: Record<string, unknown>) => translate(`builder.${key}`, named)
 
@@ -141,6 +142,21 @@ export default defineComponent({
 
     // --- sections
 
+    /** the node before (-1) or after (1) the selected one in the outline order */
+    const neighbour = (step: 1 | -1): FormNode | undefined => {
+      const nodes = descendants(props.model.root)
+      const index = nodes.findIndex((n) => n.id === props.nodeId)
+      return index < 0 ? undefined : nodes[index + step]
+    }
+
+    const navButton = (step: 1 | -1): VNode => {
+      const target = neighbour(step)
+      return h(QBtn, {
+        flat: true, dense: true, round: true, size: 'sm', icon: step < 0 ? 'arrow_upward' : 'arrow_downward', disable: !target,
+        onClick: () => { if (target) emit('select', target.id) },
+      }, () => h(QTooltip, () => tr(step < 0 ? 'previous' : 'next')))
+    }
+
     const renderHeader = (): VNode[] => {
       const n = node.value!
       const parts: VNode[] = []
@@ -149,6 +165,9 @@ export default defineComponent({
         h(QIcon, { name: item.value?.icon ?? (n.kind === 'control' ? 'input' : 'view_agenda'), class: 'q-mr-sm' }),
         h('span', { class: 'text-subtitle1' }, title),
         api.value ? h('span', { class: 'text-caption text-grey-6 q-ml-sm' }, api.value.name) : null,
+        h(QSpace),
+        navButton(-1),
+        navButton(1),
       ]))
       if (n.kind === 'control' && n.path) {
         parts.push(h('div', { class: 'row items-center q-col-gutter-sm' }, [
