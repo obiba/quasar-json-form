@@ -94,8 +94,8 @@ export default defineComponent({
           'onUpdate:modelValue': (v: string) => { locale.value = v },
         }),
         h(QSpace),
-        h(QBtn, { flat: true, dense: true, icon: 'upload', label: tr('import'), onClick: () => { importing.value = true } }),
-        h(QBtnDropdown, { flat: true, dense: true, icon: 'download', label: tr('export'), autoClose: true }, () => h(QList, { dense: true }, () => [
+        h(QBtn, { outline: true, size: 'sm', icon: 'upload', label: tr('import'), onClick: () => { importing.value = true } }),
+        h(QBtnDropdown, { outline: true, size: 'sm', icon: 'download', label: tr('export'), autoClose: true }, () => h(QList, { dense: true }, () => [
           h(QItem, { clickable: true, onClick: () => download() }, () => h(QItemSection, () => tr('form'))),
           h(QItem, { clickable: true, onClick: () => download('schema') }, () => h(QItemSection, () => tr('exportSchema'))),
           h(QItem, { clickable: true, onClick: () => download('uischema') }, () => h(QItemSection, () => tr('exportUischema'))),
