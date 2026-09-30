@@ -400,6 +400,14 @@ export default defineComponent({
     const renderRaw = (): VNode => {
       const n = node.value!
       const content: (VNode | null)[] = [
+        n.kind === 'control' && schema.value
+          ? jsonInput(tr('rawSchema'), rawSchema, (parsed) => {
+            const target = propertySchema(props.model, n.id)
+            if (!target) return
+            for (const key of Object.keys(target)) delete target[key]
+            Object.assign(target, parsed)
+          })
+          : null,
         jsonInput(tr('rawElement'), rawElement, (parsed) => {
           // the structure of the node (its kind, path and items layout) is not editable here;
           // a scope that is not a property path stays on the element, editable
@@ -410,14 +418,6 @@ export default defineComponent({
           if (n.detail && isObject(parsed.options)) delete parsed.options.items
           n.element = parsed
         }),
-        n.kind === 'control' && schema.value
-          ? jsonInput(tr('rawSchema'), rawSchema, (parsed) => {
-            const target = propertySchema(props.model, n.id)
-            if (!target) return
-            for (const key of Object.keys(target)) delete target[key]
-            Object.assign(target, parsed)
-          })
-          : null,
       ]
       return section(tr('raw'), [columns(content)])
     }
