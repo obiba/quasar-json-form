@@ -7,7 +7,7 @@
  */
 import { h, defineComponent, computed, ref, watch } from 'vue'
 import type { PropType, VNode } from 'vue'
-import { QInput, QToggle, QBtn, QIcon, QSpace, QTooltip, QBanner, QChip, QCard, QCardSection, QSeparator } from 'quasar'
+import { QInput, QSelect, QToggle, QBtn, QIcon, QImg, QSpace, QTooltip, QBanner, QChip, QCard, QCardSection, QSeparator } from 'quasar'
 import { useFormI18n, QJsonForm } from '../vue-plugin'
 import type { FormModel, FormNode, JsonObject } from './model'
 import { locate, propertySchema, isRequired, setRequired, containerOf, isValidKey, hasOwn, descendants } from './model'
@@ -92,6 +92,31 @@ export default defineComponent({
         elements: Object.keys(schema.properties).map((key) => ({ type: 'Control', scope: `#/properties/${key}`, hint: schema.properties[key].description, options: { class: 'col-12 col-sm-6', dense: true, outlined: true } })),
       },
     })
+
+    /** an image URL, typed or read from a local file as a data URI */
+    const imageInput = (value: string, onChange: (v: string) => void, label = tr('image')): VNode =>
+      h(QInput, {
+        modelValue: value, label, dense: true, outlined: true, clearable: true, placeholder: 'https://',
+        'onUpdate:modelValue': (v: string | number | null) => onChange(String(v ?? '')),
+      }, {
+        prepend: value ? () => h(QImg, { src: value, width: '24px', height: '24px', fit: 'contain' }) : undefined,
+        append: () => h(QBtn, {
+          flat: true, dense: true, round: true, size: 'sm', icon: 'upload_file',
+          onClick: () => {
+            const input = document.createElement('input')
+            input.type = 'file'
+            input.accept = 'image/jpeg,image/png,image/webp'
+            input.onchange = () => {
+              const file = input.files?.[0]
+              if (!file) return
+              const reader = new FileReader()
+              reader.onload = () => onChange(String(reader.result))
+              reader.readAsDataURL(file)
+            }
+            input.click()
+          },
+        }, () => h(QTooltip, () => tr('imageFile'))),
+      })
 
     const textInput = (slot: TextSlot, label: string, multiline = false): VNode => {
       const n = node.value!
@@ -204,6 +229,33 @@ export default defineComponent({
       return section(tr('texts'), [h('div', { class: 'text-caption text-grey-7 q-mb-sm' }, tr('textsHelp', { locale: props.locale })), columns(slots.map((slot) => textInput(slot, slot.name.startsWith('labels.') ? `${tr('label')} ${Number(slot.name.slice(7)) + 1}` : slot.name, slot.name === 'description' || slot.name === 'text' || slot.name === 'hint')))])
     }
 
+    /** the area of an image map choice: its shape and its coordinates, in the pixels of the image */
+    const areaInputs = (entry: JsonObject, choice: () => JsonObject): VNode[] => {
+      const area: JsonObject = isObject(entry.area) ? entry.area : {}
+      const shape = typeof area.shape === 'string' ? area.shape : 'rect'
+      const coords = Array.isArray(area.coords) ? area.coords.join(', ') : typeof area.coords === 'string' ? area.coords : ''
+      const update = (patch: JsonObject) => {
+        const target = choice()
+        target.area = { shape, ...(isObject(target.area) ? target.area : {}), ...patch }
+      }
+      return [
+        h('div', { class: 'col-2' }, [h(QSelect, {
+          modelValue: shape, options: ['rect', 'circle', 'poly'], label: tr('shape'), dense: true, outlined: true,
+          'onUpdate:modelValue': (v: string) => update({ shape: v }),
+        })]),
+        h('div', { class: 'col-3' }, [h(QInput, {
+          modelValue: coords, label: tr('coords'), dense: true, outlined: true, inputClass: 'q-builder-code',
+          placeholder: shape === 'circle' ? 'cx, cy, r' : shape === 'poly' ? 'x1, y1, x2, y2, x3, y3...' : 'x1, y1, x2, y2',
+          'onUpdate:modelValue': (v: string | number | null) => {
+            const text = String(v ?? '').trim()
+            const numbers = text.split(',').map((c) => Number(c.trim()))
+            // numbers when the text is a clean list of them, else the text as typed (both are accepted by the renderer)
+            update({ coords: text && numbers.every((c) => !isNaN(c)) && numbers.join(', ') === text ? numbers : text })
+          },
+        })]),
+      ]
+    }
+
     const renderChoices = (): VNode | null => {
       const n = node.value!
       const choices = choicesOf(schema.value)
@@ -217,13 +269,16 @@ export default defineComponent({
         return target.oneOf
       }
       const inItems = target !== schema.value
+      // the images control: an image per choice; the image map: an area per choice
+      const withImages = api.value?.name === 'QImagesRenderer'
+      const withAreas = api.value?.name === 'QImageMapRenderer'
       const rows = entries.map((entry, index) => {
         // the slot of the label; for an `enum` (labels are the values, translated) the one it gets once converted
         const slot = textSlots(props.model, n).find((s) => s.name === `options.${entry.const}`)
           ?? { name: `options.${entry.const}`, target: 'schema' as const, path: inItems ? ['items', 'oneOf', index, 'title'] : ['oneOf', index, 'title'] }
         const label = key === 'enum' ? props.model.translations[props.locale]?.[String(entry.const)] ?? '' : getText(props.model, n, slot, props.locale) ?? ''
         return h('div', { class: 'row items-center q-col-gutter-xs q-mb-xs no-wrap', key: index }, [
-          h('div', { class: 'col-4' }, [h(QInput, {
+          h('div', { class: withImages || withAreas ? 'col-3' : 'col-4' }, [h(QInput, {
             modelValue: String(entry.const ?? ''), label: tr('value'), dense: true, outlined: true,
             'onUpdate:modelValue': (v: string | number | null) => {
               const previous = entry.const
@@ -255,6 +310,12 @@ export default defineComponent({
               if (current) setText(props.model, n, current, props.locale, String(v ?? ''))
             },
           })]),
+          withImages ? h('div', { class: 'col-4' }, [imageInput(typeof entry.image === 'string' ? entry.image : '', (v) => {
+            const choice = toOneOf()[index]!
+            if (v) choice.image = v
+            else delete choice.image
+          })]) : null,
+          ...(withAreas ? areaInputs(entry, () => toOneOf()[index]!) : []),
           h('div', { class: 'col-auto' }, [h(QBtn, { flat: true, dense: true, round: true, size: 'sm', icon: 'delete', onClick: () => { toOneOf().splice(index, 1) } })]),
         ])
       })
@@ -274,8 +335,20 @@ export default defineComponent({
       const n = node.value!
       const settings = optionsSchema(api.value)
       const others = rawOptions(api.value)
-      if (!settings && Object.keys(others).length === 0) return null
+      // the image of the image map: a URL, or `{ src, width, height }` whose `src` is edited
+      const mapImage = api.value?.name === 'QImageMapRenderer'
+      if (mapImage) delete others.image
+      if (!settings && !mapImage && Object.keys(others).length === 0) return null
       const content: VNode[] = [h('div', { class: 'text-caption text-grey-7 q-mb-sm' }, tr('optionsHelp'))]
+      if (mapImage) {
+        const image = isObject(n.element.options) ? n.element.options.image : undefined
+        content.push(h('div', { class: 'q-mb-sm' }, [imageInput(typeof image === 'string' ? image : isObject(image) && typeof image.src === 'string' ? image.src : '', (v) => {
+          const options: JsonObject = isObject(n.element.options) ? n.element.options : (n.element.options = {})
+          if (isObject(options.image)) options.image.src = v
+          else if (v) options.image = v
+          else delete options.image
+        }, 'image')]))
+      }
       if (settings) {
         const current: JsonObject = isObject(n.element.options) ? n.element.options : {}
         // a comma separated string where the field is a list of values: shown as that list

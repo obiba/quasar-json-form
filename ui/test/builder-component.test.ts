@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { Quasar } from 'quasar'
 import QJsonFormBuilder from '../src/builder/QJsonFormBuilder'
@@ -399,6 +399,70 @@ describe('settings', () => {
     expect(select.text()).toContain('point')
     expect(select.text()).toContain('polygon')
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    wrapper.unmount()
+  })
+})
+
+describe('images', () => {
+  const imageForm = (format: string, options: Record<string, any> = {}): FormDefinition => ({
+    schema: { type: 'object', properties: { pic: { type: 'string', oneOf: [{ const: 'a', title: 'A' }, { const: 'b', title: 'B' }] } } },
+    uischema: { type: 'VerticalLayout', elements: [{ type: 'Control', scope: '#/properties/pic', options: { format, ...options } }] },
+  })
+  const imageField = (wrapper: any, title: string) => wrapper.findAll('.q-builder-section').find((c: any) => c.text().startsWith(title))!
+    .findAll('label.q-field').find((f: any) => f.find('.q-field__label').exists() && f.find('.q-field__label').text() === (title === 'Choices' ? 'Image' : 'image'))
+
+  it('sets the image of each choice of the images control', async () => {
+    const wrapper = mountBuilder({ modelValue: imageForm('images') })
+    await flush()
+    await rows(wrapper)[1]!.trigger('click')
+    await flush()
+    await imageField(wrapper, 'Choices')!.find('input').setValue('https://example.org/a.png')
+    await flush()
+    expect(lastEmitted(wrapper).schema.properties.pic.oneOf[0]).toEqual({ const: 'a', title: 'A', image: 'https://example.org/a.png' })
+    // a local file, read as a data URI
+    const createElement = document.createElement.bind(document)
+    const spy = vi.spyOn(document, 'createElement').mockImplementation((tag: string, options?: ElementCreationOptions) => {
+      const element = createElement(tag, options)
+      if (tag === 'input') {
+        Object.defineProperty(element, 'files', { value: [new File([new Uint8Array([1, 2, 3])], 'b.png', { type: 'image/png' })] })
+        element.click = () => (element as HTMLInputElement).onchange!(new Event('change'))
+      }
+      return element
+    })
+    const choices = wrapper.findAll('.q-builder-section').find((c: any) => c.text().startsWith('Choices'))!
+    await choices.findAll('.q-field__append .q-btn')[1]!.trigger('click')
+    spy.mockRestore()
+    await vi.waitFor(() => expect(lastEmitted(wrapper).schema.properties.pic.oneOf[1].image).toBe('data:image/png;base64,AQID'))
+    wrapper.unmount()
+  })
+
+  it('sets the area of each choice of the image map', async () => {
+    const wrapper = mountBuilder({ modelValue: imageForm('image-map') })
+    await flush()
+    await rows(wrapper)[1]!.trigger('click')
+    await flush()
+    const coords = () => wrapper.findAll('.q-builder-section').find((c: any) => c.text().startsWith('Choices'))!
+      .findAll('label.q-field').filter((f: any) => f.find('.q-field__label').exists() && f.find('.q-field__label').text().startsWith('Coordinates'))
+    await coords()[0]!.find('input').setValue('0, 0, 10, 20')
+    await flush()
+    expect(lastEmitted(wrapper).schema.properties.pic.oneOf[0].area).toEqual({ shape: 'rect', coords: [0, 0, 10, 20] })
+    // a list being typed is kept as text
+    await coords()[1]!.find('input').setValue('5,')
+    await flush()
+    expect(lastEmitted(wrapper).schema.properties.pic.oneOf[1].area).toEqual({ shape: 'rect', coords: '5,' })
+    wrapper.unmount()
+  })
+
+  it('sets the image of the image map, keeping its size', async () => {
+    const wrapper = mountBuilder({ modelValue: imageForm('image-map', { image: { src: 'old.png', width: 100, height: 50 } }) })
+    await flush()
+    await rows(wrapper)[1]!.trigger('click')
+    await flush()
+    const field = imageField(wrapper, 'Settings')!
+    expect((field.find('input').element as HTMLInputElement).value).toBe('old.png')
+    await field.find('input').setValue('new.png')
+    await flush()
+    expect(lastEmitted(wrapper).uischema!.elements[0].options.image).toEqual({ src: 'new.png', width: 100, height: 50 })
     wrapper.unmount()
   })
 })
