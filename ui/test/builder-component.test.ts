@@ -401,6 +401,37 @@ describe('settings', () => {
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
     wrapper.unmount()
   })
+
+  const gridForm = (areas: unknown): FormDefinition => ({
+    schema: { type: 'object', properties: { a: { type: 'string' } } },
+    uischema: { type: 'VerticalLayout', elements: [{ type: 'GridLayout', options: { areas }, elements: [{ type: 'Control', scope: '#/properties/a' }] }] },
+  })
+  const settingsOf = async (wrapper: any) => {
+    await flush()
+    await rows(wrapper)[1]!.trigger('click')
+    await flush()
+    return wrapper.findAll('.q-builder-section').find((c: any) => c.text().startsWith('Settings'))!
+  }
+
+  it('shows an array of a string option joined with commas', async () => {
+    const wrapper = mountBuilder({ modelValue: gridForm(['a a', 'b c']) })
+    const settings = await settingsOf(wrapper)
+    const field = settings.findAll('.q-string-renderer').find((r: any) => r.find('.q-form-title').text() === 'areas')!
+    expect((field.find('input').element as HTMLInputElement).value).toBe('a a, b c')
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    await field.find('input').setValue('a a, b d')
+    await flush()
+    expect(lastEmitted(wrapper).uischema!.elements[0].options.areas).toBe('a a, b d')
+    wrapper.unmount()
+  })
+
+  it('leaves an object of a string option to the JSON', async () => {
+    const wrapper = mountBuilder({ modelValue: gridForm({ xs: ['a', 'b'], md: ['a b'] }) })
+    const settings = await settingsOf(wrapper)
+    expect(settings.findAll('.q-form-title').map((l: any) => l.text())).not.toContain('areas')
+    expect(settings.findAll('.q-chip').map((c: any) => c.text())).toContain('areas')
+    wrapper.unmount()
+  })
 })
 
 describe('images', () => {

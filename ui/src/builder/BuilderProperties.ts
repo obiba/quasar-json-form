@@ -333,8 +333,15 @@ export default defineComponent({
 
     const renderSettings = (): VNode | null => {
       const n = node.value!
-      const settings = optionsSchema(api.value)
       const others = rawOptions(api.value)
+      const current: JsonObject = isObject(n.element.options) ? n.element.options : {}
+      // a string field would flatten an object (responsive grid `areas`...): such a value is edited in the JSON only
+      const fields = Object.entries((optionsSchema(api.value)?.properties ?? {}) as JsonObject).filter(([name, property]) => {
+        const flattened = property.type === 'string' && isObject(current[name])
+        if (flattened) others[name] = { desc: '' }
+        return !flattened
+      })
+      const settings: JsonObject | undefined = fields.length > 0 ? { type: 'object', properties: Object.fromEntries(fields) } : undefined
       // the image of the image map: a URL, or `{ src, width, height }` whose `src` is edited
       const mapImage = api.value?.name === 'QImageMapRenderer'
       if (mapImage) delete others.image
@@ -350,9 +357,13 @@ export default defineComponent({
         }, 'image')]))
       }
       if (settings) {
-        const current: JsonObject = isObject(n.element.options) ? n.element.options : {}
-        // a comma separated string where the field is a list of values: shown as that list
-        const shown = Object.fromEntries(Object.entries(current).map(([name, v]) => [name, settings.properties[name]?.type === 'array' && typeof v === 'string' ? v.split(',').map((s) => s.trim()).filter(Boolean) : v]))
+        // a comma separated string where the field is a list of values: shown as that list; an array in a string field: shown joined
+        const shown = Object.fromEntries(Object.entries(current).map(([name, v]) => {
+          const type = settings.properties[name]?.type
+          if (type === 'array' && typeof v === 'string') return [name, v.split(',').map((s) => s.trim()).filter(Boolean)]
+          if (type === 'string' && Array.isArray(v)) return [name, v.join(', ')]
+          return [name, v]
+        }))
         content.push(h(QJsonForm, {
           modelValue: shown,
           ...columnsForm(settings),

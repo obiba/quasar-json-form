@@ -59,7 +59,9 @@ describe('grid utils', () => {
       alignItems: 'start',
       justifyItems: 'stretch',
     })
-    expect(gridContainerStyle({ areas: '"a b"' }, 'md').gridTemplateAreas).toBe('"a b"')
+    // rows separated by commas
+    expect(gridContainerStyle({ areas: 'title title, year month' }, 'md').gridTemplateAreas).toBe('"title title" "year month"')
+    expect(gridContainerStyle({ areas: 'a b' }, 'md').gridTemplateAreas).toBe('"a b"')
     expect(gridContainerStyle({ columns: 0, areas: [] }, 'md')).toEqual({ rowGap: '10px', columnGap: '20px' })
   })
 
