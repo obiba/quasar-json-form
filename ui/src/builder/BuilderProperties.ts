@@ -17,6 +17,9 @@ import type { TextSlot } from './texts'
 import { matchItem, optionsSchema, rawOptions, keywordsSchema, choicesOf, expressionError, fieldNames } from './items'
 import type { BuilderCatalog } from './items'
 
+/** size limit of a local image embedded in the form, in bytes */
+const MAX_IMAGE_SIZE = 500_000
+
 const isObject = (value: unknown): value is JsonObject => typeof value === 'object' && value !== null && !Array.isArray(value)
 
 export default defineComponent({
@@ -93,11 +96,18 @@ export default defineComponent({
       },
     })
 
-    /** an image URL, typed or read from a local file as a data URI */
-    const imageInput = (value: string, onChange: (v: string) => void, label = tr('image')): VNode =>
+    /** the image input, by id, whose local file was refused as too large */
+    const tooLarge = ref<string>()
+
+    /** an image URL, typed or read from a local file as a data URI (of at most MAX_IMAGE_SIZE bytes) */
+    const imageInput = (id: string, value: string, onChange: (v: string) => void, label = tr('image')): VNode =>
       h(QInput, {
         modelValue: value, label, dense: true, outlined: true, clearable: true, placeholder: 'https://',
-        'onUpdate:modelValue': (v: string | number | null) => onChange(String(v ?? '')),
+        error: tooLarge.value === id, errorMessage: tr('imageTooLarge', { max: `${MAX_IMAGE_SIZE / 1000} KB` }),
+        'onUpdate:modelValue': (v: string | number | null) => {
+          tooLarge.value = undefined
+          onChange(String(v ?? ''))
+        },
       }, {
         prepend: value ? () => h(QImg, { src: value, width: '24px', height: '24px', fit: 'contain' }) : undefined,
         append: () => h(QBtn, {
@@ -109,6 +119,8 @@ export default defineComponent({
             input.onchange = () => {
               const file = input.files?.[0]
               if (!file) return
+              tooLarge.value = file.size > MAX_IMAGE_SIZE ? id : undefined
+              if (tooLarge.value) return
               const reader = new FileReader()
               reader.onload = () => onChange(String(reader.result))
               reader.readAsDataURL(file)
@@ -248,9 +260,15 @@ export default defineComponent({
           placeholder: shape === 'circle' ? 'cx, cy, r' : shape === 'poly' ? 'x1, y1, x2, y2, x3, y3...' : 'x1, y1, x2, y2',
           'onUpdate:modelValue': (v: string | number | null) => {
             const text = String(v ?? '').trim()
+            if (!text) {
+              const target = choice()
+              if (isObject(target.area)) delete target.area.coords
+              return
+            }
             const numbers = text.split(',').map((c) => Number(c.trim()))
-            // numbers when the text is a clean list of them, else the text as typed (both are accepted by the renderer)
-            update({ coords: text && numbers.every((c) => !isNaN(c)) && numbers.join(', ') === text ? numbers : text })
+            // numbers when the text is a clean list of them, spaces aside, else the text as typed (`1.`, `5,`
+            // being typed, kept from being rewritten); both are accepted by the renderer
+            update({ coords: numbers.every(Number.isFinite) && numbers.join(',') === text.replace(/\s+/g, '') ? numbers : text })
           },
         })]),
       ]
@@ -310,7 +328,7 @@ export default defineComponent({
               if (current) setText(props.model, n, current, props.locale, String(v ?? ''))
             },
           })]),
-          withImages ? h('div', { class: 'col-4' }, [imageInput(typeof entry.image === 'string' ? entry.image : '', (v) => {
+          withImages ? h('div', { class: 'col-4' }, [imageInput(`choice-${index}`, typeof entry.image === 'string' ? entry.image : '', (v) => {
             const choice = toOneOf()[index]!
             if (v) choice.image = v
             else delete choice.image
@@ -349,11 +367,11 @@ export default defineComponent({
       const content: VNode[] = [h('div', { class: 'text-caption text-grey-7 q-mb-sm' }, tr('optionsHelp'))]
       if (mapImage) {
         const image = isObject(n.element.options) ? n.element.options.image : undefined
-        content.push(h('div', { class: 'q-mb-sm' }, [imageInput(typeof image === 'string' ? image : isObject(image) && typeof image.src === 'string' ? image.src : '', (v) => {
+        content.push(h('div', { class: 'q-mb-sm' }, [imageInput('map', typeof image === 'string' ? image : isObject(image) && typeof image.src === 'string' ? image.src : '', (v) => {
           const options: JsonObject = isObject(n.element.options) ? n.element.options : (n.element.options = {})
-          if (isObject(options.image)) options.image.src = v
-          else if (v) options.image = v
-          else delete options.image
+          if (!v) delete options.image
+          else if (isObject(options.image)) options.image.src = v
+          else options.image = v
         }, 'image')]))
       }
       if (settings) {

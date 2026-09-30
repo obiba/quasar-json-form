@@ -439,6 +439,20 @@ describe('images', () => {
     schema: { type: 'object', properties: { pic: { type: 'string', oneOf: [{ const: 'a', title: 'A' }, { const: 'b', title: 'B' }] } } },
     uischema: { type: 'VerticalLayout', elements: [{ type: 'Control', scope: '#/properties/pic', options: { format, ...options } }] },
   })
+  /** clicks the file button of an image input, the file picker giving a PNG of these bytes */
+  const pickFile = async (bytes: Uint8Array<ArrayBuffer>, click: () => Promise<void>) => {
+    const createElement = document.createElement.bind(document)
+    const spy = vi.spyOn(document, 'createElement').mockImplementation((tag: string, options?: ElementCreationOptions) => {
+      const element = createElement(tag, options)
+      if (tag === 'input') {
+        Object.defineProperty(element, 'files', { value: [new File([bytes], 'b.png', { type: 'image/png' })] })
+        element.click = () => (element as HTMLInputElement).onchange!(new Event('change'))
+      }
+      return element
+    })
+    await click()
+    spy.mockRestore()
+  }
   const imageField = (wrapper: any, title: string) => wrapper.findAll('.q-builder-section').find((c: any) => c.text().startsWith(title))!
     .findAll('label.q-field').find((f: any) => f.find('.q-field__label').exists() && f.find('.q-field__label').text() === (title === 'Choices' ? 'Image' : 'image'))
 
@@ -451,19 +465,15 @@ describe('images', () => {
     await flush()
     expect(lastEmitted(wrapper).schema.properties.pic.oneOf[0]).toEqual({ const: 'a', title: 'A', image: 'https://example.org/a.png' })
     // a local file, read as a data URI
-    const createElement = document.createElement.bind(document)
-    const spy = vi.spyOn(document, 'createElement').mockImplementation((tag: string, options?: ElementCreationOptions) => {
-      const element = createElement(tag, options)
-      if (tag === 'input') {
-        Object.defineProperty(element, 'files', { value: [new File([new Uint8Array([1, 2, 3])], 'b.png', { type: 'image/png' })] })
-        element.click = () => (element as HTMLInputElement).onchange!(new Event('change'))
-      }
-      return element
-    })
-    const choices = wrapper.findAll('.q-builder-section').find((c: any) => c.text().startsWith('Choices'))!
-    await choices.findAll('.q-field__append .q-btn')[1]!.trigger('click')
-    spy.mockRestore()
+    const choices = () => wrapper.findAll('.q-builder-section').find((c: any) => c.text().startsWith('Choices'))!
+    await pickFile(new Uint8Array([1, 2, 3]), () => choices().findAll('.q-field__append .q-btn')[1]!.trigger('click'))
     await vi.waitFor(() => expect(lastEmitted(wrapper).schema.properties.pic.oneOf[1].image).toBe('data:image/png;base64,AQID'))
+    // a file too large to be embedded is refused
+    const emitted = wrapper.emitted('update:modelValue')!.length
+    await pickFile(new Uint8Array(600_000), () => choices().findAll('.q-field__append .q-btn')[0]!.trigger('click'))
+    await flush()
+    expect(wrapper.emitted('update:modelValue')!.length).toBe(emitted)
+    expect(choices().find('.q-field--error').text()).toContain('File too large')
     wrapper.unmount()
   })
 
@@ -481,6 +491,13 @@ describe('images', () => {
     await coords()[1]!.find('input').setValue('5,')
     await flush()
     expect(lastEmitted(wrapper).schema.properties.pic.oneOf[1].area).toEqual({ shape: 'rect', coords: '5,' })
+    // numbers without spaces too, the coordinates removed when emptied
+    await coords()[1]!.find('input').setValue('5,6,7')
+    await flush()
+    expect(lastEmitted(wrapper).schema.properties.pic.oneOf[1].area).toEqual({ shape: 'rect', coords: [5, 6, 7] })
+    await coords()[1]!.find('input').setValue('')
+    await flush()
+    expect(lastEmitted(wrapper).schema.properties.pic.oneOf[1].area).toEqual({ shape: 'rect' })
     wrapper.unmount()
   })
 
@@ -494,6 +511,10 @@ describe('images', () => {
     await field.find('input').setValue('new.png')
     await flush()
     expect(lastEmitted(wrapper).uischema!.elements[0].options.image).toEqual({ src: 'new.png', width: 100, height: 50 })
+    // cleared: no image left
+    await field.find('input').setValue('')
+    await flush()
+    expect(lastEmitted(wrapper).uischema!.elements[0].options.image).toBeUndefined()
     wrapper.unmount()
   })
 })
