@@ -441,7 +441,7 @@ export default defineComponent({
       content.push(columns([
         ruleInput(n, 'visible', tr('visible'), tr('visibleHint')),
         n.kind === 'control' ? ruleInput(n, 'enabled', tr('enabled'), tr('enabledHint')) : null,
-        format === 'computed' ? ruleInput(n, 'compute', tr('compute')) : null,
+        format === 'computed' ? ruleInput(n, 'compute', tr('compute'), tr('computeHint')) : null,
       ]))
       if (n.kind === 'control') {
         const validation: JsonObject[] = Array.isArray(rules.validation) ? rules.validation : []

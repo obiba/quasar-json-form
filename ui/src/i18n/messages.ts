@@ -177,6 +177,7 @@ const en: FormMessages = {
     visible: 'Visible when',
     visibleHint: 'The element is hidden when false, and the data of a hidden control is cleared. Example: country == "CA"',
     compute: 'Computed value',
+    computeHint: 'The value written into the data, re-evaluated whenever the form data changes. Example: quantity * price',
   },
 }
 
@@ -341,6 +342,7 @@ const fr: FormMessages = {
     visible: 'Visible si',
     visibleHint: 'L\'élément est masqué si faux, et les données d\'un champ masqué sont effacées. Exemple : country == "CA"',
     compute: 'Valeur calculée',
+    computeHint: 'La valeur enregistrée dans les données, réévaluée à chaque changement des données du formulaire. Exemple : quantity * price',
   },
 }
 
