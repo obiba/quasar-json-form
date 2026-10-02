@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { h, provide, toRef, defineComponent, computed, ref, watch, inject, unref, markRaw, toRaw } from 'vue'
+import { h, provide, toRef, defineComponent, computed, ref, shallowRef, watch, inject, unref, markRaw, toRaw } from 'vue'
 import type { PropType } from 'vue'
 import { JsonForms } from '@jsonforms/vue'
 import { createAjv } from '@jsonforms/core'
@@ -11,7 +11,7 @@ import '@jsonforms/vue-vanilla/vanilla.css'
 import { useFormI18n } from '../composables/useFormI18n'
 import { provideFormErrorRegistry } from '../composables/useFormErrors'
 import { useRules } from '../composables/useRules'
-import { collectHiddenPaths, filterHiddenErrors } from '../utils/visibility'
+import { collectHiddenPaths, filterHiddenErrors, unsetDataPath } from '../utils/visibility'
 import { I18N_KEY, LANGUAGES_KEY, LOCALE_KEY } from '../composables/keys'
 import type { FormI18nOverride } from '../composables/useFormI18n'
 import type { LanguagesInput } from '../composables/useControlProperties'
@@ -254,12 +254,26 @@ export default defineComponent({
         : generateDefaultUISchema(props.schema)
     })
 
-    const currentData = ref<any>(props.modelValue)
+    // the data given to JSON Forms: the model, or the model without the values just hidden
+    const currentData = shallowRef<any>(props.modelValue)
     watch(() => props.modelValue, (data) => { currentData.value = data })
     const { evaluateRule } = useRules(currentData)
     const hiddenPaths = computed<string[]>(() =>
       collectHiddenPaths(generatedUischema.value, props.schema, (rule) => evaluateRule(rule, true) === true),
     )
+
+    // A control hidden by a `visible` rule loses its value, as with
+    // angular-schema-form: the renderers clear their own value when their own
+    // rule hides them, but the controls of a hidden layout are unmounted
+    // without clearing, so the paths newly hidden are removed from the data here.
+    watch(hiddenPaths, (paths, previous) => {
+      const newlyHidden = paths.filter((path) => !previous.includes(path))
+      if (newlyHidden.length === 0) return
+      const data = newlyHidden.reduce((acc, path) => unsetDataPath(acc, path), currentData.value)
+      if (data === currentData.value) return
+      currentData.value = data
+      emit('update:modelValue', data)
+    })
 
     // Errors found by the renderers themselves, merged with the AJV ones.
     // The AJV errors of the controls hidden by a `visible` rule (their own or
@@ -303,7 +317,7 @@ export default defineComponent({
       class: 'json-form-wrapper',
     }, [
       h(JsonForms, {
-        data: props.modelValue,
+        data: currentData.value,
         schema: props.schema,
         uischema: generatedUischema.value,
         renderers: renderers.value,
