@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import { defineComponent, h } from 'vue'
+import { describe, it, expect, vi } from 'vitest'
+import { defineComponent, h, isReactive, reactive } from 'vue'
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
 import { rankWith, isStringControl, optionIs, and } from '@jsonforms/core'
 import { mountForm, flush } from './utils'
@@ -75,6 +75,26 @@ describe('renderers prop', () => {
     const wrapper = mountForm({ modelValue: { name: 'plain' }, schema, uischema, renderers })
     await flush()
     expect(wrapper.find('.color-renderer').exists()).toBe(false)
+    wrapper.unmount()
+  })
+})
+
+describe('tester ranks', () => {
+  it('are not computed again on a data change, and testers get raw schemas', async () => {
+    const tester = vi.fn((uischema: any, schema: any) => {
+      expect(isReactive(uischema) || isReactive(schema)).toBe(false)
+      return -1
+    })
+    const wrapper = mountForm({ modelValue: { name: 'x' }, schema: reactive(schema), uischema: reactive(uischema), renderers: [{ renderer: ColorRenderer, tester }] })
+    await flush()
+    const calls = tester.mock.calls.length
+    expect(calls).toBeGreaterThan(0)
+
+    await wrapper.setProps({ modelValue: { name: 'y' } })
+    await wrapper.find('input').setValue('z')
+    await flush()
+    expect(wrapper.emitted('update:modelValue')).toBeTruthy()
+    expect(tester.mock.calls.length).toBe(calls)
     wrapper.unmount()
   })
 })
