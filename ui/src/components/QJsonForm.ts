@@ -284,14 +284,24 @@ export default defineComponent({
 
     // The schemas given to JSON Forms and walked on every change: never
     // reactive proxies, on which each key enumeration of the testers
-    // (lodash `isEmpty`, `resolveSchema`) goes through the proxy traps
-    const schema = computed<any>(() => markRaw(toRaw(props.schema)))
+    // (lodash `isEmpty`, `resolveSchema`) goes through the proxy traps.
+    // Marked raw copies, so that the caller's objects stay reactive, renewed
+    // on an in-place change of a reactive schema (which also resets the
+    // cached tester ranks, keyed by the root schema).
+    const schemaVersion = ref(0)
+    watch(() => [props.schema, props.uischema], () => { schemaVersion.value++ }, { deep: true })
+    const rawCopy = (value: any): any => markRaw({ ...toRaw(value) })
+    const schema = computed<any>(() => {
+      void schemaVersion.value
+      return rawCopy(props.schema)
+    })
     // if uiSchema is not provided, generate a default one
-    const generatedUischema = computed(() => markRaw(toRaw(
-      props.uischema && Object.keys(props.uischema).length > 0
-        ? props.uischema
-        : generateDefaultUISchema(schema.value),
-    )))
+    const generatedUischema = computed(() => {
+      void schemaVersion.value
+      return props.uischema && Object.keys(props.uischema).length > 0
+        ? rawCopy(props.uischema)
+        : markRaw(generateDefaultUISchema(schema.value))
+    })
 
     // the data given to JSON Forms: the model, or the model without the values just hidden
     const currentData = shallowRef<any>(props.modelValue)
