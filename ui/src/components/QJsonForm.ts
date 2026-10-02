@@ -22,6 +22,41 @@ import type { FormTranslations } from '../utils/i18n'
 // The Quasar renderers, with the vanilla ones as a fallback
 const builtinRenderers = Object.freeze([...vanillaRenderers, ...qRenderers])
 
+// key of the tester ranks computed without a config
+const NO_CONFIG = {}
+
+/**
+ * A renderer entry whose tester rank is cached by config, UI schema element
+ * and schema: JSON Forms re-runs every tester of every element on each data
+ * change, while a rank only depends on these and on the root schema (the
+ * cache is reset when it changes).
+ */
+function memoizeTester(entry: JsonFormsRendererRegistryEntry): JsonFormsRendererRegistryEntry {
+  let ranks = new WeakMap<object, WeakMap<object, WeakMap<object, number>>>()
+  let rootSchema: unknown
+  const tester: JsonFormsRendererRegistryEntry['tester'] = (uischema, schema, context) => {
+    const config = (context as any)?.config ?? NO_CONFIG
+    if (!uischema || !schema || typeof uischema !== 'object' || typeof schema !== 'object' || typeof config !== 'object') {
+      return entry.tester(uischema, schema, context)
+    }
+    if (context?.rootSchema !== rootSchema) {
+      ranks = new WeakMap()
+      rootSchema = context?.rootSchema
+    }
+    let byUischema = ranks.get(config)
+    if (!byUischema) ranks.set(config, (byUischema = new WeakMap()))
+    let bySchema = byUischema.get(uischema)
+    if (!bySchema) byUischema.set(uischema, (bySchema = new WeakMap()))
+    let rank = bySchema.get(schema)
+    if (rank === undefined) {
+      rank = entry.tester(uischema, schema, context)
+      bySchema.set(schema, rank)
+    }
+    return rank
+  }
+  return { renderer: entry.renderer, tester }
+}
+
 /**
  * Custom `format` values understood by the renderers: registered on the
  * default AJV instance as always valid, so that AJV does not warn about them.
@@ -247,11 +282,25 @@ export default defineComponent({
       }
     }
 
+    // The schemas given to JSON Forms and walked on every change: never
+    // reactive proxies, on which each key enumeration of the testers
+    // (lodash `isEmpty`, `resolveSchema`) goes through the proxy traps.
+    // Marked raw copies, so that the caller's objects stay reactive, renewed
+    // on an in-place change of a reactive schema (which also resets the
+    // cached tester ranks, keyed by the root schema).
+    const schemaVersion = ref(0)
+    watch(() => [props.schema, props.uischema], () => { schemaVersion.value++ }, { deep: true })
+    const rawCopy = (value: any): any => markRaw({ ...toRaw(value) })
+    const schema = computed<any>(() => {
+      void schemaVersion.value
+      return rawCopy(props.schema)
+    })
     // if uiSchema is not provided, generate a default one
     const generatedUischema = computed(() => {
+      void schemaVersion.value
       return props.uischema && Object.keys(props.uischema).length > 0
-        ? props.uischema
-        : generateDefaultUISchema(props.schema)
+        ? rawCopy(props.uischema)
+        : markRaw(generateDefaultUISchema(schema.value))
     })
 
     // the data given to JSON Forms: the model, or the model without the values just hidden
@@ -259,7 +308,7 @@ export default defineComponent({
     watch(() => props.modelValue, (data) => { currentData.value = data })
     const { evaluateRule } = useRules(currentData)
     const hiddenPaths = computed<string[]>(() =>
-      collectHiddenPaths(generatedUischema.value, props.schema, (rule) => evaluateRule(rule, true) === true),
+      collectHiddenPaths(generatedUischema.value, schema.value, (rule) => evaluateRule(rule, true) === true),
     )
 
     // A control hidden by a `visible` rule loses its value, as with
@@ -310,7 +359,7 @@ export default defineComponent({
     // Frozen, so that JSON Forms does not make the array (and the components
     // in it) reactive; the raw prop for the same reason
     const renderers = computed<readonly JsonFormsRendererRegistryEntry[]>(
-      () => Object.freeze([...toRaw(props.renderers), ...builtinRenderers]),
+      () => Object.freeze([...toRaw(props.renderers), ...builtinRenderers].map(memoizeTester)),
     )
 
     return () => h('div', {
@@ -318,7 +367,7 @@ export default defineComponent({
     }, [
       h(JsonForms, {
         data: currentData.value,
-        schema: props.schema,
+        schema: schema.value,
         uischema: generatedUischema.value,
         renderers: renderers.value,
         readonly: props.readonly,
