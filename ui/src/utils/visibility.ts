@@ -81,3 +81,25 @@ export function filterHiddenErrors<T extends ErrorObject>(errors: T[], hiddenPat
     return !hiddenPaths.some((hidden) => path === hidden || path.startsWith(hidden + '/'))
   })
 }
+
+/**
+ * A copy of `data` without the value at the data path (`/a/b`), the objects
+ * along the path copied, or `data` itself when there is no value there.
+ */
+export function unsetDataPath(data: any, path: string): any {
+  const segments = path.split('/').slice(1).map((s) => s.replace(/~1/g, '/').replace(/~0/g, '~'))
+  const unset = (value: any, index: number): any => {
+    if (value === null || typeof value !== 'object') return value
+    const key = segments[index]!
+    if (!Object.prototype.hasOwnProperty.call(value, key)) return value
+    if (index === segments.length - 1) {
+      if (Array.isArray(value)) return value
+      const { [key]: _removed, ...rest } = value
+      return rest
+    }
+    const child = unset(value[key], index + 1)
+    if (child === value[key]) return value
+    return Array.isArray(value) ? Object.assign([...value], { [key]: child }) : { ...value, [key]: child }
+  }
+  return segments.length ? unset(data, 0) : data
+}
