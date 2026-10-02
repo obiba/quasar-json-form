@@ -1,6 +1,7 @@
 import { h, computed, watch, defineComponent, onMounted, onUnmounted } from 'vue'
 import type { VNode } from 'vue'
-import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
+import { rendererProps } from '@jsonforms/vue'
+import { useControl } from '../composables/useControl'
 import { QOptionGroup } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
 
@@ -8,7 +9,7 @@ export default defineComponent({
   name: 'QOptionsRenderer',
   props: rendererProps(),
   setup(props: any) {
-    const controlResult = useJsonFormsControl(props)
+    const controlResult = useControl(props)
 
     const control = controlResult.control
 

@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { h, watch, defineComponent, ref, computed, reactive } from 'vue'
 import type { VNode } from 'vue'
-import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
+import { rendererProps } from '@jsonforms/vue'
+import { useControl } from '../composables/useControl'
 import { QBtn, QList, QItem, QItemSection, QIcon, QLinearProgress } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
 import { useFormI18n } from '../composables/useFormI18n'
@@ -61,7 +62,7 @@ export default defineComponent({
   setup(props: any) {
     const { t, translate } = useFormI18n()
 
-    const controlResult = useJsonFormsControl(props)
+    const controlResult = useControl(props)
 
     const control = controlResult.control
 

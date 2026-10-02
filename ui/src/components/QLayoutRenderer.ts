@@ -1,6 +1,8 @@
 import { h, computed, defineComponent } from 'vue'
-import { DispatchRenderer, rendererProps, useJsonFormsControl } from '@jsonforms/vue'
+import { rendererProps } from '@jsonforms/vue'
+import QDispatchRenderer from './QDispatchRenderer'
 import { useControlProperties } from '../composables/useControlProperties'
+import { useLayoutControl } from '../composables/useControl'
 
 /**
  * VerticalLayout / HorizontalLayout renderer.
@@ -16,7 +18,7 @@ export default defineComponent({
   name: 'QLayoutRenderer',
   props: rendererProps(),
   setup(props: any) {
-    const controlResult = useJsonFormsControl(props)
+    const controlResult = useLayoutControl(props)
 
     const control = controlResult.control
 
@@ -37,7 +39,7 @@ export default defineComponent({
       return h('div', {
         class: [isHorizontal.value ? 'q-horizontal-layout' : 'q-vertical-layout', rootClass.value],
       }, elements.value.map((element: any, index: number) =>
-        h(DispatchRenderer, {
+        h(QDispatchRenderer, {
           key: `${props.path}-${index}`,
           schema: props.schema,
           uischema: element,

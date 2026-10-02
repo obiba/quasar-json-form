@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { h, computed, watch, defineComponent, inject, ref, unref } from 'vue'
-import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
+import { rendererProps } from '@jsonforms/vue'
+import { useControl } from '../composables/useControl'
 import { QSelect } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
 import type { SelectOption } from '../composables/useControlProperties'
@@ -22,7 +23,7 @@ export default defineComponent({
   setup(props: any) {
     const { t, locale } = useFormI18n()
 
-    const controlResult = useJsonFormsControl(props)
+    const controlResult = useControl(props)
 
     const control = controlResult.control
 

@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { h, computed, watch, defineComponent, onMounted, onUnmounted } from 'vue'
 import type { VNode } from 'vue'
-import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
+import { rendererProps } from '@jsonforms/vue'
+import { useControl } from '../composables/useControl'
 import { QImg, QIcon, QBtn, useQuasar } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
 import { useFormI18n } from '../composables/useFormI18n'
@@ -66,7 +67,7 @@ export default defineComponent({
   setup(props: any) {
     const $q = useQuasar()
 
-    const controlResult = useJsonFormsControl(props)
+    const controlResult = useControl(props)
 
     const control = controlResult.control
 

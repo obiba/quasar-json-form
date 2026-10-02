@@ -1,5 +1,6 @@
 import { h, watch, defineComponent, ref, computed } from 'vue'
-import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
+import { rendererProps } from '@jsonforms/vue'
+import { useControl } from '../composables/useControl'
 import { QInput, QIcon, QPopupProxy, QTime, QBtn } from 'quasar'
 import type { QPopupProxy as QPopupProxyInstance } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
@@ -14,7 +15,7 @@ export default defineComponent({
 
     const popupRef = ref<QPopupProxyInstance | null>(null)
 
-    const controlResult = useJsonFormsControl(props)
+    const controlResult = useControl(props)
 
     const control = controlResult.control
 

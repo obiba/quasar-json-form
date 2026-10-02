@@ -1,8 +1,10 @@
 import { h, computed, ref, defineComponent } from 'vue'
-import { DispatchRenderer, rendererProps, useJsonFormsControl } from '@jsonforms/vue'
+import { rendererProps } from '@jsonforms/vue'
+import QDispatchRenderer from './QDispatchRenderer'
 import { QStepper, QStep, QStepperNavigation, QBtn } from 'quasar'
 import { useFormI18n } from '../composables/useFormI18n'
 import { useControlProperties } from '../composables/useControlProperties'
+import { useLayoutControl } from '../composables/useControl'
 
 export default defineComponent({
   name: 'QStepperLayout',
@@ -10,7 +12,7 @@ export default defineComponent({
   setup(props: any) {
     const { t } = useFormI18n()
 
-    const controlResult = useJsonFormsControl(props)
+    const controlResult = useLayoutControl(props)
 
     const control = controlResult.control
 
@@ -40,7 +42,7 @@ export default defineComponent({
         title: t(name),
         icon: icons.value ? icons.value[index] : undefined,
       }, () => [
-        h(DispatchRenderer, {
+        h(QDispatchRenderer, {
           schema: props.schema,
           uischema: elements.value[index],
           path: props.path,

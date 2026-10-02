@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { h, watch, defineComponent } from 'vue'
-import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
+import { rendererProps } from '@jsonforms/vue'
+import { useControl } from '../composables/useControl'
 import { useControlProperties } from '../composables/useControlProperties'
 import { omitOptions, RENDERER_OPTION_KEYS } from '../utils/options'
 import QMarkdownEditor from './QMarkdownEditor'
@@ -13,7 +14,7 @@ export default defineComponent({
   name: 'QMarkdownRenderer',
   props: rendererProps(),
   setup(props: any) {
-    const controlResult = useJsonFormsControl(props)
+    const controlResult = useControl(props)
 
     const control = controlResult.control
 
