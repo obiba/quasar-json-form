@@ -8,50 +8,80 @@ import type { ErrorObject } from 'ajv'
  * layout, evaluated against the current form data. A control found under a
  * hidden element is hidden whatever its own rule says.
  *
- * The rules of the elements of a list item (`options.items`) are relative to
- * the item data and are not evaluated here: a hidden list hides its items
- * through its own path.
+ * The elements of each list item (the item UI schema, scopes relative to the
+ * item schema) are walked too, their paths under the item path (`/list/0/b`).
+ * As when rendered, their rules are evaluated against the form data.
  */
 export function collectHiddenPaths(
   uischema: any,
   schema: any,
   evaluate: (rule: string) => boolean,
+  data?: any,
 ): string[] {
   const hidden: string[] = []
 
-  const visibleRule = (element: any): string | undefined => {
-    const fromUischema = element.rules && element.rules.visible
-    if (fromUischema) return fromUischema
-    if (element.type === 'Control' && typeof element.scope === 'string') {
-      const property = safeResolve(schema, element.scope)
-      return property && property.rules && property.rules.visible
-    }
-    return undefined
-  }
-
-  const walk = (element: any, ancestorHidden: boolean): void => {
+  // element: UI schema element, base: schema its scope is relative to, prefix: data path of base
+  const walk = (element: any, base: any, prefix: string, ancestorHidden: boolean): void => {
     if (!element || typeof element !== 'object') return
-    const rule = visibleRule(element)
+    const property = element.type === 'Control' && typeof element.scope === 'string'
+      ? safeResolve(base, element.scope, schema)
+      : undefined
+    const rule = (element.rules && element.rules.visible) || (property && property.rules && property.rules.visible)
     const isHidden = ancestorHidden || (typeof rule === 'string' && rule.length > 0 && evaluate(rule) !== true)
     if (element.type === 'Control') {
-      if (isHidden && typeof element.scope === 'string') {
-        const path = toDataPath(element.scope)
+      if (typeof element.scope !== 'string') return
+      const path = prefix + toDataPath(element.scope)
+      if (isHidden) {
         if (path) hidden.push(path)
+        return
+      }
+      const value = getDataPath(data, path)
+      if (Array.isArray(value) && property && property.items && typeof property.items === 'object') {
+        const itemUischema = listItemUischema(element, property.items)
+        value.forEach((_item, index) => walk(itemUischema, property.items, `${path}/${index}`, false))
       }
       return
     }
     if (Array.isArray(element.elements)) {
-      element.elements.forEach((child: any) => walk(child, isHidden))
+      element.elements.forEach((child: any) => walk(child, base, prefix, isHidden))
     }
   }
 
-  walk(uischema, false)
+  walk(uischema, schema, '', false)
   return hidden
 }
 
-function safeResolve(schema: any, scope: string): any {
+/**
+ * UI schema of one item of a list control (`options.items`, scopes relative to
+ * the item schema): by default one control per property of an object item, or
+ * the item itself.
+ */
+export function listItemUischema(uischema: any, itemsSchema: any): any {
+  if (uischema?.options?.items) return uischema.options.items
+  const properties = itemsSchema?.properties
+  if (properties && typeof properties === 'object' && !itemsSchema?.format) {
+    return {
+      type: 'VerticalLayout',
+      elements: Object.keys(properties).map((key) => ({
+        type: 'Control',
+        scope: `#/properties/${key}`,
+      })),
+    }
+  }
+  return { type: 'Control', scope: '#', label: false }
+}
+
+function getDataPath(data: any, path: string): any {
+  return path
+    .split('/')
+    .slice(1)
+    .map((s) => s.replace(/~1/g, '/').replace(/~0/g, '~'))
+    .reduce((value, key) => (value !== null && typeof value === 'object' ? value[key] : undefined), data)
+}
+
+function safeResolve(schema: any, scope: string, rootSchema: any): any {
   try {
-    return resolveSchema(schema, scope, schema)
+    return resolveSchema(schema, scope, rootSchema)
   } catch {
     return undefined
   }

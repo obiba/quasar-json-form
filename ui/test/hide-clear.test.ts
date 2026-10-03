@@ -140,3 +140,63 @@ describe('hidden fields are cleared: edge cases', () => {
     wrapper.unmount()
   })
 })
+
+describe('hidden fields are cleared: list items', () => {
+  const itemSchema = {
+    type: 'object',
+    properties: {
+      flag: { type: 'boolean' },
+      members: {
+        type: 'array',
+        items: { type: 'object', properties: { name: { type: 'string' }, role: { type: 'string' } }, required: ['role'] },
+      },
+    },
+  }
+  const uischema = {
+    type: 'VerticalLayout',
+    elements: [
+      { type: 'Control', scope: '#/properties/flag' },
+      {
+        type: 'Control',
+        scope: '#/properties/members',
+        options: {
+          items: {
+            type: 'VerticalLayout',
+            elements: [
+              { type: 'Control', scope: '#/properties/name' },
+              { type: 'Group', label: 'Role', rules: { visible: 'flag == true' }, elements: [{ type: 'Control', scope: '#/properties/role' }] },
+            ],
+          },
+        },
+      },
+    ],
+  }
+
+  it('clears the values of a hidden layout inside each item', async () => {
+    const emitted: any[] = []
+    const wrapper = mountForm({
+      schema: itemSchema,
+      uischema,
+      modelValue: { flag: true, members: [{ name: 'a', role: 'r' }, { name: 'b', role: 's' }] },
+      'onUpdate:modelValue': (data: any) => emitted.push(data),
+    })
+    await flush(5)
+    await wrapper.setProps({ modelValue: { flag: false, members: [{ name: 'a', role: 'r' }, { name: 'b', role: 's' }] } })
+    await flush(10)
+    expect(emitted[emitted.length - 1]).toEqual({ flag: false, members: [{ name: 'a' }, { name: 'b' }] })
+    wrapper.unmount()
+  })
+
+  it('does not report the errors of a hidden layout inside an item', async () => {
+    const errors: any[][] = []
+    const wrapper = mountForm({
+      schema: itemSchema,
+      uischema,
+      modelValue: { flag: false, members: [{ name: 'a' }] },
+      'onUpdate:errors': (e: any[]) => errors.push(e),
+    })
+    await flush(10)
+    expect(errors[errors.length - 1] ?? []).toEqual([])
+    wrapper.unmount()
+  })
+})
