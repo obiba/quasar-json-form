@@ -1,9 +1,9 @@
 import { h, defineComponent } from 'vue'
-import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
+import { rendererProps } from '@jsonforms/vue'
 import { rankWith, isStringControl, optionIs, and } from '@jsonforms/core'
 import type { ControlElement, JsonFormsRendererRegistryEntry } from '@jsonforms/core'
 import { QColor } from 'quasar'
-import { useControlProperties, omitOptions } from 'ui'
+import { useControl, useControlProperties, omitOptions } from 'ui'
 import type { RendererApi } from 'ui/catalog'
 
 /** A string control with `options.format: "color"`, edited with a QColor palette. */
@@ -11,7 +11,7 @@ const QColorRenderer = defineComponent({
   name: 'QColorRenderer',
   props: rendererProps<ControlElement>(),
   setup (props) {
-    const { control, handleChange } = useJsonFormsControl(props)
+    const { control, handleChange } = useControl(props)
     const { isVisible, isEnabled, isReadonly, rootClass, hasError, errorMessage, options, renderHeader, renderHint } =
       useControlProperties(control)
 

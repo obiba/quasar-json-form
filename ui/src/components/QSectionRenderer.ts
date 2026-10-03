@@ -1,6 +1,7 @@
 import { h, defineComponent } from 'vue'
-import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
+import { rendererProps } from '@jsonforms/vue'
 import { useControlProperties } from '../composables/useControlProperties'
+import { useLayoutControl } from '../composables/useControl'
 import { useFormI18n } from '../composables/useFormI18n'
 import { renderMarkdown, renderMarkdownInline } from '../utils/markdown'
 
@@ -11,7 +12,7 @@ export default defineComponent({
   setup(props: any) {
     const { t } = useFormI18n()
     
-    const controlResult = useJsonFormsControl(props)
+    const controlResult = useLayoutControl(props)
 
     const control = controlResult.control
 
@@ -28,7 +29,7 @@ export default defineComponent({
       const uischema = control.value.uischema as any
 
       // the heading: `label` (JSON Forms convention), `title` accepted too
-      const label = control.value.label || uischema.label || uischema.title
+      const label = uischema.label || uischema.title
       if (label) {
         children.push(h('div', {
           class: ['q-form-label', uischema.labelClass],
@@ -36,10 +37,10 @@ export default defineComponent({
         }))
       }
 
-      if (control.value.description || uischema.description) {
+      if (uischema.description) {
         children.push(h('div', {
           class: ['q-form-description text-markdown', uischema.descriptionClass],
-          innerHTML: renderMarkdown(t(String(control.value.description || uischema.description))),
+          innerHTML: renderMarkdown(t(String(uischema.description))),
         }))
       }
 

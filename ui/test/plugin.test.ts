@@ -37,6 +37,7 @@ describe('vue plugin', () => {
     expect(typeof plugin.createFormErrorRegistry).toBe('function')
     expect(typeof plugin.toInstancePath).toBe('function')
     expect(typeof plugin.normalizeLanguages).toBe('function')
+    expect(typeof plugin.useControl).toBe('function')
     expect(typeof plugin.useControlProperties).toBe('function')
     expect(typeof plugin.useFormI18n).toBe('function')
     expect(typeof plugin.useReportedErrors).toBe('function')

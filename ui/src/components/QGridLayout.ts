@@ -1,7 +1,9 @@
 import { h, computed, defineComponent } from 'vue'
-import { DispatchRenderer, rendererProps, useJsonFormsControl } from '@jsonforms/vue'
+import { rendererProps } from '@jsonforms/vue'
+import QDispatchRenderer from './QDispatchRenderer'
 import { useQuasar } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
+import { useLayoutControl } from '../composables/useControl'
 import { gridContainerStyle, gridCellStyle } from '../utils/grid'
 import type { Breakpoint } from '../utils/grid'
 
@@ -21,7 +23,7 @@ export default defineComponent({
   setup(props: any) {
     const $q = useQuasar()
 
-    const controlResult = useJsonFormsControl(props)
+    const controlResult = useLayoutControl(props)
 
     const control = controlResult.control
 
@@ -50,7 +52,7 @@ export default defineComponent({
           class: 'q-grid-layout__cell',
           style: gridCellStyle(element?.options?.grid, screen.value),
         }, [
-          h(DispatchRenderer, {
+          h(QDispatchRenderer, {
             schema: props.schema,
             uischema: element,
             path: props.path,

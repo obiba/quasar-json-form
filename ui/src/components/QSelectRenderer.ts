@@ -1,5 +1,6 @@
 import { h, computed, watch, defineComponent, onUnmounted } from 'vue'
-import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
+import { rendererProps } from '@jsonforms/vue'
+import { useControl } from '../composables/useControl'
 import { QSelect } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
 import { omitOptions } from '../utils/options'
@@ -8,7 +9,7 @@ export default defineComponent({
   name: 'QSelectRenderer',
   props: rendererProps(),
   setup(props: any) {
-    const controlResult = useJsonFormsControl(props)
+    const controlResult = useControl(props)
 
     const control = controlResult.control
 

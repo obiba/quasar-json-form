@@ -1,8 +1,10 @@
 import { h, computed, ref, defineComponent } from 'vue'
-import { DispatchRenderer, rendererProps, useJsonFormsControl } from '@jsonforms/vue'
+import { rendererProps } from '@jsonforms/vue'
+import QDispatchRenderer from './QDispatchRenderer'
 import { QTabs, QTab, QTabPanels, QTabPanel, QSeparator } from 'quasar'
 import { useFormI18n } from '../composables/useFormI18n'
 import { useControlProperties } from '../composables/useControlProperties'
+import { useLayoutControl } from '../composables/useControl'
 
 export default defineComponent({
   name: 'QTabsLayout',
@@ -10,7 +12,7 @@ export default defineComponent({
   setup(props: any) {
     const { t } = useFormI18n()
 
-    const controlResult = useJsonFormsControl(props)
+    const controlResult = useLayoutControl(props)
 
     const control = controlResult.control
 
@@ -67,7 +69,7 @@ export default defineComponent({
           h(QTabPanel, {
             name: String(index),
           }, () => [
-            h(DispatchRenderer, {
+            h(QDispatchRenderer, {
               schema: props.schema,
               uischema: elements.value[index],
               path: props.path,

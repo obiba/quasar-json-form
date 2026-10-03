@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { h, watch, defineComponent, ref, computed, inject, onMounted } from 'vue'
-import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
+import { rendererProps } from '@jsonforms/vue'
+import { useControl } from '../composables/useControl'
 import { QInput, QIcon, QPopupProxy, QDate, QBtn, date as qdate } from 'quasar'
 import type { QPopupProxy as QPopupProxyInstance } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
@@ -40,7 +41,7 @@ export default defineComponent({
     const popupRef = ref<QPopupProxyInstance | null>(null)
     const formData = inject<any>(DATA_KEY, ref({}))
 
-    const controlResult = useJsonFormsControl(props)
+    const controlResult = useControl(props)
 
     const control = controlResult.control
 

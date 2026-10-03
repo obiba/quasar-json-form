@@ -38,9 +38,11 @@ or a widget without data) is matched with `uiTypeIs`.
 
 ## Component
 
-The component is written like the built-in ones: `rendererProps` and `useJsonFormsControl` from
-`@jsonforms/vue` give the resolved `control` (its `path`, `data`, `schema`, `uischema`, `errors`,
-`required`...) and the `handleChange(path, value)` function to store a value. The
+The component is written like the built-in ones: `rendererProps` from `@jsonforms/vue` and the
+`useControl` composable of the library give the resolved `control` (its `path`, `data`, `schema`,
+`uischema`, `errors`, `required`...) and the `handleChange(path, value)` function to store a value.
+`useControl` is `useJsonFormsControl` of `@jsonforms/vue` whose `control` only changes when one of
+its entries does, so that the control is not rendered again on every change of the form. The
 `useControlProperties(control)` composable of the library then evaluates the rules and prepares
 what every control displays:
 

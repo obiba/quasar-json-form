@@ -1,6 +1,8 @@
 import { h, computed, watch, defineComponent, ref } from 'vue'
 import { createDefaultValue, composePaths } from '@jsonforms/core'
-import { DispatchRenderer, rendererProps, useJsonFormsControl } from '@jsonforms/vue'
+import { rendererProps } from '@jsonforms/vue'
+import { useControl } from '../composables/useControl'
+import QDispatchRenderer from './QDispatchRenderer'
 import { QList, QItem, QItemSection, QBtn, QDialog, QCard, QCardSection, QCardActions } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
 import { useFormI18n } from '../composables/useFormI18n'
@@ -14,7 +16,7 @@ export default defineComponent({
   props: rendererProps(),
   setup(props: any) {
     const { t } = useFormI18n()
-    const controlResult = useJsonFormsControl(props)
+    const controlResult = useControl(props)
 
     const control = controlResult.control
 
@@ -187,7 +189,7 @@ export default defineComponent({
         }, () => items.value.map((_item: any, index: number) =>
           h(QItem, { key: index }, () => [
             h(QItemSection, { class: 'q-pa-sm' }, () => [
-              h(DispatchRenderer, {
+              h(QDispatchRenderer, {
                 schema: itemsSchema.value as any,
                 uischema: itemsUiSchema.value,
                 path: composePaths(control.value.path, `${index}`),

@@ -1,6 +1,8 @@
 import { h, defineComponent } from 'vue'
-import { DispatchRenderer, rendererProps, useJsonFormsControl } from '@jsonforms/vue'
+import { rendererProps } from '@jsonforms/vue'
+import QDispatchRenderer from './QDispatchRenderer'
 import { useControlProperties } from '../composables/useControlProperties'
+import { useLayoutControl } from '../composables/useControl'
 import { useFormI18n } from '../composables/useFormI18n'
 import { renderMarkdown } from '../utils/markdown'
 
@@ -11,7 +13,7 @@ export default defineComponent({
   setup(props: any) {
     const { t } = useFormI18n()
     
-    const controlResult = useJsonFormsControl(props)
+    const controlResult = useLayoutControl(props)
 
     const control = controlResult.control
 
@@ -38,8 +40,8 @@ export default defineComponent({
         }))
       }
 
-      if (control.value.description || (control.value.uischema as any).description) {
-        let description = t(String(control.value.description || (control.value.uischema as any).description))
+      if ((control.value.uischema as any).description) {
+        let description = t(String((control.value.uischema as any).description))
         description = renderMarkdown(description)
         children.push(h('div', {
           class: 'q-form-description' + ((control.value.uischema as any).descriptionClass ? ` ${(control.value.uischema as any).descriptionClass}` : ''),
@@ -48,7 +50,7 @@ export default defineComponent({
       }
 
       ((control.value.uischema as any)?.elements || []).forEach((element: any) => {
-        children.push(h(DispatchRenderer, {
+        children.push(h(QDispatchRenderer, {
           schema: props.schema,
           uischema: element,
           path: control.value.path,
