@@ -46,6 +46,7 @@ import { ruleEngine, RuleEngine } from './composables/useRules'
 import { createFormErrorRegistry, toInstancePath, useReportedErrors } from './composables/useFormErrors'
 import type { FormErrorRegistry } from './composables/useFormErrors'
 import { normalizeLanguages, useControlProperties } from './composables/useControlProperties'
+import { useControl } from './composables/useControl'
 import type { Language, LanguagesInput, ControlPropertiesReturn, SelectOption } from './composables/useControlProperties'
 import { useFormI18n } from './composables/useFormI18n'
 import type { FormI18n, FormI18nOverride } from './composables/useFormI18n'
@@ -154,6 +155,7 @@ export {
   toInstancePath,
   useReportedErrors,
   normalizeLanguages,
+  useControl,
   useControlProperties,
   useFormI18n,
   omitOptions,
