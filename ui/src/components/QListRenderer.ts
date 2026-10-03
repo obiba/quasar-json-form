@@ -7,6 +7,7 @@ import { QList, QItem, QItemSection, QBtn, QDialog, QCard, QCardSection, QCardAc
 import { useControlProperties } from '../composables/useControlProperties'
 import { useFormI18n } from '../composables/useFormI18n'
 import { omitOptions, RENDERER_OPTION_KEYS } from '../utils/options'
+import { listItemUischema } from '../utils/visibility'
 
 /** options interpreted by the list renderer, not passed to QList */
 const LIST_OPTION_KEYS = [...RENDERER_OPTION_KEYS, 'addLabel', 'addIcon', 'class']
@@ -120,22 +121,7 @@ export default defineComponent({
     }
 
     const itemsSchema = computed(() => control.value.schema.items)
-    // UI schema of one item (`options.items`, scopes relative to the item schema): by
-    // default one control per property of an object item, or the item itself
-    const itemsUiSchema = computed(() => {
-      if (control.value.uischema.options?.items) return control.value.uischema.options.items
-      const properties = (itemsSchema.value as any)?.properties
-      if (properties && typeof properties === 'object' && !(itemsSchema.value as any)?.format) {
-        return {
-          type: 'VerticalLayout',
-          elements: Object.keys(properties).map((key) => ({
-            type: 'Control',
-            scope: `#/properties/${key}`,
-          }))
-        }
-      }
-      return { type: 'Control', scope: '#', label: false }
-    })
+    const itemsUiSchema = computed(() => listItemUischema(control.value.uischema, itemsSchema.value))
 
     const addLabel = computed(() => {
       const label = options.value.addLabel || (control.value as any).addLabel

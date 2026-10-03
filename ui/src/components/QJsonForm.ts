@@ -308,7 +308,7 @@ export default defineComponent({
     watch(() => props.modelValue, (data) => { currentData.value = data })
     const { evaluateRule } = useRules(currentData)
     const hiddenPaths = computed<string[]>(() =>
-      collectHiddenPaths(generatedUischema.value, schema.value, (rule) => evaluateRule(rule, true) === true),
+      collectHiddenPaths(generatedUischema.value, schema.value, (rule) => evaluateRule(rule, true) === true, currentData.value),
     )
 
     // A control hidden by a `visible` rule loses its value, as with
