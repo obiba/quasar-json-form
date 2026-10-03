@@ -76,19 +76,12 @@
             }
           },
           {
-            "type": "VerticalLayout",
-            "elements": [
-              {
-                "type": "Control",
-                "scope": "#/properties/_objectives",
-                "hint": "harmonization-initiative.objectives-help",
-                "options": {
-                  "marked": true,
-                  "rows": 3
-                }
-              }
-            ],
+            "type": "Control",
+            "scope": "#/properties/_objectives",
+            "hint": "harmonization-initiative.objectives-help",
             "options": {
+              "marked": true,
+              "rows": 3,
               "class": "col-6"
             }
           }
@@ -104,25 +97,15 @@
             "type": "VerticalLayout",
             "elements": [
               {
-                "type": "VerticalLayout",
-                "elements": [
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/startYear"
-                  }
-                ],
+                "type": "Control",
+                "scope": "#/properties/startYear",
                 "options": {
                   "class": "col-12 col-md-6"
                 }
               },
               {
-                "type": "VerticalLayout",
-                "elements": [
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/endYear"
-                  }
-                ],
+                "type": "Control",
+                "scope": "#/properties/endYear",
                 "options": {
                   "class": "col-12 col-md-6"
                 }

@@ -426,14 +426,9 @@
             "type": "VerticalLayout",
             "elements": [
               {
-                "type": "VerticalLayout",
-                "elements": [
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/projectWebsite",
-                    "hint": "data-access-amendment.default.I.C.website-help"
-                  }
-                ],
+                "type": "Control",
+                "scope": "#/properties/projectWebsite",
+                "hint": "data-access-amendment.default.I.C.website-help",
                 "options": {
                   "class": "col-6"
                 }

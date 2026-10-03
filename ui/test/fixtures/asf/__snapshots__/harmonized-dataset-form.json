@@ -124,26 +124,16 @@
             "type": "VerticalLayout",
             "elements": [
               {
-                "type": "VerticalLayout",
-                "elements": [
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/version",
-                    "hint": "harmonization-protocol.version-help"
-                  }
-                ],
+                "type": "Control",
+                "scope": "#/properties/version",
+                "hint": "harmonization-protocol.version-help",
                 "options": {
                   "class": "col-12 col-md-6"
                 }
               },
               {
-                "type": "VerticalLayout",
-                "elements": [
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/participants"
-                  }
-                ],
+                "type": "Control",
+                "scope": "#/properties/participants",
                 "options": {
                   "class": "col-12 col-md-6"
                 }
@@ -162,34 +152,20 @@
             "type": "VerticalLayout",
             "elements": [
               {
-                "type": "VerticalLayout",
-                "elements": [
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/qualitativeQuantitative",
-                    "hint": "harmonization-protocol.qualitative-quantitative.help",
-                    "options": {
-                      "format": "radio"
-                    }
-                  }
-                ],
+                "type": "Control",
+                "scope": "#/properties/qualitativeQuantitative",
+                "hint": "harmonization-protocol.qualitative-quantitative.help",
                 "options": {
+                  "format": "radio",
                   "class": "col-12 col-md-6"
                 }
               },
               {
-                "type": "VerticalLayout",
-                "elements": [
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/prospectiveRetrospective",
-                    "hint": "harmonization-protocol.prospective-retrospective.help",
-                    "options": {
-                      "format": "radio"
-                    }
-                  }
-                ],
+                "type": "Control",
+                "scope": "#/properties/prospectiveRetrospective",
+                "hint": "harmonization-protocol.prospective-retrospective.help",
                 "options": {
+                  "format": "radio",
                   "class": "col-12 col-md-6"
                 }
               }

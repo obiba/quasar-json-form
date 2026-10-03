@@ -68,44 +68,30 @@
             "type": "VerticalLayout",
             "elements": [
               {
-                "type": "VerticalLayout",
-                "elements": [
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/startDate",
-                    "hint": "research-project.default.status.start-help",
-                    "options": {
-                      "validationMessage": "research-project.default.status.date-error",
-                      "dateOptions": {
-                        "dateFormat": "yyyy-MM-dd"
-                      }
-                    }
-                  }
-                ],
+                "type": "Control",
+                "scope": "#/properties/startDate",
+                "hint": "research-project.default.status.start-help",
                 "options": {
+                  "validationMessage": "research-project.default.status.date-error",
+                  "dateOptions": {
+                    "dateFormat": "yyyy-MM-dd"
+                  },
                   "class": "col-6"
                 }
               },
               {
-                "type": "VerticalLayout",
-                "elements": [
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/endDate",
-                    "hint": "research-project.default.status.end-help",
-                    "options": {
-                      "validationMessage": "research-project.default.status.date-error",
-                      "dateOptions": {
-                        "dateFormat": "yyyy-MM-dd"
-                      }
-                    },
-                    "rules": {
-                      "min": "startDate"
-                    }
-                  }
-                ],
+                "type": "Control",
+                "scope": "#/properties/endDate",
+                "hint": "research-project.default.status.end-help",
                 "options": {
+                  "validationMessage": "research-project.default.status.date-error",
+                  "dateOptions": {
+                    "dateFormat": "yyyy-MM-dd"
+                  },
                   "class": "col-6"
+                },
+                "rules": {
+                  "min": "startDate"
                 }
               }
             ],
