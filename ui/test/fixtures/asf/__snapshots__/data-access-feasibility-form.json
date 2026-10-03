@@ -185,13 +185,8 @@
                 }
               },
               {
-                "type": "VerticalLayout",
-                "elements": [
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/grantCompetition"
-                  }
-                ],
+                "type": "Control",
+                "scope": "#/properties/grantCompetition",
                 "options": {
                   "class": "col-6"
                 }
@@ -294,25 +289,15 @@
         "type": "Group",
         "elements": [
           {
-            "type": "VerticalLayout",
-            "elements": [
-              {
-                "type": "VerticalLayout",
-                "elements": [
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/projectTitle"
-                  },
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/projectObjectives",
-                    "options": {
-                      "rows": 3
-                    }
-                  }
-                ]
-              }
-            ]
+            "type": "Control",
+            "scope": "#/properties/projectTitle"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/projectObjectives",
+            "options": {
+              "rows": 3
+            }
           }
         ]
       },
@@ -329,35 +314,25 @@
         "type": "Group",
         "elements": [
           {
-            "type": "VerticalLayout",
-            "elements": [
-              {
-                "type": "VerticalLayout",
-                "elements": [
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/datasets",
-                    "options": {
-                      "rows": 3
-                    }
-                  },
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/selectionCriteria",
-                    "options": {
-                      "rows": 3
-                    }
-                  },
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/studyDesign",
-                    "options": {
-                      "rows": 3
-                    }
-                  }
-                ]
-              }
-            ]
+            "type": "Control",
+            "scope": "#/properties/datasets",
+            "options": {
+              "rows": 3
+            }
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/selectionCriteria",
+            "options": {
+              "rows": 3
+            }
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/studyDesign",
+            "options": {
+              "rows": 3
+            }
           }
         ]
       },
@@ -378,42 +353,32 @@
         "type": "Group",
         "elements": [
           {
-            "type": "VerticalLayout",
-            "elements": [
-              {
-                "type": "VerticalLayout",
-                "elements": [
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/biospecimensType",
-                    "options": {
-                      "rows": 3
-                    }
-                  },
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/biospecimensSelectionCriteria",
-                    "options": {
-                      "rows": 3
-                    }
-                  },
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/biospecimensPreAnalyticalCharacteristics",
-                    "options": {
-                      "rows": 3
-                    }
-                  },
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/biospecimensAnalyzeMethods",
-                    "options": {
-                      "rows": 3
-                    }
-                  }
-                ]
-              }
-            ]
+            "type": "Control",
+            "scope": "#/properties/biospecimensType",
+            "options": {
+              "rows": 3
+            }
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/biospecimensSelectionCriteria",
+            "options": {
+              "rows": 3
+            }
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/biospecimensPreAnalyticalCharacteristics",
+            "options": {
+              "rows": 3
+            }
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/biospecimensAnalyzeMethods",
+            "options": {
+              "rows": 3
+            }
           }
         ],
         "rules": {
@@ -433,21 +398,11 @@
         "type": "Group",
         "elements": [
           {
-            "type": "VerticalLayout",
-            "elements": [
-              {
-                "type": "VerticalLayout",
-                "elements": [
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/linkage",
-                    "options": {
-                      "rows": 3
-                    }
-                  }
-                ]
-              }
-            ]
+            "type": "Control",
+            "scope": "#/properties/linkage",
+            "options": {
+              "rows": 3
+            }
           }
         ]
       }

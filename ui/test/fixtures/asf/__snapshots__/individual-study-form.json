@@ -536,19 +536,12 @@
             }
           },
           {
-            "type": "VerticalLayout",
-            "elements": [
-              {
-                "type": "Control",
-                "scope": "#/properties/_objectives",
-                "hint": "study.objectives-help",
-                "options": {
-                  "marked": true,
-                  "rows": 3
-                }
-              }
-            ],
+            "type": "Control",
+            "scope": "#/properties/_objectives",
+            "hint": "study.objectives-help",
             "options": {
+              "marked": true,
+              "rows": 3,
               "class": "col-6"
             }
           }
@@ -620,54 +613,44 @@
             "type": "VerticalLayout",
             "elements": [
               {
-                "type": "VerticalLayout",
-                "elements": [
-                  {
-                    "type": "Label",
-                    "text": "<h4>study.design</h4>"
-                  },
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/methods/properties/design",
-                    "label": false,
-                    "hint": "study_taxonomy.vocabulary.methods-design.description",
-                    "options": {
-                      "format": "radio"
-                    }
-                  },
-                  {
-                    "type": "VerticalLayout",
-                    "elements": [
-                      {
-                        "type": "Control",
-                        "scope": "#/properties/methods/properties/otherDesign",
-                        "rules": {
-                          "visible": "methods.design == \"other\""
-                        }
-                      }
-                    ],
-                    "options": {
-                      "class": "hoffset3"
-                    }
-                  },
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/methods/properties/followUpInfo",
-                    "hint": "study.follow-up-help",
-                    "options": {
-                      "rows": 3,
-                      "marked": true
-                    }
-                  },
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/methods/properties/info",
-                    "options": {
-                      "rows": 3,
-                      "marked": true
-                    }
-                  }
-                ]
+                "type": "Label",
+                "text": "<h4>study.design</h4>"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/methods/properties/design",
+                "label": false,
+                "hint": "study_taxonomy.vocabulary.methods-design.description",
+                "options": {
+                  "format": "radio"
+                }
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/methods/properties/otherDesign",
+                "rules": {
+                  "visible": "methods.design == \"other\""
+                },
+                "options": {
+                  "class": "hoffset3"
+                }
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/methods/properties/followUpInfo",
+                "hint": "study.follow-up-help",
+                "options": {
+                  "rows": 3,
+                  "marked": true
+                }
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/methods/properties/info",
+                "options": {
+                  "rows": 3,
+                  "marked": true
+                }
               }
             ],
             "options": {
@@ -691,16 +674,11 @@
                 }
               },
               {
-                "type": "VerticalLayout",
-                "elements": [
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/methods/properties/otherRecruitment",
-                    "rules": {
-                      "visible": "contains(methods.recruitments, \"other\")"
-                    }
-                  }
-                ],
+                "type": "Control",
+                "scope": "#/properties/methods/properties/otherRecruitment",
+                "rules": {
+                  "visible": "contains(methods.recruitments, \"other\")"
+                },
                 "options": {
                   "class": "hoffset3"
                 }
@@ -710,43 +688,28 @@
                 "text": "<h4>numberOfParticipants.label</h4>"
               },
               {
-                "type": "VerticalLayout",
-                "elements": [
-                  {
-                    "type": "VerticalLayout",
-                    "elements": [
-                      {
-                        "type": "Control",
-                        "scope": "#/properties/numberOfParticipants/properties/participant/properties/number"
-                      },
-                      {
-                        "type": "Control",
-                        "scope": "#/properties/numberOfParticipants/properties/participant/properties/noLimit"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "VerticalLayout",
-                    "elements": [
-                      {
-                        "type": "Control",
-                        "scope": "#/properties/numberOfParticipants/properties/sample/properties/number"
-                      },
-                      {
-                        "type": "Control",
-                        "scope": "#/properties/numberOfParticipants/properties/sample/properties/noLimit"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/numberOfParticipants/properties/info",
-                    "options": {
-                      "rows": 3,
-                      "marked": true
-                    }
-                  }
-                ]
+                "type": "Control",
+                "scope": "#/properties/numberOfParticipants/properties/participant/properties/number"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/numberOfParticipants/properties/participant/properties/noLimit"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/numberOfParticipants/properties/sample/properties/number"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/numberOfParticipants/properties/sample/properties/noLimit"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/numberOfParticipants/properties/info",
+                "options": {
+                  "rows": 3,
+                  "marked": true
+                }
               }
             ],
             "options": {
@@ -785,21 +748,14 @@
                     "label": false
                   },
                   {
-                    "type": "VerticalLayout",
-                    "elements": [
-                      {
-                        "type": "Control",
-                        "scope": "#/properties/otherAccess",
-                        "options": {
-                          "rows": 2
-                        },
-                        "rules": {
-                          "visible": "access.access_other == \"yes\""
-                        }
-                      }
-                    ],
+                    "type": "Control",
+                    "scope": "#/properties/otherAccess",
                     "options": {
+                      "rows": 2,
                       "class": "hoffset3"
+                    },
+                    "rules": {
+                      "visible": "access.access_other == \"yes\""
                     }
                   }
                 ],
@@ -861,13 +817,8 @@
             }
           },
           {
-            "type": "VerticalLayout",
-            "elements": [
-              {
-                "type": "Control",
-                "scope": "#/properties/access_restrictions"
-              }
-            ],
+            "type": "Control",
+            "scope": "#/properties/access_restrictions",
             "options": {
               "class": "col-12"
             },
@@ -893,81 +844,76 @@
                     "type": "VerticalLayout",
                     "elements": [
                       {
-                        "type": "VerticalLayout",
-                        "elements": [
-                          {
-                            "type": "Label",
-                            "text": "<label>study_taxonomy.vocabulary.access_data.title</label>"
-                          },
-                          {
-                            "type": "Control",
-                            "scope": "#/properties/access_permission_data",
-                            "label": false
-                          },
-                          {
-                            "type": "Label",
-                            "text": "<label>study_taxonomy.vocabulary.access_bio_samples.title</label>"
-                          },
-                          {
-                            "type": "Control",
-                            "scope": "#/properties/access_permission_biological_samples",
-                            "label": false
-                          },
-                          {
-                            "type": "Label",
-                            "text": "<label>study.access.access_permission_additional_info.label</label>"
-                          },
-                          {
-                            "type": "Control",
-                            "scope": "#/properties/access_permission_additional_info",
-                            "label": false,
-                            "options": {
-                              "rows": 2
-                            }
-                          }
-                        ],
-                        "options": {
-                          "class": "col-6"
-                        }
+                        "type": "Label",
+                        "text": "<label>study_taxonomy.vocabulary.access_data.title</label>"
                       },
                       {
-                        "type": "VerticalLayout",
-                        "elements": [
-                          {
-                            "type": "Label",
-                            "text": "<label>study.access.access_restrictions.transfer.title</label>"
-                          },
-                          {
-                            "type": "Control",
-                            "scope": "#/properties/access_data_can_leave"
-                          },
-                          {
-                            "type": "Control",
-                            "scope": "#/properties/access_biological_samples_can_leave"
-                          },
-                          {
-                            "type": "Label",
-                            "text": "<label>study.access.access_special_conditions_to_leave.label</label>"
-                          },
-                          {
-                            "type": "Control",
-                            "scope": "#/properties/access_special_conditions_to_leave",
-                            "label": false,
-                            "options": {
-                              "rows": 2
-                            }
-                          }
-                        ],
+                        "type": "Control",
+                        "scope": "#/properties/access_permission_data",
+                        "label": false
+                      },
+                      {
+                        "type": "Label",
+                        "text": "<label>study_taxonomy.vocabulary.access_bio_samples.title</label>"
+                      },
+                      {
+                        "type": "Control",
+                        "scope": "#/properties/access_permission_biological_samples",
+                        "label": false
+                      },
+                      {
+                        "type": "Label",
+                        "text": "<label>study.access.access_permission_additional_info.label</label>"
+                      },
+                      {
+                        "type": "Control",
+                        "scope": "#/properties/access_permission_additional_info",
+                        "label": false,
                         "options": {
-                          "class": "col-6"
+                          "rows": 2
                         }
                       }
                     ],
                     "options": {
-                      "class": "row q-col-gutter-md"
+                      "class": "col-6"
+                    }
+                  },
+                  {
+                    "type": "VerticalLayout",
+                    "elements": [
+                      {
+                        "type": "Label",
+                        "text": "<label>study.access.access_restrictions.transfer.title</label>"
+                      },
+                      {
+                        "type": "Control",
+                        "scope": "#/properties/access_data_can_leave"
+                      },
+                      {
+                        "type": "Control",
+                        "scope": "#/properties/access_biological_samples_can_leave"
+                      },
+                      {
+                        "type": "Label",
+                        "text": "<label>study.access.access_special_conditions_to_leave.label</label>"
+                      },
+                      {
+                        "type": "Control",
+                        "scope": "#/properties/access_special_conditions_to_leave",
+                        "label": false,
+                        "options": {
+                          "rows": 2
+                        }
+                      }
+                    ],
+                    "options": {
+                      "class": "col-6"
                     }
                   }
-                ]
+                ],
+                "options": {
+                  "class": "row q-col-gutter-md"
+                }
               }
             ],
             "options": {
@@ -978,13 +924,8 @@
             }
           },
           {
-            "type": "VerticalLayout",
-            "elements": [
-              {
-                "type": "Control",
-                "scope": "#/properties/access_fees"
-              }
-            ],
+            "type": "Control",
+            "scope": "#/properties/access_fees",
             "options": {
               "class": "col-12"
             },
@@ -1040,33 +981,28 @@
                     "type": "VerticalLayout",
                     "elements": [
                       {
-                        "type": "VerticalLayout",
-                        "elements": [
-                          {
-                            "type": "Label",
-                            "text": "<label>study.access.access_cost_reduction_consideration_specification.title</label>"
-                          },
-                          {
-                            "type": "Control",
-                            "scope": "#/properties/access_cost_reduction_consideration_specification",
-                            "label": false,
-                            "options": {
-                              "rows": 2
-                            }
-                          },
-                          {
-                            "type": "Label",
-                            "text": "<label>study.access.access_cost_additional_information.title</label>"
-                          },
-                          {
-                            "type": "Control",
-                            "scope": "#/properties/access_cost_additional_information",
-                            "label": false,
-                            "options": {
-                              "rows": 2
-                            }
-                          }
-                        ]
+                        "type": "Label",
+                        "text": "<label>study.access.access_cost_reduction_consideration_specification.title</label>"
+                      },
+                      {
+                        "type": "Control",
+                        "scope": "#/properties/access_cost_reduction_consideration_specification",
+                        "label": false,
+                        "options": {
+                          "rows": 2
+                        }
+                      },
+                      {
+                        "type": "Label",
+                        "text": "<label>study.access.access_cost_additional_information.title</label>"
+                      },
+                      {
+                        "type": "Control",
+                        "scope": "#/properties/access_cost_additional_information",
+                        "label": false,
+                        "options": {
+                          "rows": 2
+                        }
                       }
                     ],
                     "options": {

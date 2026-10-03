@@ -266,7 +266,7 @@ class Converter {
   convert(definition: unknown): Record<string, any> {
     const items = Array.isArray(definition) ? definition : []
     this.collectExplicitKeys(items)
-    return { type: 'VerticalLayout', elements: this.convertItems(items, { prefix: [] }) }
+    return flatten({ type: 'VerticalLayout', elements: this.convertItems(items, { prefix: [] }) })
   }
 
   /**
@@ -565,6 +565,44 @@ class Converter {
     if (Object.keys(options).length > 0) element.options = options
     return element
   }
+}
+
+/** layouts whose children are laid out by the class (Quasar grid) rather than stacked */
+const GRID_CLASS = /(^|\s)(row|column|flex)(\s|$)/
+
+/** stacks its children vertically: a nested plain vertical layout adds nothing */
+function isStacking(element: any): boolean {
+  return ['VerticalLayout', 'Group', 'Category'].includes(element.type) && !GRID_CLASS.test(element.options?.class ?? '')
+}
+
+/**
+ * Removes the layout levels that render the same without them: a plain
+ * vertical layout inside a stacking one is replaced by its elements, a
+ * vertical layout of a single element passes its class and visible rule to
+ * that element (when it has none of its own).
+ */
+function flatten(element: any): any {
+  if (Array.isArray(element.elements)) {
+    const children = element.elements.map((child: any) => hoist(flatten(child)))
+    element.elements = isStacking(element)
+      ? children.flatMap((child: any) => (child.type === 'VerticalLayout' && !child.options && !child.rules ? child.elements : [child]))
+      : children
+  }
+  if (element.options?.items) element.options.items = hoist(flatten(element.options.items))
+  return element
+}
+
+function hoist(element: any): any {
+  if (element.type !== 'VerticalLayout' || element.elements?.length !== 1) return element
+  const child = element.elements[0]
+  const cls = element.options?.class
+  const visible = element.rules?.visible
+  const otherOptions = Object.keys(element.options ?? {}).some((name) => name !== 'class')
+  const otherRules = Object.keys(element.rules ?? {}).some((name) => name !== 'visible')
+  if (otherOptions || otherRules || (cls && (GRID_CLASS.test(cls) || child.options?.class)) || (visible && child.rules?.visible)) return element
+  if (cls) child.options = { ...child.options, class: cls }
+  if (visible) child.rules = { ...child.rules, visible }
+  return child
 }
 
 /** true when the array schema is rendered by a widget (files, countries...) rather than as a list */

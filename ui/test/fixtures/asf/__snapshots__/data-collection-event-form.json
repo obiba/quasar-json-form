@@ -187,30 +187,18 @@
         "type": "VerticalLayout",
         "elements": [
           {
-            "type": "VerticalLayout",
-            "elements": [
-              {
-                "type": "Control",
-                "scope": "#/properties/_id",
-                "options": {
-                  "validationMessage": {
-                    "uniqueId": "global.messages.error.unique-id"
-                  }
-                }
-              }
-            ],
+            "type": "Control",
+            "scope": "#/properties/_id",
             "options": {
+              "validationMessage": {
+                "uniqueId": "global.messages.error.unique-id"
+              },
               "class": "col-6"
             }
           },
           {
-            "type": "VerticalLayout",
-            "elements": [
-              {
-                "type": "Control",
-                "scope": "#/properties/_name"
-              }
-            ],
+            "type": "Control",
+            "scope": "#/properties/_name",
             "options": {
               "class": "col-6"
             }
@@ -224,18 +212,11 @@
         "type": "VerticalLayout",
         "elements": [
           {
-            "type": "VerticalLayout",
-            "elements": [
-              {
-                "type": "Control",
-                "scope": "#/properties/_description",
-                "options": {
-                  "marked": true,
-                  "rows": 3
-                }
-              }
-            ],
+            "type": "Control",
+            "scope": "#/properties/_description",
             "options": {
+              "marked": true,
+              "rows": 3,
               "class": "col-12"
             }
           }
@@ -325,18 +306,11 @@
         "type": "VerticalLayout",
         "elements": [
           {
-            "type": "VerticalLayout",
-            "elements": [
-              {
-                "type": "Control",
-                "scope": "#/properties/dataSources",
-                "hint": "study_taxonomy.vocabulary.populations-dataCollectionEvents-dataSources.description",
-                "options": {
-                  "format": "checkbox"
-                }
-              }
-            ],
+            "type": "Control",
+            "scope": "#/properties/dataSources",
+            "hint": "study_taxonomy.vocabulary.populations-dataCollectionEvents-dataSources.description",
             "options": {
+              "format": "checkbox",
               "class": "col-6"
             }
           },

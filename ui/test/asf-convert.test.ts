@@ -105,7 +105,21 @@ describe('ASF converter', () => {
     expect(row.options.class).toBe('row q-col-gutter-md')
     expect(row.elements[0].options.class).toBe('col-6')
     expect(row.elements[1].options.class).toBe('col-12 col-md-6 offset-3 hoffset3')
-    expect(row.elements[1].elements[0].scope).toBe('#/properties/email')
+    // a single-element section passes its class to the element
+    expect(row.elements[1].scope).toBe('#/properties/email')
+  })
+
+  it('removes the layout levels that render the same without them', () => {
+    const { uischema } = convert(schema, [
+      { type: 'fieldset', title: 'G', items: [{ type: 'section', items: ['name', { type: 'section', items: ['email'] }] }] },
+      { type: 'section', condition: 'model.name', items: [{ key: 'notes', condition: 'model.email' }] },
+      { type: 'section', htmlClass: 'row', items: [{ type: 'section', items: ['gender', 'tags'] }] },
+    ], quiet)
+    expect(uischema.elements[0].elements.map((e: any) => e.scope)).toEqual(['#/properties/name', '#/properties/email'])
+    // both have a visible rule: kept
+    expect(uischema.elements[1].type).toBe('VerticalLayout')
+    // a grid row keeps its plain column
+    expect(uischema.elements[2].elements[0].elements).toHaveLength(2)
   })
 
   it('honours the rowClass option', () => {
@@ -295,7 +309,7 @@ describe('ASF converter', () => {
       { key: 'staff', readonly: true },
     ], quiet)
     expect(lists.elements[0].options.items.elements[0].options).toEqual({ readonly: true })
-    expect(lists.elements[0].options.items.elements[1].elements[0].options).toEqual({ readonly: true })
+    expect(lists.elements[0].options.items.elements[1].options).toEqual({ readonly: true })
     expect(lists.elements[1].options.items.options).toEqual({ readonly: true })
     expect(lists.elements[2].options.items.elements.every((e: any) => e.options?.readonly === true)).toBe(true)
   })
