@@ -83,6 +83,34 @@ describe('hidden fields are cleared', () => {
   })
 })
 
+describe('disabled fields are cleared', () => {
+  it('rule on the control itself or on the enclosing layout', async () => {
+    const data = await hideAndGetData({
+      type: 'VerticalLayout',
+      elements: [
+        { type: 'Control', scope: '#/properties/flag' },
+        { ...list, rules: { enabled: 'flag == true' } },
+        { type: 'VerticalLayout', rules: { enabled: 'flag == true' }, elements: [note] },
+      ],
+    })
+    expect(data).toBeDefined()
+    expect(data.members).toBeUndefined()
+    expect(data.note).toBeUndefined()
+  })
+
+  it('a broken enabled rule does not clear', async () => {
+    const data = await hideAndGetData({
+      type: 'VerticalLayout',
+      elements: [
+        { type: 'Control', scope: '#/properties/flag' },
+        { ...note, rules: { enabled: 'flag ==' } },
+      ],
+    })
+    // nothing is emitted when nothing is cleared
+    expect(data === undefined || data.note === 'y').toBe(true)
+  })
+})
+
 describe('hidden fields are cleared: edge cases', () => {
   const nestedSchema = {
     type: 'object',

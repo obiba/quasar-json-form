@@ -311,9 +311,10 @@ export default defineComponent({
       collectHiddenPaths(generatedUischema.value, schema.value, (rule) => evaluateRule(rule, true) === true, currentData.value),
     )
 
-    // A control hidden by a `visible` rule loses its value, as with
-    // angular-schema-form: the renderers clear their own value when their own
-    // rule hides them, but the controls of a hidden layout are unmounted
+    // A control hidden by a `visible` rule, or disabled by an `enabled` rule,
+    // loses its value, as with angular-schema-form and Amber: the renderers
+    // clear their own value when their own rule hides them, but the controls
+    // of a hidden layout are unmounted and the disabled ones stay mounted
     // without clearing, so the paths newly hidden are removed from the data here.
     watch(hiddenPaths, (paths, previous) => {
       const newlyHidden = paths.filter((path) => !previous.includes(path))

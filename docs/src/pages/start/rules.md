@@ -17,7 +17,7 @@ and sections.
 | Rule | Type | Effect |
 |---|---|---|
 | `visible` | boolean | Hide the element when false; the data of a hidden control is cleared |
-| `enabled` | boolean | Disable the control when false |
+| `enabled` | boolean | Disable the element when false; as when hidden, the data of a disabled control is cleared and its errors are not reported |
 | `validation` | `[{ expr, message }]` | Each expression must be true, else `message` (translated) is displayed and reported with the `validation` keyword |
 | `min` / `max` | value | Bounds for [dates](#/controls/date), [lists](#/controls/list) and [file uploads](#/controls/file-upload) |
 | `compute` | value | Value of a [computed](#/controls/computed) control |

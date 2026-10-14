@@ -4,9 +4,11 @@ import type { ErrorObject } from 'ajv'
 
 /**
  * Data paths (`/a/b`, JSON pointer style like the AJV `instancePath`) of the
- * controls hidden by a `visible` rule, their own or the rule of an enclosing
- * layout, evaluated against the current form data. A control found under a
- * hidden element is hidden whatever its own rule says.
+ * controls hidden by a `visible` rule or disabled by an `enabled` rule, their
+ * own or the rule of an enclosing layout, evaluated against the current form
+ * data. A control found under a hidden element is hidden whatever its own rule
+ * says. Disabled controls count as hidden: their value is cleared and their
+ * errors are not reported.
  *
  * The elements of each list item (the item UI schema, scopes relative to the
  * item schema) are walked too, their paths under the item path (`/list/0/b`).
@@ -26,8 +28,11 @@ export function collectHiddenPaths(
     const property = element.type === 'Control' && typeof element.scope === 'string'
       ? safeResolve(base, element.scope, schema)
       : undefined
-    const rule = (element.rules && element.rules.visible) || (property && property.rules && property.rules.visible)
-    const isHidden = ancestorHidden || (typeof rule === 'string' && rule.length > 0 && evaluate(rule) !== true)
+    const fails = (name: 'visible' | 'enabled'): boolean => {
+      const rule = (element.rules && element.rules[name]) || (property && property.rules && property.rules[name])
+      return typeof rule === 'string' && rule.length > 0 && evaluate(rule) !== true
+    }
+    const isHidden = ancestorHidden || fails('visible') || fails('enabled')
     if (element.type === 'Control') {
       if (typeof element.scope !== 'string') return
       const path = prefix + toDataPath(element.scope)
