@@ -13,6 +13,7 @@ import { omitOptions, RENDERER_OPTION_KEYS } from '../utils/options'
  * `options.values` (strings or `{ label, value }`), or the schema `examples`
  * / `enum`. The value must be one of the suggestions unless
  * `options.editable` is true (then any typed text is accepted with Enter).
+ * On an array property, several values are selected and displayed as chips.
  */
 export default defineComponent({
   name: 'QTypeaheadRenderer',
@@ -43,6 +44,8 @@ export default defineComponent({
         })
     })
 
+    const isMultiple = computed(() => (control.value.schema as any).type === 'array')
+
     const filtered = ref<SelectOption[]>([])
     watch(allOptions, (value) => { filtered.value = value }, { immediate: true })
 
@@ -56,7 +59,8 @@ export default defineComponent({
     }
 
     const onChange = (value: any) => {
-      controlResult.handleChange(control.value.path, value === '' || value === null ? undefined : value)
+      const empty = value === '' || value === null || (Array.isArray(value) && value.length === 0)
+      controlResult.handleChange(control.value.path, empty ? undefined : value)
     }
 
     watch(
@@ -78,14 +82,16 @@ export default defineComponent({
         h(QSelect, {
           ...omitOptions(options.value, [...RENDERER_OPTION_KEYS, 'class']),
           class: 'q-typeahead',
-          modelValue: control.value.data ?? null,
+          modelValue: control.value.data ?? (isMultiple.value ? [] : null),
           'onUpdate:modelValue': onChange,
           label: inputLabel.value,
           options: filtered.value,
           onFilter,
           useInput: true,
-          fillInput: true,
-          hideSelected: true,
+          multiple: isMultiple.value,
+          useChips: isMultiple.value,
+          fillInput: !isMultiple.value,
+          hideSelected: !isMultiple.value,
           inputDebounce: 0,
           newValueMode: options.value.editable === true ? 'add-unique' : undefined,
           error: hasError.value,

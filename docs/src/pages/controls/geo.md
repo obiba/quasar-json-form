@@ -30,6 +30,11 @@ source. The tiles are displayed in a scale of greys (inverted in dark mode) so t
 `height`, `precision` and `grayscale`:
 `<QJsonForm :config="{ geo: { tiles: { url, attributions }, center: [lon, lat], zoom: 6 } }" />`.
 
+`options.feature: true` stores the geometry wrapped in a GeoJSON Feature,
+`{ "type": "Feature", "geometry": {...}, "properties": null }`; a Feature value is read whatever the
+option. Several features are a [list](#/controls/list) of geo items:
+`{ "type": "array", "items": { "type": "object", "format": "geo" } }`.
+
 ## Point
 
 When a point is allowed, latitude and longitude inputs under the map show the value and accept

@@ -84,6 +84,27 @@ describe('RuleEngine built-in functions', () => {
     expect(evaluate('truthy(a)', { a: [] })).toBe(true)
   })
 
+  it('now and parseDate', () => {
+    vi.spyOn(Date, 'now').mockReturnValue(Date.parse('2026-01-01'))
+    expect(evaluate('parseDate(d) > now()', { d: '2026-06-01' })).toBe(true)
+    expect(evaluate('parseDate(d) > now()', { d: '2025-06-01' })).toBe(false)
+    expect(evaluate('parseDate(d) > now()', {})).toBe(false)
+    expect(Number.isNaN(evaluate('parseDate(d)', { d: 'nope' }))).toBe(true)
+  })
+
+  it('map with an object mapping, a thresholds array, arrays and undefined', () => {
+    expect(evaluate("map(v, { '1': 'yes', '0': 'no' })", { v: 1 })).toBe('yes')
+    expect(evaluate("map(v, { '1': 'yes', '*': 'other' })", { v: 3 })).toBe('other')
+    expect(evaluate("map(v, { '1': 'yes' })", { v: 3 })).toBe(3)
+    // below 10: low, below 20: mid, at least 20: high
+    const thresholds = "[10, 'low', 20, 'mid', 20, 'high']"
+    expect(evaluate(`map(v, ${thresholds})`, { v: 5 })).toBe('low')
+    expect(evaluate(`map(v, ${thresholds})`, { v: 15 })).toBe('mid')
+    expect(evaluate(`map(v, ${thresholds})`, { v: 25 })).toBe('high')
+    expect(evaluate(`map(v, ${thresholds})`, { v: [5, 25] })).toEqual(['low', 'high'])
+    expect(evaluate(`map(v, ${thresholds}, 'none')`, {})).toBe('none')
+  })
+
   it('supports dot access on nested data, tolerating missing objects', () => {
     expect(evaluate('person.address.city == "Paris"', { person: { address: { city: 'Paris' } } })).toBe(true)
     expect(evaluate('isUndefined(person.address.city)', { person: {} })).toBe(true)

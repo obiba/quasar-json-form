@@ -121,6 +121,12 @@ const isTypeaheadControl = and(
   hasFormat('typeahead')
 )
 
+const isMultiTypeaheadControl = and(
+  uiTypeIs('Control'),
+  schemaTypeIs('array'),
+  hasFormat('typeahead')
+)
+
 const isDatePickerControl = and(
   uiTypeIs('Control'),
   hasFormat('datepicker', 'ymdatepicker', 'year-month')
@@ -224,6 +230,11 @@ const qRenderers = [
   {
     renderer: QTypeaheadRenderer,
     tester: rankWith(5, isTypeaheadControl),
+  },
+  {
+    renderer: QTypeaheadRenderer,
+    // above the multiple selection, whose items may have an enum
+    tester: rankWith(7, isMultiTypeaheadControl),
   },
   {
     renderer: QLocalizedStringRenderer,

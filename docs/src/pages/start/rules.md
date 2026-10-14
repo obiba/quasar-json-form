@@ -17,6 +17,7 @@ and sections.
 | Rule | Type | Effect |
 |---|---|---|
 | `visible` | boolean | Hide the element when false; the data of a hidden control is cleared |
+| `required` | boolean | Replaces the static `required` of the property: the control is marked and a missing value reported (`required` keyword) while true |
 | `enabled` | boolean | Disable the element when false; as when hidden, the data of a disabled control is cleared and its errors are not reported |
 | `validation` | `[{ expr, message }]` | Each expression must be true, else `message` (translated) is displayed and reported with the `validation` keyword |
 | `min` / `max` | value | Bounds for [dates](#/controls/date), [lists](#/controls/list) and [file uploads](#/controls/file-upload) |
@@ -59,6 +60,9 @@ Assignments and the `this` keyword are rejected, and the data is never mutated b
 | `startsWith(s, p)`, `endsWith(s, s)` | string prefix / suffix |
 | `matches(s, pattern)` | regular expression test (pattern of at most 100 characters) |
 | `wordCount(s)` | number of whitespace-separated words |
+| `now()` | current time in milliseconds, as `Date.now()` |
+| `parseDate(s)` | milliseconds of a date string, as `Date.parse()` (`NaN` when invalid): `parseDate(birth) < now()` |
+| `map(v, mapping, undef)` | recodes `v` (each value of an array): with an object, its entry for `v` or the `'*'` one; with `[stop1, v1, ..., stopN, vN]`, `v1` below `stop1`..., `vN` from `stopN`; `undef` when `v` is undefined; else `v` |
 
 An expression that fails to compile or to evaluate logs an error and counts as `false`, except for
 `visible`: an element whose rule is broken stays visible. The values follow JavaScript: `undefined > 3` is `false` and `undefined % 2 == 0` is

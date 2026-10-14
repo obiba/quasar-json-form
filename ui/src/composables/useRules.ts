@@ -129,6 +129,15 @@ export class RuleEngine {
 
     // truthy(value): JavaScript truthiness
     this.addFunction('truthy', (value: any) => !!value)
+
+    // now(): current time in milliseconds since the epoch, as `Date.now()`
+    this.addFunction('now', () => Date.now())
+
+    // parseDate(value): milliseconds since the epoch of a date string, as `Date.parse()` (NaN when invalid)
+    this.addFunction('parseDate', (value: any) => (typeof value === 'string' ? Date.parse(value) : NaN))
+
+    // map(value, mapping, undefValue): recodes a value (each value of an array)
+    this.addFunction('map', mapValue)
   }
 
   addFunction(name: string, fn: (...args: any[]) => any): void {
@@ -199,6 +208,32 @@ export class RuleEngine {
       return false
     }
   }
+}
+
+/**
+ * Recodes a value, as the `map()` of the Amber computed items:
+ * - `undefined` gives `undefValue`, an array is recoded value by value;
+ * - with an object mapping, the entry of the value (as a string), else the
+ *   `'*'` entry;
+ * - with an array mapping `[stop1, v1, stop2, v2, ..., stopN, vN]`, `v1` when
+ *   the value is below `stop1`, `v2` when below `stop2`..., and `vN` when it
+ *   is at least `stopN`;
+ * - otherwise the value itself.
+ */
+function mapValue(value: any, mapping: any, undefValue?: any): any {
+  if (value === undefined) return undefValue
+  if (Array.isArray(value)) return value.map((v) => mapValue(v, mapping, undefValue))
+  if (Array.isArray(mapping)) {
+    for (let i = 0; i + 1 < mapping.length; i += 2) {
+      const last = i === mapping.length - 2
+      if (last ? value >= mapping[i] : value < mapping[i]) return mapping[i + 1]
+    }
+  } else if (mapping !== null && typeof mapping === 'object') {
+    const key = String(value)
+    if (Object.prototype.hasOwnProperty.call(mapping, key)) return mapping[key]
+    if (Object.prototype.hasOwnProperty.call(mapping, '*')) return mapping['*']
+  }
+  return value
 }
 
 // Singleton instance

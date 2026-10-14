@@ -223,6 +223,35 @@ describe('QGeoRenderer', () => {
     expect((inputs[1]!.props('modelValue'))).toBe('-73.5673')
   })
 
+  it('writes and reads a Feature with feature: true', async () => {
+    const feature = { type: 'Feature', geometry: POINT, properties: null }
+    const wrapper = await mountGeo({ feature: true }, { where: { type: 'Feature', geometry: LINE, properties: null } })
+    const map = lastMap()
+    expect(map.setGeometry).toHaveBeenCalledWith(LINE, true)
+    map.options.onChange(POINT)
+    await flush()
+    expect(lastData(wrapper)).toEqual({ where: feature })
+    // the Feature written is not sent back to the map
+    expect(map.setGeometry).toHaveBeenCalledTimes(1)
+  })
+
+  it('stores several features as a list of geo items', async () => {
+    const feature = (geometry: GeoGeometry) => ({ type: 'Feature', geometry, properties: null })
+    const wrapper = mountForm({
+      schema: { type: 'object', properties: { zones: { type: 'array', items: { type: 'object', format: 'geo' } } } },
+      uischema: uischema({ type: 'Control', scope: '#/properties/zones', options: { items: { type: 'Control', scope: '#', label: false, options: { feature: true } } } }),
+      modelValue: { zones: [feature(POINT), feature(POLYGON)] },
+    })
+    await waitForMaps(2)
+    await flush()
+    expect(maps[0]!.setGeometry).toHaveBeenCalledWith(POINT, true)
+    expect(maps[1]!.setGeometry).toHaveBeenCalledWith(POLYGON, true)
+    maps[1]!.options.onChange(LINE)
+    await flush()
+    expect(lastData(wrapper)).toEqual({ zones: [feature(POINT), feature(LINE)] })
+    wrapper.unmount()
+  })
+
   it('offers one draw mode per allowed kind', async () => {
     let wrapper = await mountGeo()
     expect(modeButtons(wrapper).length).toBe(3)

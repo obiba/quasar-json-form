@@ -483,6 +483,7 @@ export default defineComponent({
       content.push(columns([
         ruleInput(n, 'visible', tr('visible'), tr('visibleHint')),
         n.kind === 'control' ? ruleInput(n, 'enabled', tr('enabled'), tr('enabledHint')) : null,
+        n.kind === 'control' ? ruleInput(n, 'required', tr('requiredRule'), tr('requiredRuleHint')) : null,
         format === 'computed' ? ruleInput(n, 'compute', tr('compute'), tr('computeHint')) : null,
       ]))
       if (n.kind === 'control') {
