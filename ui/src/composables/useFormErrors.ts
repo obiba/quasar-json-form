@@ -12,8 +12,10 @@ export { FORM_ERRORS_KEY }
  * `QJsonForm` can emit them with `update:errors` next to the AJV errors.
  */
 export interface FormErrorRegistry {
-  set(path: string, keyword: string, messages: string[]): void
-  remove(path: string, keyword: string): void
+  /** sets the messages of a path and keyword; `owner` (any value) claims the entry */
+  set(path: string, keyword: string, messages: string[], owner?: unknown): void
+  /** removes the messages of a path and keyword, unless another `owner` claimed the entry since */
+  remove(path: string, keyword: string, owner?: unknown): void
   errors: ComputedRef<ErrorObject[]>
 }
 
@@ -25,11 +27,16 @@ export function toInstancePath(path: string): string {
 
 export function createFormErrorRegistry(): FormErrorRegistry {
   const entries = reactive(new Map<string, ErrorObject[]>())
+  // the last owner of each entry: a renderer mounted again (new UI schema)
+  // reports its errors before the previous instance is unmounted, whose
+  // removal must not drop them
+  const owners = new Map<string, unknown>()
 
   const idOf = (path: string, keyword: string) => `${path}::${keyword}`
 
-  const set = (path: string, keyword: string, messages: string[]) => {
+  const set = (path: string, keyword: string, messages: string[], owner?: unknown) => {
     const id = idOf(path, keyword)
+    owners.set(id, owner)
     if (messages.length === 0) {
       if (entries.has(id)) entries.delete(id)
       return
@@ -47,8 +54,10 @@ export function createFormErrorRegistry(): FormErrorRegistry {
     })))
   }
 
-  const remove = (path: string, keyword: string) => {
+  const remove = (path: string, keyword: string, owner?: unknown) => {
     const id = idOf(path, keyword)
+    if (owners.get(id) !== owner) return
+    owners.delete(id)
     if (entries.has(id)) entries.delete(id)
   }
 
@@ -74,17 +83,18 @@ export function useReportedErrors(
 ): void {
   const registry = inject<FormErrorRegistry | undefined>(FORM_ERRORS_KEY, undefined)
   if (!registry) return
+  const owner = Symbol(keyword)
   let lastPath = path()
   watch(
     [path, messages],
     ([currentPath, currentMessages]) => {
       if (currentPath !== lastPath) {
-        registry.remove(lastPath, keyword)
+        registry.remove(lastPath, keyword, owner)
         lastPath = currentPath
       }
-      registry.set(currentPath, keyword, currentMessages)
+      registry.set(currentPath, keyword, currentMessages, owner)
     },
     { immediate: true },
   )
-  onUnmounted(() => registry.remove(lastPath, keyword))
+  onUnmounted(() => registry.remove(lastPath, keyword, owner))
 }
