@@ -354,6 +354,26 @@ The only deviation from JavaScript is a missing object in a path, `undefined` ra
 The 13 default Mica forms are converted as acceptance fixtures (`test/fixtures/asf`, snapshots in
 `__snapshots__`), and the `ui/dev` page "test-asf-converter" renders any pasted pair.
 
+## Amber forms compatibility
+
+`@obiba/quasar-ui-json-form/amber` converts the schema of an Amber form (a tree of `items` with its
+`i18n` translations) into a `(schema, uischema, translations)` bundle for `QJsonForm` that collects
+the same data (groups as nested objects, multiple choices as arrays, maps as GeoJSON features):
+
+```js
+import { convert, rewriteExpression } from '@obiba/quasar-ui-json-form/amber'
+
+const { schema, uischema, translations, diagnostics } = convert(amberSchema)
+// <QJsonForm :schema="schema" :uischema="uischema" :translations="translations" apply-defaults ... />
+```
+
+The root UI schema has one element per top-level item (`uischema.elements[page]` for a paged
+form). The item expressions (`condition`, `required`, `disabled`, `validation`, `compute`) are
+rewritten into rules: `$('A.B')` → `A.B`, `val` → the item path, `Date.parse()` / `Date.now()` →
+`parseDate()` / `now()`, `includes` / `indexOf` → `contains()`. What cannot be converted is
+reported in `diagnostics` and skipped. The Amber demo form is the acceptance fixture
+(`test/fixtures/amber`), and the builder imports Amber schemas (`fromAmber`).
+
 # Renderer catalog
 
 `@obiba/quasar-ui-json-form/catalog` describes every built-in renderer and the form component:

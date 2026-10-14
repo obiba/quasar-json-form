@@ -26,6 +26,11 @@
       "import": "./dist/asf.esm.js",
       "require": "./dist/asf.common.js"
     },
+    "./amber": {
+      "types": "./dist/amber/index.d.ts",
+      "import": "./dist/amber.esm.js",
+      "require": "./dist/amber.common.js"
+    },
     "./catalog": {
       "types": "./dist/catalog/index.d.ts",
       "import": "./dist/catalog.esm.js",

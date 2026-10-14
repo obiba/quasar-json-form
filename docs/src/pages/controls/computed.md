@@ -8,7 +8,8 @@ title: Computed
 
 The [rule](#/start/rules) expression is re-evaluated whenever the form data changes. The title
 and description are rendered as markdown above the value, the hint under it, and `options.show: true`
-displays the value. A hidden computed control stores `undefined`.
+displays the value; `options.hidden: true` displays nothing at all, the value being still computed and
+stored. A hidden computed control (by a `visible` rule) stores `undefined`.
 
 <DocExample name="computed/basic" title="Total" source />
 

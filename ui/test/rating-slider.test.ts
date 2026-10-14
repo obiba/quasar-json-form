@@ -124,3 +124,35 @@ describe('slider renderer', () => {
     wrapper.unmount()
   })
 })
+
+describe('bounds from the schema', () => {
+  it('takes min / max of the slider and max of the rating from the schema, unless the options set them', async () => {
+    const bounded = {
+      type: 'object',
+      properties: {
+        stars: { type: 'integer', minimum: 0, maximum: 3 },
+        level: { type: 'integer', minimum: 2, maximum: 8 },
+      },
+    }
+    const ui = (stars: Record<string, unknown>, level: Record<string, unknown>) => ({
+      type: 'VerticalLayout',
+      elements: [
+        { type: 'Control', scope: '#/properties/stars', options: { format: 'rating', ...stars } },
+        { type: 'Control', scope: '#/properties/level', options: { format: 'slider', ...level } },
+      ],
+    })
+    const wrapper = mountForm({ schema: bounded, uischema: ui({}, {}), modelValue: {} })
+    await flush()
+    expect(wrapper.findComponent(QRating).props('max')).toBe(3)
+    expect(wrapper.findComponent(QSlider).props('min')).toBe(2)
+    expect(wrapper.findComponent(QSlider).props('max')).toBe(8)
+    wrapper.unmount()
+
+    const overridden = mountForm({ schema: bounded, uischema: ui({ max: 6 }, { min: 0, max: 10 }), modelValue: {} })
+    await flush()
+    expect(overridden.findComponent(QRating).props('max')).toBe(6)
+    expect(overridden.findComponent(QSlider).props('min')).toBe(0)
+    expect(overridden.findComponent(QSlider).props('max')).toBe(10)
+    overridden.unmount()
+  })
+})

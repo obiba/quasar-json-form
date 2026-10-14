@@ -16,7 +16,7 @@ export { parseCsv, translationsToCsv, mergeCsv } from './csv'
 export type { CsvImport } from './csv'
 export type { ImportedForm } from './BuilderImport'
 export {
-  fromDefinition, toDefinition, fromAsf,
+  fromDefinition, toDefinition, fromAsf, fromAmber,
   parseScope, toScope, isValidKey,
   locations, locate, findNode, descendants, listOf, containerOf, propertyIn, parentSchemaIn, propertySchema,
   isRequired, setRequired, uniqueKey,

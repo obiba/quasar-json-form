@@ -125,10 +125,17 @@ export function rawOptions(api: RendererApi | undefined): Record<string, ApiEntr
   return Object.fromEntries(Object.entries(rendererOptions(api)).filter(([name, entry]) => !MANAGED_OPTIONS.has(name) && !entry.values && !OPTION_TYPES[entry.type ?? ''] && name !== '…'))
 }
 
-/** The validation keywords of a property, by schema type, as a JSON schema for the builder form. */
+/**
+ * The validation keywords of a property, by schema type, as a JSON schema for
+ * the builder form, with its `default` value when of a primitive type (set in
+ * a new record by `applyDefaults`).
+ */
 export function keywordsSchema(schema: JsonObject | undefined): JsonObject | undefined {
   const type = schema?.type
   const properties: JsonObject = {}
+  if (['string', 'number', 'integer', 'boolean'].includes(type)) {
+    properties.default = { type, title: 'default' }
+  }
   if (type === 'string') {
     properties.minLength = { type: 'integer', title: 'minLength', minimum: 0 }
     properties.maxLength = { type: 'integer', title: 'maxLength', minimum: 0 }

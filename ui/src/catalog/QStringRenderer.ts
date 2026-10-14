@@ -30,6 +30,10 @@ export default {
       type: 'String',
       desc: 'Placeholder of the input.',
     },
+    mask: {
+      type: 'String',
+      desc: 'Input mask of `QInput` (`#` a digit, `S` a letter, `N` alphanumeric...: `(###) ### - ####`); the masked text is stored.',
+    },
     wordLimit: {
       type: 'String | Number',
       desc: 'Word count limit, `"min:max"` or a maximum; a word counter is displayed under the input.',

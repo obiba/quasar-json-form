@@ -57,6 +57,8 @@ export default defineComponent({
           locale: props.locale,
           languages: props.languages,
           readonly: readonly.value,
+          // a new record: the defaults are set when the form starts (again)
+          applyDefaults: true,
           renderers: props.renderers,
           config: props.config,
           'onUpdate:modelValue': (value: Record<string, unknown>) => { data.value = value },

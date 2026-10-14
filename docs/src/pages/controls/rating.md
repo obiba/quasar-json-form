@@ -8,7 +8,7 @@ title: Rating
 
 The schema `title` and `description` are displayed above the rating and the `hint` of the control
 element under it, unless there is an error. Every other option is passed to `QRating`: `max`,
-`icon`, `iconSelected`, `color`, `size`, `noReset`...
+`icon`, `iconSelected`, `color`, `size`, `noReset`... `max` defaults to the schema `maximum`.
 
 <DocExample name="rating/basic" title="Ratings" source />
 

@@ -12,6 +12,26 @@ export default {
     },
   ],
   options: {
+    min: {
+      type: 'Number',
+      default: 'schema minimum, else 0',
+      desc: 'Lower bound of the slider.',
+    },
+    max: {
+      type: 'Number',
+      default: 'schema maximum, else 100',
+      desc: 'Upper bound of the slider.',
+    },
+    step: {
+      type: 'Number',
+      default: '1',
+      desc: 'Step between two values.',
+    },
+    labelAlways: {
+      type: 'Boolean',
+      default: 'false',
+      desc: 'Always display the value above the cursor.',
+    },
     '…': {
       type: 'any',
       desc: 'Every option is passed as a prop to [QSlider](https://quasar.dev/vue-components/slider#qslider-api): `min`, `max`, `step`, `label`, `labelAlways`, `markers`, `markerLabels`, `snap`, `color`, `dense`...',

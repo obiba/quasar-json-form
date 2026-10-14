@@ -1,0 +1,739 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`amber convert > converts the demo form without diagnostics, one root element per item 1`] = `
+{
+  "schema": {
+    "properties": {
+      "AUTOCOMPLETES": {
+        "properties": {
+          "AUTOCOMPLETE_M": {
+            "description": "Select one predefined value from an autocomplete field. Visit the [Auto Complete documentation](https://amberdoc.obiba.org/en/latest/studio-user-guide/content/items/auto-complete.html) for more details.",
+            "items": {
+              "type": "string",
+            },
+            "title": "Auto complete (multiple choices)",
+            "type": "array",
+            "uniqueItems": true,
+          },
+          "AUTOCOMPLETE_S": {
+            "description": "Select one predefined value from an autocomplete field. Visit the [Auto Complete documentation](https://amberdoc.obiba.org/en/latest/studio-user-guide/content/items/auto-complete.html) for more details.",
+            "title": "Auto complete (single choice)",
+            "type": "string",
+          },
+        },
+        "type": "object",
+      },
+      "CHECKS": {
+        "properties": {
+          "MULTIPLE_CHOICES": {
+            "description": "Select one or more predefined values. Visit the [Multiple choices documentation](https://amberdoc.obiba.org/en/latest/studio-user-guide/content/items/multiple-choices.html) for more details.",
+            "items": {
+              "oneOf": [
+                {
+                  "const": "1",
+                  "title": "Blue",
+                },
+                {
+                  "const": "2",
+                  "title": "Red",
+                },
+                {
+                  "const": "3",
+                  "title": "Yellow",
+                },
+              ],
+              "type": "string",
+            },
+            "title": "Multiple choices",
+            "type": "array",
+            "uniqueItems": true,
+          },
+          "SINGLE_CHOICE": {
+            "description": "Select one predefined value. Visit the [Single choice documentation](https://amberdoc.obiba.org/en/latest/studio-user-guide/content/items/single-choice.html) for more details.",
+            "oneOf": [
+              {
+                "const": "1",
+                "title": "Blue",
+              },
+              {
+                "const": "2",
+                "title": "Red",
+              },
+              {
+                "const": "3",
+                "title": "Yellow",
+              },
+            ],
+            "title": "Single choice",
+            "type": "string",
+          },
+        },
+        "type": "object",
+      },
+      "COMPUTATIONS": {
+        "properties": {
+          "COMP": {
+            "description": "Computed field",
+            "format": "computed",
+            "rules": {
+              "compute": "COMPUTATIONS.SLIDER1 + COMPUTATIONS.SLIDER2",
+            },
+            "title": "Computed",
+          },
+          "SLIDER1": {
+            "default": 5,
+            "maximum": 10,
+            "minimum": 0,
+            "title": "Slider 1",
+            "type": "integer",
+          },
+          "SLIDER2": {
+            "default": 5,
+            "maximum": 10,
+            "minimum": 0,
+            "title": "Slider 2",
+            "type": "integer",
+          },
+        },
+        "type": "object",
+      },
+      "CONDITIONS": {
+        "properties": {
+          "YES": {
+            "title": "Explain why you selected Yes",
+            "type": "string",
+          },
+          "YESNO": {
+            "description": "Either select Yes or No to trigger visibility of other fields. ",
+            "oneOf": [
+              {
+                "const": "1",
+                "title": "Yes",
+              },
+              {
+                "const": "0",
+                "title": "No",
+              },
+            ],
+            "title": "Binary answer",
+            "type": "string",
+          },
+        },
+        "type": "object",
+      },
+      "GEOS": {
+        "properties": {
+          "POINT": {
+            "description": "Select a position. Visit the [Geographic data documentation](https://amberdoc.obiba.org/en/latest/studio-user-guide/content/items/geo-data.html) for more details.",
+            "format": "geo",
+            "title": "Point",
+            "type": "object",
+          },
+          "POLYGON": {
+            "description": "Select a geographic area. Visit the [Geographic data documentation](https://amberdoc.obiba.org/en/latest/studio-user-guide/content/items/geo-data.html) for more details.",
+            "format": "geo",
+            "title": "Polygon",
+            "type": "object",
+          },
+        },
+        "type": "object",
+      },
+      "NUMERICS": {
+        "properties": {
+          "NUMBER": {
+            "default": 18,
+            "description": "Type a numeric value, can be integer or decimal. Visit the [Number documentation](https://amberdoc.obiba.org/en/latest/studio-user-guide/content/items/number.html) for more details.",
+            "title": "Number",
+            "type": "number",
+          },
+          "RATING": {
+            "description": "The more icons selected, the higher the value. Icon and maximum value are configurable. Visit the [Rating documentation](https://amberdoc.obiba.org/en/latest/studio-user-guide/content/items/rating.html) for more details.",
+            "maximum": 5,
+            "minimum": 0,
+            "title": "Rating",
+            "type": "integer",
+          },
+          "SLIDER": {
+            "default": 50,
+            "description": "Slide the cursor to select an integer value. The range of values is configurable. Visit the [Slider documentation](https://amberdoc.obiba.org/en/latest/studio-user-guide/content/items/slider.html) for more details.",
+            "maximum": 100,
+            "minimum": 0,
+            "title": "Slider",
+            "type": "integer",
+          },
+        },
+        "type": "object",
+      },
+      "OTHERS": {
+        "properties": {
+          "TOGGLE": {
+            "description": "Select a logical value. Visit the [Toggle documentation](https://amberdoc.obiba.org/en/latest/studio-user-guide/content/items/toggle.html) for more details.",
+            "title": "Toggle",
+            "type": "boolean",
+          },
+        },
+        "type": "object",
+      },
+      "SELECTS": {
+        "properties": {
+          "DROPDOWN_M": {
+            "description": "Select several predefined values from a dropdown. Visit the [Dropdown documentation](https://amberdoc.obiba.org/en/latest/studio-user-guide/content/items/dropdown.html).",
+            "items": {
+              "oneOf": [
+                {
+                  "const": "1",
+                  "title": "Blue",
+                },
+                {
+                  "const": "2",
+                  "title": "Red",
+                },
+                {
+                  "const": "3",
+                  "title": "Yellow",
+                },
+              ],
+              "type": "string",
+            },
+            "title": "Dropdown (multiple choices)",
+            "type": "array",
+            "uniqueItems": true,
+          },
+          "DROPDOWN_S": {
+            "description": "Select one predefined value from a dropdown. Visit the [Dropdown documentation](https://amberdoc.obiba.org/en/latest/studio-user-guide/content/items/dropdown.html).",
+            "oneOf": [
+              {
+                "const": "1",
+                "title": "Blue",
+              },
+              {
+                "const": "2",
+                "title": "Red",
+              },
+              {
+                "const": "3",
+                "title": "Yellow",
+              },
+            ],
+            "title": "Dropdown (single choice)",
+            "type": "string",
+          },
+          "IMAGE": {
+            "description": "Select a value by clicking on an image area. Visit the [Image Select documentation](https://amberdoc.obiba.org/en/latest/studio-user-guide/content/items/image-select.html).",
+            "oneOf": [
+              {
+                "const": "1",
+                "title": "Front right",
+              },
+              {
+                "const": "2",
+                "title": "Front left",
+              },
+              {
+                "const": "3",
+                "title": "Back left",
+              },
+              {
+                "const": "4",
+                "title": "Back right",
+              },
+            ],
+            "title": "Image select",
+            "type": "string",
+          },
+        },
+        "type": "object",
+      },
+      "TEMPORALS": {
+        "properties": {
+          "DATE": {
+            "description": "Select a date in a Gregorian calendar. Visit the [Date documentation](https://amberdoc.obiba.org/en/latest/studio-user-guide/content/items/date.html) for more details.",
+            "format": "date",
+            "title": "Date",
+            "type": "string",
+          },
+          "DATE_TIME": {
+            "description": "Select a date and a time in a single field. Visit the [Date and Time documentation](https://amberdoc.obiba.org/en/latest/studio-user-guide/content/items/datetime.html) for more details.",
+            "format": "date-time",
+            "title": "Date and time",
+            "type": "string",
+          },
+          "TIME": {
+            "description": "Select a date in 24h format. Visit the [Time documentation](https://amberdoc.obiba.org/en/latest/studio-user-guide/content/items/time.html) for more details.",
+            "format": "time",
+            "title": "Time",
+            "type": "string",
+          },
+        },
+        "type": "object",
+      },
+      "TEXTS": {
+        "properties": {
+          "PARAGRAPH": {
+            "description": "The text can be long, with multiple lines. Visit the [Paragraph documentation](https://amberdoc.obiba.org/en/latest/studio-user-guide/content/items/paragraph.html) for more details.",
+            "title": "Paragraph",
+            "type": "string",
+          },
+          "SHORT_ANSWER": {
+            "description": "Answer is a short text. Visit the [Short answer documentation](https://amberdoc.obiba.org/en/latest/studio-user-guide/content/items/short-answer.html) for more details.",
+            "title": "Short answer",
+            "type": "string",
+          },
+          "SHORT_ANSWER_MASKED": {
+            "description": "Answer is a short text with an input mask. Visit the [Short answer documentation](https://amberdoc.obiba.org/en/latest/studio-user-guide/content/items/short-answer.html) for more details.",
+            "title": "Short answer",
+            "type": "string",
+          },
+        },
+        "type": "object",
+      },
+      "VALIDATIONS": {
+        "properties": {
+          "DATE": {
+            "description": "Validate that the input date is in the future.",
+            "format": "date",
+            "title": "Date after today",
+            "type": "string",
+          },
+          "NUMBER": {
+            "description": "Number to validate relatively to the Slider's input value.",
+            "title": "Number ",
+            "type": "number",
+          },
+          "REQUIRED": {
+            "description": "Minimal validation is whether an input value is required.",
+            "title": "Required",
+            "type": "string",
+          },
+          "SLIDER": {
+            "default": 5,
+            "description": "Select a reference value.",
+            "maximum": 10,
+            "minimum": 0,
+            "title": "Slider",
+            "type": "integer",
+          },
+        },
+        "type": "object",
+      },
+    },
+    "type": "object",
+  },
+  "uischema": {
+    "elements": [
+      {
+        "description": "This form demonstrates all the **different types of questionnaire items** that can be included in a form.
+
+* text and numeric inputs
+* date and time inputs
+* select inputs
+* geographical data inputs
+* sections and groups
+* validation, condition rules
+* computed values
+* ...
+
+Visit the [Form items documentation](https://amberdoc.obiba.org/en/latest/studio-user-guide/content/items/index.html) for more details.",
+        "label": "Welcome to the Demo Form",
+        "type": "Section",
+      },
+      {
+        "description": "Different ways of capturing data.",
+        "label": "Data capture",
+        "type": "Section",
+      },
+      {
+        "description": "Questionnaire items that capture text entries.",
+        "elements": [
+          {
+            "hint": "Enter free text!",
+            "scope": "#/properties/TEXTS/properties/SHORT_ANSWER",
+            "type": "Control",
+          },
+          {
+            "hint": "Enter a phone number!",
+            "options": {
+              "mask": " (###) ### - ####",
+            },
+            "scope": "#/properties/TEXTS/properties/SHORT_ANSWER_MASKED",
+            "type": "Control",
+          },
+          {
+            "hint": "Enter free text!",
+            "options": {
+              "rows": 3,
+            },
+            "scope": "#/properties/TEXTS/properties/PARAGRAPH",
+            "type": "Control",
+          },
+        ],
+        "label": "Text types",
+        "type": "Group",
+      },
+      {
+        "description": "Select values from radios or check boxes.",
+        "elements": [
+          {
+            "options": {
+              "format": "radio",
+            },
+            "scope": "#/properties/CHECKS/properties/SINGLE_CHOICE",
+            "type": "Control",
+          },
+          {
+            "options": {
+              "format": "checkbox",
+            },
+            "scope": "#/properties/CHECKS/properties/MULTIPLE_CHOICES",
+            "type": "Control",
+          },
+        ],
+        "label": "Checks",
+        "type": "Group",
+      },
+      {
+        "description": "Select values from a select widget.",
+        "elements": [
+          {
+            "hint": "Select your favorite color!",
+            "scope": "#/properties/SELECTS/properties/DROPDOWN_S",
+            "type": "Control",
+          },
+          {
+            "hint": "Select your favorite colors!",
+            "scope": "#/properties/SELECTS/properties/DROPDOWN_M",
+            "type": "Control",
+          },
+          {
+            "options": {
+              "areas": {
+                "1": {
+                  "coords": [
+                    0,
+                    0,
+                    150,
+                    0,
+                    150,
+                    750,
+                    0,
+                    750,
+                  ],
+                  "shape": "poly",
+                },
+                "2": {
+                  "coords": [
+                    150,
+                    0,
+                    300,
+                    0,
+                    300,
+                    750,
+                    150,
+                    750,
+                  ],
+                  "shape": "poly",
+                },
+                "3": {
+                  "coords": [
+                    345,
+                    0,
+                    495,
+                    0,
+                    495,
+                    750,
+                    345,
+                    750,
+                  ],
+                  "shape": "poly",
+                },
+                "4": {
+                  "coords": [
+                    495,
+                    0,
+                    645,
+                    0,
+                    645,
+                    750,
+                    495,
+                    750,
+                  ],
+                  "shape": "poly",
+                },
+              },
+              "format": "image-map",
+              "image": "<image>",
+            },
+            "scope": "#/properties/SELECTS/properties/IMAGE",
+            "type": "Control",
+          },
+        ],
+        "label": "Selects",
+        "type": "Group",
+      },
+      {
+        "description": "Type some text to filter the list of predefined values.",
+        "elements": [
+          {
+            "hint": "Type your favorite color name!",
+            "options": {
+              "format": "typeahead",
+              "values": [
+                {
+                  "label": "Blue",
+                  "value": "1",
+                },
+                {
+                  "label": "Red",
+                  "value": "2",
+                },
+                {
+                  "label": "Yellow",
+                  "value": "3",
+                },
+              ],
+            },
+            "scope": "#/properties/AUTOCOMPLETES/properties/AUTOCOMPLETE_S",
+            "type": "Control",
+          },
+          {
+            "hint": "Type your favorite color names!",
+            "options": {
+              "format": "typeahead",
+              "values": [
+                {
+                  "label": "Blue",
+                  "value": "1",
+                },
+                {
+                  "label": "Red",
+                  "value": "2",
+                },
+                {
+                  "label": "Yellow",
+                  "value": "3",
+                },
+              ],
+            },
+            "scope": "#/properties/AUTOCOMPLETES/properties/AUTOCOMPLETE_M",
+            "type": "Control",
+          },
+        ],
+        "label": "Auto complete",
+        "type": "Group",
+      },
+      {
+        "description": "Enter or select a number",
+        "elements": [
+          {
+            "scope": "#/properties/NUMERICS/properties/NUMBER",
+            "type": "Control",
+          },
+          {
+            "options": {
+              "format": "slider",
+              "labelAlways": true,
+            },
+            "scope": "#/properties/NUMERICS/properties/SLIDER",
+            "type": "Control",
+          },
+          {
+            "options": {
+              "color": "primary",
+              "format": "rating",
+              "icon": "star",
+              "size": "2em",
+            },
+            "scope": "#/properties/NUMERICS/properties/RATING",
+            "type": "Control",
+          },
+        ],
+        "label": "Numeric types",
+        "type": "Group",
+      },
+      {
+        "description": "Select dates and times in a ISO 8601 compatible format (yyyy-MM-dd hh:mm).",
+        "elements": [
+          {
+            "scope": "#/properties/TEMPORALS/properties/DATE",
+            "type": "Control",
+          },
+          {
+            "scope": "#/properties/TEMPORALS/properties/TIME",
+            "type": "Control",
+          },
+          {
+            "scope": "#/properties/TEMPORALS/properties/DATE_TIME",
+            "type": "Control",
+          },
+        ],
+        "label": "Temporal types",
+        "type": "Group",
+      },
+      {
+        "elements": [
+          {
+            "options": {
+              "feature": true,
+              "geometries": [
+                "point",
+              ],
+            },
+            "scope": "#/properties/GEOS/properties/POINT",
+            "type": "Control",
+          },
+          {
+            "options": {
+              "feature": true,
+              "geometries": [
+                "polygon",
+              ],
+            },
+            "scope": "#/properties/GEOS/properties/POLYGON",
+            "type": "Control",
+          },
+        ],
+        "label": "Geographics",
+        "type": "Group",
+      },
+      {
+        "elements": [
+          {
+            "scope": "#/properties/OTHERS/properties/TOGGLE",
+            "type": "Control",
+          },
+        ],
+        "label": "Other types",
+        "type": "Group",
+      },
+      {
+        "description": "Process captured data for validation, condition and computation.",
+        "label": "Data processing",
+        "type": "Section",
+      },
+      {
+        "description": "Validation is about defining a rule that constraints the input value. A form with invalid fields cannot be completed.",
+        "elements": [
+          {
+            "rules": {
+              "required": "true",
+            },
+            "scope": "#/properties/VALIDATIONS/properties/REQUIRED",
+            "type": "Control",
+          },
+          {
+            "rules": {
+              "validation": [
+                {
+                  "expr": "parseDate(VALIDATIONS.DATE) > now()",
+                  "message": "The date must be in the future.",
+                },
+              ],
+            },
+            "scope": "#/properties/VALIDATIONS/properties/DATE",
+            "type": "Control",
+          },
+          {
+            "options": {
+              "format": "slider",
+              "labelAlways": true,
+            },
+            "rules": {
+              "required": "true",
+            },
+            "scope": "#/properties/VALIDATIONS/properties/SLIDER",
+            "type": "Control",
+          },
+          {
+            "hint": "Enter a value or change the Slider's one to trigger field validation.",
+            "rules": {
+              "validation": [
+                {
+                  "expr": "VALIDATIONS.SLIDER > VALIDATIONS.NUMBER",
+                  "message": "The value must be strictly lower than the Slider's one.",
+                },
+              ],
+            },
+            "scope": "#/properties/VALIDATIONS/properties/NUMBER",
+            "type": "Control",
+          },
+        ],
+        "label": "Validations",
+        "type": "Group",
+      },
+      {
+        "description": "A condition is a rule that drives the visibility of a field. When a field is not visible there is no value associated.",
+        "elements": [
+          {
+            "options": {
+              "format": "radio",
+            },
+            "scope": "#/properties/CONDITIONS/properties/YESNO",
+            "type": "Control",
+          },
+          {
+            "rules": {
+              "visible": "CONDITIONS.YESNO === '1'",
+            },
+            "scope": "#/properties/CONDITIONS/properties/YES",
+            "type": "Control",
+          },
+          {
+            "description": "Ok, you said No, let's forget it then.",
+            "rules": {
+              "visible": "CONDITIONS.YESNO === '0'",
+            },
+            "type": "Section",
+          },
+        ],
+        "label": "Conditions",
+        "type": "Group",
+      },
+      {
+        "description": "A value can be computed based on other values. There is no representation of a computed item. Its value can be used in another item's condition or validation rule.",
+        "elements": [
+          {
+            "options": {
+              "hidden": true,
+            },
+            "scope": "#/properties/COMPUTATIONS/properties/COMP",
+            "type": "Control",
+          },
+          {
+            "options": {
+              "format": "slider",
+              "labelAlways": true,
+            },
+            "scope": "#/properties/COMPUTATIONS/properties/SLIDER1",
+            "type": "Control",
+          },
+          {
+            "options": {
+              "format": "slider",
+              "labelAlways": true,
+            },
+            "scope": "#/properties/COMPUTATIONS/properties/SLIDER2",
+            "type": "Control",
+          },
+          {
+            "description": "The addition of Slider 1 and Slider 2 values is **below 10**.",
+            "rules": {
+              "visible": "COMPUTATIONS.COMP < 10",
+            },
+            "type": "Section",
+          },
+          {
+            "description": "The addition of Slider 1 and Slider 2 values is **equal or higher than 10**.",
+            "rules": {
+              "visible": "COMPUTATIONS.COMP >= 10",
+            },
+            "type": "Section",
+          },
+        ],
+        "label": "Computations",
+        "type": "Group",
+      },
+    ],
+    "type": "VerticalLayout",
+  },
+}
+`;

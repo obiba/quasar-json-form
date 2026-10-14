@@ -15,6 +15,8 @@
 import type { FormTranslations } from '../utils/i18n'
 import { toJsonForms } from '../asf'
 import type { AsfConvertOptions, AsfDiagnostic } from '../asf'
+import { convert as convertAmber } from '../amber'
+import type { AmberConvertOptions } from '../amber'
 
 export type JsonObject = Record<string, any>
 
@@ -138,7 +140,10 @@ export function toNode(model: FormModel, element: JsonObject): FormNode {
     const path = parseScope(scope)
     const node: FormNode = { id, kind: 'control', element: rest, children: [] }
     if (path) node.path = path
-    else {
+    else if (scope === '#') {
+      // the item itself of a list of primitives (or of formatted objects): kept as is
+      node.element.scope = scope
+    } else {
       node.element.scope = scope
       model.diagnostics.push({ level: 'warn', message: `Scope "${scope}" is not a property path: the control is kept as-is`, nodeId: id })
     }
@@ -220,6 +225,14 @@ export function fromAsf(schema: unknown, definitionOrUischema: unknown, options:
   return model
 }
 
+/** The model of an Amber form schema (`items` and `i18n`), its translations included. */
+export function fromAmber(amberSchema: unknown, options: AmberConvertOptions = {}): FormModel {
+  const result = convertAmber(amberSchema, { logger: false, ...options })
+  const model = fromDefinition({ schema: result.schema, uischema: result.uischema, translations: result.translations })
+  model.diagnostics.unshift(...result.diagnostics.map((d) => ({ level: d.level, message: d.key ? `${d.key}: ${d.message}` : d.message })))
+  return model
+}
+
 // ---------------------------------------------------------------------------
 // Tree navigation
 
@@ -288,7 +301,14 @@ export function parentSchemaIn(container: JsonObject | undefined, path: string[]
 /** The schema of the property of a control, or undefined (not a control, or not in the schema). */
 export function propertySchema(model: FormModel, id: string): JsonObject | undefined {
   const location = locate(model, id)
-  if (!location || !location.node.path) return undefined
+  if (!location) return undefined
+  if (!location.node.path) {
+    // `#` in the item layout of a list: the items schema (not created when missing)
+    const list = location.list
+    if (location.node.element.scope !== '#' || !list?.path) return undefined
+    const items = propertyIn(containerOf(model, listOf(model, list.id)), list.path)?.items
+    return isObject(items) ? items : undefined
+  }
   return propertyIn(containerOf(model, location.list), location.node.path)
 }
 

@@ -57,7 +57,8 @@ const rollupPlugins = [
 const LIBRARY_ENTRIES = {
   [pathResolve('../src/vue-plugin.ts')]: '@obiba/quasar-ui-json-form',
   [pathResolve('../src/catalog/index.ts')]: '@obiba/quasar-ui-json-form/catalog',
-  [pathResolve('../src/asf/index.ts')]: '@obiba/quasar-ui-json-form/asf'
+  [pathResolve('../src/asf/index.ts')]: '@obiba/quasar-ui-json-form/asf',
+  [pathResolve('../src/amber/index.ts')]: '@obiba/quasar-ui-json-form/amber'
 }
 
 // Resolves the imports of the library entries to the package names, external
@@ -134,6 +135,36 @@ const builds = [
         format: 'cjs'
       }
     },
+    build: {
+      minified: true
+    }
+  },
+  {
+    rollup: {
+      input: {
+        input: pathResolve('../src/amber/index.ts')
+      },
+      output: {
+        file: pathResolve('../dist/amber.esm.js'),
+        format: 'es'
+      }
+    },
+    externalLibrary: true,
+    build: {
+      minified: true
+    }
+  },
+  {
+    rollup: {
+      input: {
+        input: pathResolve('../src/amber/index.ts')
+      },
+      output: {
+        file: pathResolve('../dist/amber.common.js'),
+        format: 'cjs'
+      }
+    },
+    externalLibrary: true,
     build: {
       minified: true
     }

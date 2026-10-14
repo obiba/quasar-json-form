@@ -50,7 +50,8 @@ export default defineComponent({
     }
 
     return () => {
-      if (!isVisible.value) {
+      // `options.hidden`: the value is computed and stored, nothing is displayed
+      if (!isVisible.value || control.value.uischema.options?.hidden === true) {
         return null
       }
 

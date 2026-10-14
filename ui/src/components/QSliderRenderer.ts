@@ -4,6 +4,14 @@ import { useControl } from '../composables/useControl'
 import { QSlider } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
 
+/** `min` / `max` props from the `minimum` / `maximum` of a schema */
+const bounds = (schema: any): Record<string, number> => {
+  const result: Record<string, number> = {}
+  if (typeof schema?.minimum === 'number') result.min = schema.minimum
+  if (typeof schema?.maximum === 'number') result.max = schema.maximum
+  return result
+}
+
 export default defineComponent({
   name: 'QSliderRenderer',
   props: rendererProps(),
@@ -38,6 +46,8 @@ export default defineComponent({
       return h('div', { class: ['q-slider-renderer q-mt-md', rootClass.value] }, [
         ...renderHeader(),
         h(QSlider, {
+          // the bounds of the schema, unless the options set them
+          ...bounds(control.value.schema),
           ...options.value,
           modelValue: control.value.data,
           'onUpdate:modelValue': onChange,
