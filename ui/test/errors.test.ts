@@ -44,6 +44,31 @@ describe('renderer errors', () => {
     expect(registry.errors.value).toEqual([])
   })
 
+  it('keeps the entry of its last owner', () => {
+    const registry = createFormErrorRegistry()
+    const previous = Symbol('previous')
+    const next = Symbol('next')
+    registry.set('a', 'k', ['m'], previous)
+    // mounted again: the new renderer reports first, then the previous one is unmounted
+    registry.set('a', 'k', ['m'], next)
+    registry.remove('a', 'k', previous)
+    expect(registry.errors.value.map((e) => e.message)).toEqual(['m'])
+    registry.remove('a', 'k', next)
+    expect(registry.errors.value).toEqual([])
+  })
+
+  it('keeps the renderer errors when the UI schema changes', async () => {
+    // the control is mounted again in another layout (a paged form showing another page)
+    const control = { type: 'Control', scope: '#/properties/even' }
+    const wrapper = mountForm({ schema, uischema: { type: 'VerticalLayout', elements: [control] }, modelValue: { name: 'x', even: 3 } })
+    await flush()
+    expect(lastErrors(wrapper).map((e) => e.keyword)).toEqual(['validation'])
+    await wrapper.setProps({ uischema: { type: 'VerticalLayout', elements: [{ type: 'VerticalLayout', options: { class: 'hidden' }, elements: [control] }] } })
+    await flush()
+    expect(lastErrors(wrapper).map((e) => e.keyword)).toEqual(['validation'])
+    wrapper.unmount()
+  })
+
   it('emits the validation rule errors with the AJV errors', async () => {
     const wrapper = mountForm({ schema, modelValue: { even: 3 } })
     await flush()
