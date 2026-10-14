@@ -23,6 +23,11 @@ export default {
       default: 'false',
       desc: 'Render every control read-only: inputs are not editable, list and upload buttons are hidden.',
     },
+    applyDefaults: {
+      type: 'Boolean',
+      default: 'false',
+      desc: 'Fill in the schema `default` of the properties without a value when the form is mounted (for a new record), except the ones hidden or disabled by a rule; the data is then emitted with `update:modelValue`.',
+    },
     validationMode: {
       type: 'String',
       default: 'ValidateAndShow',

@@ -45,6 +45,11 @@ export default {
       default: 'primary',
       desc: 'Quasar color (or any CSS color) of the drawn geometry and of the selected draw mode.',
     },
+    feature: {
+      type: 'Boolean',
+      default: 'false',
+      desc: 'Store the geometry wrapped in a GeoJSON `Feature` (`{ type: "Feature", geometry, properties: null }`). A `Feature` value is read whatever this option. For several features, use a [list](#/controls/list) of geo items.',
+    },
     precision: {
       type: 'Number',
       default: '6',
@@ -81,7 +86,7 @@ export default {
     },
   },
   data: {
-    desc: 'A GeoJSON geometry in WGS84 longitude / latitude: `Point`, `LineString` or `Polygon` (rings closed on their first position), or no value. Drawing replaces the current geometry, **Clear** removes it. Read-only, the map can be browsed but not edited; a hidden control (`rules.visible`) loses its value; a value that is not a valid geometry is displayed as nothing and left untouched until the user acts.',
+    desc: 'A GeoJSON geometry in WGS84 longitude / latitude: `Point`, `LineString` or `Polygon` (rings closed on their first position), or a `Feature` of one with `feature: true`, or no value. Drawing replaces the current geometry, **Clear** removes it. Read-only, the map can be browsed but not edited; a hidden control (`rules.visible`) loses its value; a value that is not a valid geometry is displayed as nothing and left untouched until the user acts.',
     example: '{ "location": { "type": "Point", "coordinates": [-73.5673, 45.5017] } }',
   },
   items: [

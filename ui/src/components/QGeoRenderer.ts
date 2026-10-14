@@ -51,6 +51,7 @@ const loadMapModule = () => {
  * WGS84 longitude / latitude) drawn on a map. `options.geometries` restricts
  * the kinds, the toolbar picks the one to draw, locates the user and clears
  * the value. A point can also be typed as a latitude and a longitude.
+ * `options.feature` stores the geometry wrapped in a GeoJSON `Feature`.
  */
 export default defineComponent({
   name: 'QGeoRenderer',
@@ -131,7 +132,8 @@ export default defineComponent({
       options.value.locate !== false && typeof navigator !== 'undefined' && !!navigator.geolocation)
 
     const onChange = (value: GeoGeometry | undefined) => {
-      controlResult.handleChange(control.value.path, value)
+      const feature = value && options.value.feature === true ? { type: 'Feature', geometry: value, properties: null } : value
+      controlResult.handleChange(control.value.path, feature)
     }
 
     // --- map -----------------------------------------------------------------

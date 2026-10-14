@@ -28,6 +28,7 @@ export interface ValidationRule {
 export interface ControlRules {
   visible?: string
   enabled?: string
+  required?: string
   max?: string
   min?: string
   compute?: string
@@ -245,16 +246,31 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
     computed(() => (isVisible.value ? customValidationErrors.value : [])),
   )
 
+  // A control required by a `required` rule: AJV does not know about it, so
+  // the missing value is reported here, with the `required` keyword
+  const requiredRuleErrors = computed<string[]>(() => {
+    if (!ruleOptions.value.required || !control.value.required) return []
+    const value = control.value.data
+    const missing = value === undefined || value === null || value === '' || (Array.isArray(value) && value.length === 0)
+    return missing ? [translate('error.required')] : []
+  })
+
+  useReportedErrors(
+    () => control.value.path,
+    'required',
+    computed(() => (isVisible.value ? requiredRuleErrors.value : [])),
+  )
+
   // Combined errors
   const hasError = computed(() => {
-    return control.value.errors.length > 0 || customValidationErrors.value.length > 0
+    return control.value.errors.length > 0 || customValidationErrors.value.length > 0 || requiredRuleErrors.value.length > 0
   })
 
   const errorMessage = computed(() => {
     const jsonFormsErrors = Array.isArray(control.value.errors)
       ? control.value.errors
       : [control.value.errors]
-    const customErrors = customValidationErrors.value
+    const customErrors = [...requiredRuleErrors.value, ...customValidationErrors.value]
     // Combine both error arrays
     const allErrors = [...jsonFormsErrors, ...customErrors].filter((e: any) => e && e.length > 0)
     return allErrors.join('; ')

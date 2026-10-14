@@ -10,6 +10,11 @@ export default {
       rank: 5,
       desc: 'Text input with filtered suggestions.',
     },
+    {
+      schema: '{ "type": "array", "items": { "type": "string" } } + format: "typeahead" (schema or options)',
+      rank: 7,
+      desc: 'Several values, displayed as chips.',
+    },
   ],
   options: {
     values: {
@@ -27,7 +32,7 @@ export default {
     },
   },
   data: {
-    desc: 'The selected (or typed, when `editable`) string; a cleared input stores `undefined`.',
+    desc: 'The selected (or typed, when `editable`) string, or the array of strings on an array property; a cleared input stores `undefined`.',
     example: '{ "role": "Data manager" }',
   },
   items: [

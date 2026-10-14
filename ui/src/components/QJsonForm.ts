@@ -12,6 +12,7 @@ import { useFormI18n } from '../composables/useFormI18n'
 import { provideFormErrorRegistry } from '../composables/useFormErrors'
 import { useRules } from '../composables/useRules'
 import { collectHiddenPaths, filterHiddenErrors, unsetDataPath } from '../utils/visibility'
+import { fillDefaults } from '../utils/defaults'
 import { I18N_KEY, LANGUAGES_KEY, LOCALE_KEY } from '../composables/keys'
 import type { FormI18nOverride } from '../composables/useFormI18n'
 import type { LanguagesInput } from '../composables/useControlProperties'
@@ -230,6 +231,17 @@ export default defineComponent({
       default: () => [],
     },
     /**
+     * Fill in the schema `default` of the properties without a value, once,
+     * when the form is mounted (for a new record), except the ones hidden or
+     * disabled by a rule. The data with the defaults is emitted with
+     * `update:modelValue`.
+     */
+    applyDefaults: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    /**
      * Output only: accepted so that `v-model:errors` is a declared binding;
      * the emitted `update:errors` is the source of truth.
      */
@@ -307,6 +319,20 @@ export default defineComponent({
     const currentData = shallowRef<any>(props.modelValue)
     watch(() => props.modelValue, (data) => { currentData.value = data })
     const { evaluateRule } = useRules(currentData)
+
+    // The defaults of the properties without a value, the hidden ones left
+    // out (evaluated on the data with the defaults, a default may hide another)
+    if (props.applyDefaults) {
+      const { data, paths } = fillDefaults(schema.value, currentData.value)
+      if (paths.length > 0) {
+        currentData.value = data
+        const hidden = collectHiddenPaths(generatedUischema.value, schema.value, (rule) => evaluateRule(rule, true) === true, data)
+        currentData.value = paths
+          .filter((path) => hidden.some((h) => path === h || path.startsWith(h + '/')))
+          .reduce((acc, path) => unsetDataPath(acc, path), data)
+        emit('update:modelValue', currentData.value)
+      }
+    }
     const hiddenPaths = computed<string[]>(() =>
       collectHiddenPaths(generatedUischema.value, schema.value, (rule) => evaluateRule(rule, true) === true, currentData.value),
     )
@@ -333,7 +359,8 @@ export default defineComponent({
     const registry = provideFormErrorRegistry()
     const ajvErrors = ref<ErrorObject[]>([])
     const visibleAjvErrors = computed<ErrorObject[]>(() => filterHiddenErrors(ajvErrors.value, hiddenPaths.value))
-    const allErrors = computed<ErrorObject[]>(() => [...visibleAjvErrors.value, ...registry.errors.value])
+    // the renderer errors too: a disabled control is still mounted
+    const allErrors = computed<ErrorObject[]>(() => [...visibleAjvErrors.value, ...filterHiddenErrors(registry.errors.value, hiddenPaths.value)])
     watch(allErrors, (errors) => emit('update:errors', errors))
 
     const onChange = (event: any) => {

@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { computed, inject } from 'vue'
+import { computed, inject, ref } from 'vue'
 import { useJsonFormsControl } from '@jsonforms/vue'
 import { hasEnableRule, isInherentlyEnabled } from '@jsonforms/core'
+import { DATA_KEY } from './keys'
+import { useRules } from './useRules'
 
 /**
  * `useJsonFormsControl` for the elements without a scope (layouts, groups,
@@ -45,11 +47,18 @@ function shallowEqual(a: Record<string, unknown>, b: Record<string, unknown>): b
  * `useJsonFormsControl` whose control keeps its previous value when none of
  * its entries changed: JSON Forms builds a new control on every data change
  * of the form, which rendered every control again on each keystroke.
+ *
+ * A `required` rule (on the UI schema element, else on the schema property)
+ * replaces the `required` flag of the control, so that every renderer marks
+ * and checks it as it does a statically required property.
  */
 export function useControl(props: any) {
   const result = useJsonFormsControl(props)
+  const { evaluateRule } = useRules(inject<any>(DATA_KEY, ref({})))
   const control = computed<typeof result.control.value>((previous) => {
-    const next = result.control.value
+    let next = result.control.value
+    const rule = (next.uischema as any)?.rules?.required ?? (next.schema as any)?.rules?.required
+    if (typeof rule === 'string' && rule.length > 0) next = { ...next, required: evaluateRule(rule) === true }
     return previous && shallowEqual(previous, next) ? previous : next
   })
   return { ...result, control }

@@ -383,6 +383,31 @@ describe('typeahead renderer', () => {
     wrapper.unmount()
   })
 
+  it('selects several values on an array property, even with enum items', async () => {
+    const wrapper = mountForm({
+      schema: {
+        type: 'object',
+        properties: {
+          colors: { type: 'array', format: 'typeahead', uniqueItems: true, items: { type: 'string', enum: ['blue', 'red'] } },
+        },
+      },
+      modelValue: { colors: ['blue'] },
+    })
+    await flush()
+    const select = wrapper.findComponent(QSelect)
+    expect(select.classes()).toContain('q-typeahead')
+    expect(select.props('multiple')).toBe(true)
+    expect(select.props('useChips')).toBe(true)
+    expect(select.props('modelValue')).toEqual(['blue'])
+    select.vm.$emit('update:modelValue', ['blue', 'red'])
+    await flush()
+    expect(lastData(wrapper).colors).toEqual(['blue', 'red'])
+    select.vm.$emit('update:modelValue', [])
+    await flush()
+    expect(lastData(wrapper).colors).toBeUndefined()
+    wrapper.unmount()
+  })
+
   it('has no suggestions without a source and clears its value when hidden', async () => {
     const none = mountForm({
       schema: { type: 'object', properties: { free: { type: 'string', format: 'typeahead' } } },
