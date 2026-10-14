@@ -54,5 +54,27 @@ export default {
         },
       },
     },
+    {
+      name: 'multi-typeahead',
+      label: 'Multiple typeahead',
+      icon: 'saved_search',
+      schema: {
+        type: 'array',
+        format: 'typeahead',
+        uniqueItems: true,
+        items: {
+          type: 'string',
+        },
+      },
+      uischema: {
+        type: 'Control',
+        options: {
+          values: [
+            'A',
+            'B',
+          ],
+        },
+      },
+    },
   ],
 } satisfies RendererApi

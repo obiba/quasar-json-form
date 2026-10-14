@@ -1,23 +1,28 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * The import dialog: a form (schema, UI schema and translations), a schema
- * alone, or an angular-schema-form pair, pasted or picked as a file.
+ * alone, an angular-schema-form pair or an Amber form schema, pasted or picked as a file.
  */
 import { h, defineComponent, ref, watch } from 'vue'
 import { QInput, QBtn, QDialog, QCard, QCardSection, QCardActions, QFile } from 'quasar'
 import { useFormI18n } from '../vue-plugin'
 import { isAsfDefinition } from '../asf'
+import { isAmberSchema } from '../amber'
 import type { FormDefinition } from './model'
 
 const isObject = (value: unknown): value is Record<string, any> => typeof value === 'object' && value !== null && !Array.isArray(value)
 
-/** What an imported JSON document is: a form (bundle), a schema alone, or an ASF pair. */
-export type ImportedForm = { kind: 'form'; definition: FormDefinition } | { kind: 'asf'; schema: unknown; definition: unknown }
+/** What an imported JSON document is: a form (bundle), a schema alone, an ASF pair, or an Amber form schema. */
+export type ImportedForm =
+  | { kind: 'form'; definition: FormDefinition }
+  | { kind: 'asf'; schema: unknown; definition: unknown }
+  | { kind: 'amber'; schema: unknown }
 
 
 /** Recognizes a pasted or picked document; undefined when it is none of the known shapes. */
 export function recognize(parsed: unknown): ImportedForm | undefined {
   if (!isObject(parsed)) return undefined
+  if (isAmberSchema(parsed)) return { kind: 'amber', schema: parsed }
   if (isObject(parsed.schema)) {
     if (isAsfDefinition(parsed.definition)) return { kind: 'asf', schema: parsed.schema, definition: parsed.definition }
     return { kind: 'form', definition: { schema: parsed.schema, uischema: isObject(parsed.uischema) ? parsed.uischema : undefined, translations: isObject(parsed.translations) ? parsed.translations : undefined } }

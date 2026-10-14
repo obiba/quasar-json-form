@@ -8,7 +8,8 @@ title: Slider
 
 The schema `title` and `description` are displayed above the slider and the `hint` of the control
 element under it, unless there is an error. Every other option is passed to `QSlider`: `min`,
-`max`, `step`, `markers`, `label`, `labelAlways`, `color`... To select two ends, see the
+`max`, `step`, `markers`, `label`, `labelAlways`, `color`... `min` and `max` default to the schema
+`minimum` and `maximum`. To select two ends, see the
 [range](#/controls/range).
 
 <DocExample name="slider/basic" title="Sliders" source />

@@ -13,7 +13,7 @@ import { useFormI18n, normalizeLanguages } from '../vue-plugin'
 import type { LanguagesInput } from '../vue-plugin'
 import type { RendererApi } from '../catalog'
 import type { FormDefinition, FormModel } from './model'
-import { fromDefinition, toDefinition, fromAsf } from './model'
+import { fromDefinition, toDefinition, fromAsf, fromAmber } from './model'
 import { builderCatalog, downloadText } from './items'
 import BuilderTree from './BuilderTree'
 import BuilderProperties from './BuilderProperties'
@@ -78,7 +78,9 @@ export default defineComponent({
     }, { deep: true })
 
     const onImport = (imported: ImportedForm) => {
-      load(imported.kind === 'asf' ? fromAsf(imported.schema, imported.definition) : fromDefinition(imported.definition))
+      load(imported.kind === 'asf'
+        ? fromAsf(imported.schema, imported.definition)
+        : imported.kind === 'amber' ? fromAmber(imported.schema) : fromDefinition(imported.definition))
       tab.value = 'properties'
     }
 

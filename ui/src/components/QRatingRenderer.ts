@@ -38,6 +38,8 @@ export default defineComponent({
       return h('div', { class: ['q-rating-renderer q-mt-md', rootClass.value] }, [
         ...renderHeader(),
         h(QRating, {
+          // the maximum of the schema, unless the options set it
+          ...(typeof (control.value.schema as any).maximum === 'number' ? { max: (control.value.schema as any).maximum } : {}),
           ...options.value,
           // QRating requires a number: no value displays no selected icon
           modelValue: control.value.data ?? 0,

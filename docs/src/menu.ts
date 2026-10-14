@@ -74,6 +74,7 @@ const menu: MenuSection[] = [
       { title: 'Mapping', path: 'migration/mapping' },
       { title: 'Conditions', path: 'migration/conditions' },
       { title: 'Converter playground', path: 'migration/playground' },
+      { title: 'From Amber forms', path: 'migration/amber' },
     ],
   },
   {

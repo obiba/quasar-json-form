@@ -17,6 +17,11 @@ export default {
       default: 'false',
       desc: 'Display the computed value under the title (the `noValue` i18n key when undefined).',
     },
+    hidden: {
+      type: 'Boolean',
+      default: 'false',
+      desc: 'Display nothing, not even the title and description: the value is still computed and stored.',
+    },
   },
   data: {
     desc: 'The result of the `compute` rule (`rules.compute` on the schema property or the control), re-evaluated whenever the form data changes; `undefined` while the control is hidden.',
