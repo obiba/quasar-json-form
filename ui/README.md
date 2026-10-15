@@ -422,6 +422,8 @@ import { QJsonFormBuilder } from '@obiba/quasar-ui-json-form/builder'
 | `catalog` | `RendererApi` descriptions of the renderers of the application, added to the palette |
 | `renderers`, `config` | passed to the preview form |
 | `no-caps` | no uppercase transform on the import/export buttons and the tab labels (default `false`) |
+| `no-import` | no import button, when the application imports the forms its own way (default `false`) |
+| `no-export` | no export button, when the application exports the forms its own way (default `false`) |
 
 The labels of the builder come from the `builder.*` keys of the built-in messages (english and
 french), overridable in the application bundles.
