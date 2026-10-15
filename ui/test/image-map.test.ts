@@ -123,6 +123,8 @@ describe('image map renderer', () => {
     expect(overlay.attributes('viewBox')).toBe('0 0 600 400')
     expect(overlay.attributes('aria-label')).toBe('Room')
     expect(overlay.attributes('preserveAspectRatio')).toBe('none')
+    // an area going past the image is clipped to it, as in the Amber forms
+    expect(overlay.attributes('overflow')).toBe('hidden')
     expect(overlay.classes()).toContain('text-primary')
     // the pool is hidden by its rule, the garage has no area
     const shapes = areas(wrapper)

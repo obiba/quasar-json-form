@@ -14,7 +14,8 @@ a plain `enum`, and winning over the entries). An area follows the HTML `<area>`
 (`x1, y1, x2, y2, ...`), the coords in the pixels of the image, as an array or a comma separated
 string. A value without a valid area is only available in the list.
 
-The areas are drawn as an SVG overlay that scales with the image, so it can be constrained with
+The areas are drawn as an SVG overlay that scales with the image (the parts outside of the image
+are not drawn), so it can be constrained with
 `options.maxWidth` and still fit its container. The `title` of the entry is the tooltip and the
 accessible name of the area. An image that cannot be loaded shows a placeholder icon.
 
