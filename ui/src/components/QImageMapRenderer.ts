@@ -278,6 +278,8 @@ export default defineComponent({
         class: ['q-image-map__overlay', 'absolute-full', `text-${color.value}`],
         viewBox: `0 0 ${size.value.width} ${size.value.height}`,
         preserveAspectRatio: 'none',
+        // the parts of the areas outside of the image are not drawn
+        overflow: 'hidden',
         role: isMultiple.value ? 'group' : 'radiogroup',
         'aria-label': name.value,
       }, regions.value.map(renderShape))
