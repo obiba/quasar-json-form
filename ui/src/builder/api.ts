@@ -41,6 +41,16 @@ export const builderApi: RendererApi = {
       default: 'false',
       desc: 'No uppercase transform on the import/export buttons and the tab labels.',
     },
+    noImport: {
+      type: 'Boolean',
+      default: 'false',
+      desc: 'No import button, when the application imports the forms its own way.',
+    },
+    noExport: {
+      type: 'Boolean',
+      default: 'false',
+      desc: 'No export button, when the application exports the forms its own way.',
+    },
   },
   events: {
     'update:modelValue': {

@@ -40,6 +40,10 @@ export default defineComponent({
     config: { type: Object, default: undefined },
     /** no uppercase transform on the import/export buttons and the tab labels */
     noCaps: { type: Boolean, default: false },
+    /** no import button (the application imports the forms its own way) */
+    noImport: { type: Boolean, default: false },
+    /** no export button (the application exports the forms its own way) */
+    noExport: { type: Boolean, default: false },
   },
   emits: ['update:modelValue'],
   setup(props, { emit, expose }) {
@@ -98,8 +102,8 @@ export default defineComponent({
           'onUpdate:modelValue': (v: string) => { locale.value = v },
         }),
         h(QSpace),
-        h(QBtn, { outline: true, noCaps: props.noCaps, size: 'sm', icon: 'upload', label: tr('import'), onClick: () => { importing.value = true } }),
-        h(QBtnDropdown, { outline: true, noCaps: props.noCaps, size: 'sm', icon: 'download', label: tr('export'), autoClose: true }, () => h(QList, { dense: true }, () => [
+        props.noImport ? null : h(QBtn, { outline: true, noCaps: props.noCaps, size: 'sm', icon: 'upload', label: tr('import'), onClick: () => { importing.value = true } }),
+        props.noExport ? null : h(QBtnDropdown, { outline: true, noCaps: props.noCaps, size: 'sm', icon: 'download', label: tr('export'), autoClose: true }, () => h(QList, { dense: true }, () => [
           h(QItem, { clickable: true, onClick: () => download() }, () => h(QItemSection, () => tr('form'))),
           h(QItem, { clickable: true, onClick: () => download('schema') }, () => h(QItemSection, () => tr('exportSchema'))),
           h(QItem, { clickable: true, onClick: () => download('uischema') }, () => h(QItemSection, () => tr('exportUischema'))),
@@ -136,7 +140,7 @@ export default defineComponent({
         ]),
       ]),
       // outside the tabs: available whichever tab is shown
-      h(BuilderImport, { modelValue: importing.value, 'onUpdate:modelValue': (v: boolean) => { importing.value = v }, onImport }),
+      props.noImport ? null : h(BuilderImport, { modelValue: importing.value, 'onUpdate:modelValue': (v: boolean) => { importing.value = v }, onImport }),
     ])
   },
 })

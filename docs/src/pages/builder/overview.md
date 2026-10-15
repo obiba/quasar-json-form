@@ -51,7 +51,8 @@ The builder is an outline tree, a property panel and a live preview.
 
 Import accepts a form, a schema alone (the UI schema is generated, one control per property) or an
 [angular-schema-form pair](#/migration/overview) (schema and definition, converted with its
-diagnostics), pasted or picked as a file. Export downloads the form or one of its parts.
+diagnostics), pasted or picked as a file. Export downloads the form or one of its parts. An application
+that imports and exports the forms its own way hides these buttons with `no-import` and `no-export`.
 
 A hand-written schema is preserved: the keywords the builder does not understand stay attached
 to their element and are written back as they were. A property that cannot be modeled at all

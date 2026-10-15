@@ -534,3 +534,25 @@ describe('api description', () => {
     expect(() => JSON.parse(builderApi.data!.example!)).not.toThrow()
   })
 })
+
+describe('QJsonFormBuilder import and export', () => {
+  const toolbar = (wrapper: any) => wrapper.find('.q-json-form-builder > .row').findAll('.q-btn').map((b: any) => b.text())
+
+  it('has import and export buttons', async () => {
+    const wrapper = mountBuilder()
+    await flush()
+    expect(toolbar(wrapper)).toEqual([expect.stringContaining('Import'), expect.stringContaining('Export')])
+    wrapper.unmount()
+  })
+
+  it('hides them with noImport and noExport', async () => {
+    const wrapper = mountBuilder({ noImport: true })
+    await flush()
+    expect(toolbar(wrapper)).toEqual([expect.stringContaining('Export')])
+    await wrapper.setProps({ noImport: false, noExport: true })
+    expect(toolbar(wrapper)).toEqual([expect.stringContaining('Import')])
+    await wrapper.setProps({ noImport: true })
+    expect(toolbar(wrapper)).toEqual([])
+    wrapper.unmount()
+  })
+})
