@@ -51,7 +51,7 @@ export default defineComponent({
         return null
       }
 
-      return h('div', { class: ['q-time-renderer', rootClass.value] }, [...renderHeader(), h(QInput, {
+      return h('div', { class: ['q-input-field q-time-renderer', rootClass.value] }, [...renderHeader(), h(QInput, {
         ...omitOptions(options.value, ['class']),
         modelValue: timeValue.value,
         'onUpdate:modelValue': onChange,

@@ -174,7 +174,7 @@ export default defineComponent({
         children.push(renderHint())
       }
 
-      return h('div', { class: ['q-radio-matrix-renderer', rootClass.value] }, children)
+      return h('div', { class: ['q-input-field q-radio-matrix-renderer', rootClass.value] }, children)
     }
   },
 })

@@ -51,7 +51,7 @@ export default defineComponent({
         return null
       }
 
-      return h('div', { class: ['q-select-renderer', rootClass.value] }, [
+      return h('div', { class: ['q-input-field q-select-renderer', rootClass.value] }, [
         ...renderHeader(),
         h(QSelect, {
           ...omitOptions(options.value, ['class']),

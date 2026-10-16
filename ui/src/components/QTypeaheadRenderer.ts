@@ -77,7 +77,7 @@ export default defineComponent({
         return null
       }
 
-      return h('div', { class: ['q-typeahead-renderer', rootClass.value] }, [
+      return h('div', { class: ['q-input-field q-typeahead-renderer', rootClass.value] }, [
         ...renderHeader(),
         h(QSelect, {
           ...omitOptions(options.value, [...RENDERER_OPTION_KEYS, 'class']),

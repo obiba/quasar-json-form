@@ -221,7 +221,7 @@ export default defineComponent({
       const refsMissing = hasRefs.value && !refRange.value
       const disabled = (!isEnabled.value || refsMissing) && !isReadonly.value
 
-      return h('div', { class: ['q-date-renderer', rootClass.value] }, [...renderHeader(), h(QInput, {
+      return h('div', { class: ['q-input-field q-date-renderer', rootClass.value] }, [...renderHeader(), h(QInput, {
         ...omitOptions(options.value, [...RENDERER_OPTION_KEYS, 'class']),
         modelValue: dateValue.value,
         'onUpdate:modelValue': onChange,

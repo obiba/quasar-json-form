@@ -38,7 +38,7 @@ export default defineComponent({
         return null
       }
 
-      return h('div', { class: ['q-number-renderer', rootClass.value] }, [
+      return h('div', { class: ['q-input-field q-number-renderer', rootClass.value] }, [
         ...renderHeader(),
         h(QInput, {
           ...omitOptions(options.value, ['class']),

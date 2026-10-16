@@ -35,7 +35,7 @@ export default defineComponent({
         return null
       }
 
-      return h('div', { class: ['q-rating-renderer q-mt-md', rootClass.value] }, [
+      return h('div', { class: ['q-input-field q-rating-renderer q-mt-md', rootClass.value] }, [
         ...renderHeader(),
         h(QRating, {
           // the maximum of the schema, unless the options set it

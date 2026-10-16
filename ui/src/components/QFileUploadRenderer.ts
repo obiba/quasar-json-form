@@ -423,7 +423,7 @@ export default defineComponent({
         children.push(renderHint())
       }
 
-      return h('div', { class: ['q-file-upload-renderer', rootClass.value] }, children)
+      return h('div', { class: ['q-input-field q-file-upload-renderer', rootClass.value] }, children)
     }
   },
 })

@@ -95,7 +95,7 @@ export default defineComponent({
 
       const errors = [errorMessage.value, ...wordErrors.value].filter((e) => e && e.length > 0)
 
-      return h('div', { class: ['q-string-renderer', rootClass.value] }, [
+      return h('div', { class: ['q-input-field q-string-renderer', rootClass.value] }, [
         ...renderHeader(),
         h(QInput, {
           ...omitOptions(options.value, [...RENDERER_OPTION_KEYS, 'class']),

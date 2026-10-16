@@ -55,7 +55,7 @@ export default defineComponent({
         return null
       }
 
-      return h('div', { class: ['q-range-renderer q-mt-md', rootClass.value] }, [
+      return h('div', { class: ['q-input-field q-range-renderer q-mt-md', rootClass.value] }, [
         ...renderHeader(),
         h(QRange, {
           ...options.value,

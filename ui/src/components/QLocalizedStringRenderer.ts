@@ -165,7 +165,7 @@ export default defineComponent({
           ...(toggle ? { append: () => toggle } : {}),
         })
 
-      return h('div', { class: ['q-localized-string-renderer', rootClass.value] }, [...renderHeader(), input])
+      return h('div', { class: ['q-input-field q-localized-string-renderer', rootClass.value] }, [...renderHeader(), input])
     }
   },
 })

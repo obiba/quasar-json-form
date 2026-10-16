@@ -337,7 +337,7 @@ export default defineComponent({
           : renderHint(),
       )
 
-      return h('div', { class: ['q-images-renderer', rootClass.value] }, children)
+      return h('div', { class: ['q-input-field q-images-renderer', rootClass.value] }, children)
     }
   },
 })

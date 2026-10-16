@@ -40,7 +40,7 @@ export default defineComponent({
         return null
       }
 
-      return h('div', { class: ['q-markdown-renderer', rootClass.value] }, [
+      return h('div', { class: ['q-input-field q-markdown-renderer', rootClass.value] }, [
         ...renderHeader(),
         h(QMarkdownEditor, {
           modelValue: control.value.data,

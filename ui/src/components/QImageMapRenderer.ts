@@ -351,7 +351,7 @@ export default defineComponent({
         )
       }
 
-      return h('div', { class: ['q-image-map-renderer', rootClass.value] }, children)
+      return h('div', { class: ['q-input-field q-image-map-renderer', rootClass.value] }, children)
     }
   },
 })

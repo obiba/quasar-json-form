@@ -43,7 +43,7 @@ export default defineComponent({
         return null
       }
 
-      return h('div', { class: ['q-slider-renderer q-mt-md', rootClass.value] }, [
+      return h('div', { class: ['q-input-field q-slider-renderer q-mt-md', rootClass.value] }, [
         ...renderHeader(),
         h(QSlider, {
           // the bounds of the schema, unless the options set them

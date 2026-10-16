@@ -226,7 +226,7 @@ export default defineComponent({
       }
 
       return h('div', {
-        class: ['q-list-renderer', rootClass.value],
+        class: ['q-input-field q-list-renderer', rootClass.value],
       }, [
         ...renderHeader(),
         listItems,

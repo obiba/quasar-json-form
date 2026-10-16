@@ -35,7 +35,7 @@ export default defineComponent({
         return null
       }
 
-      return h('div', { class: ['q-toggle-renderer', rootClass.value] }, [
+      return h('div', { class: ['q-input-field q-toggle-renderer', rootClass.value] }, [
         ...renderHeader(),
         h(QToggle, {
           ...options.value,
