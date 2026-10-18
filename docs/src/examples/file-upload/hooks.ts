@@ -21,8 +21,16 @@ export default {
   data: { protocol: { obibaFiles: [{ id: 'a1b2', fileName: 'protocol-v2.pdf', size: 245760 }] } },
   config: {
     fileUpload: {
-      upload: (file: File) => new Promise((resolve) => {
-        setTimeout(() => resolve({ id: `tmp-${Date.now()}`, fileName: file.name, size: file.size }), 800)
+      upload: (file: File, context: unknown, onProgress: (progress: number) => void) => new Promise((resolve) => {
+        let progress = 0
+        const timer = setInterval(() => {
+          progress += 25
+          onProgress(progress)
+          if (progress >= 100) {
+            clearInterval(timer)
+            resolve({ id: `tmp-${Date.now()}`, fileName: file.name, size: file.size })
+          }
+        }, 200)
       }),
       remove: (item: { id?: string }) => { console.log('removed', item.id) },
       downloadUrl: (item: { id?: string; fileName?: string }) => `/ws/files/${item.id}/${item.fileName}`,
@@ -32,8 +40,17 @@ export default {
 const config = {
   fileUpload: {
     // returns the file item to store (or the path, for a string control)
-    upload: (file, context) => new Promise((resolve) => {
-      setTimeout(() => resolve({ id: 'tmp-' + Date.now(), fileName: file.name, size: file.size }), 800)
+    // onProgress (0 to 100) makes the progress bar determinate
+    upload: (file, context, onProgress) => new Promise((resolve) => {
+      let progress = 0
+      const timer = setInterval(() => {
+        progress += 25
+        onProgress(progress)
+        if (progress >= 100) {
+          clearInterval(timer)
+          resolve({ id: 'tmp-' + Date.now(), fileName: file.name, size: file.size })
+        }
+      }, 200)
     }),
     remove: (item, context) => { console.log('removed', item.id) },
     downloadUrl: (item, context) => '/ws/files/' + item.id + '/' + item.fileName,

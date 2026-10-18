@@ -246,8 +246,12 @@ Mica temp file flow: `uploadUrl: "/ws/files/temp"`, `metadataUrl: "/ws/files/tem
 items get `justUploaded: true`; removing such an item calls `deleteUrl` (`{id}`) when set. `downloadUrl`
 is a template with the item properties (`/ws/files/{id}/{fileName}`) used as link in the list.
 
-Programmatic, through `config.fileUpload` (see `FileUploadHooks`): `upload(file, context)` returning the
-item (or the path), `remove(item, context)`, `downloadUrl(item, context)`.
+Programmatic, through `config.fileUpload` (see `FileUploadHooks`): `upload(file, context, onProgress)`
+returning the item (or the path) and calling `onProgress` (0 to 100) for a determinate progress bar,
+`remove(item, context)`, `downloadUrl(item, context)`, and `download(item, context)`: an async handler
+called when the file name is clicked, instead of a link. A link cannot carry an `Authorization` header,
+and a token in the URL leaks in the logs and the history: the handler fetches the file with the
+application authentication and saves it.
 
 ## Radio matrix
 

@@ -84,7 +84,7 @@ precedence is `options` on the control element, then `config`, then the built-in
   :config="{
     languages: { en: 'English', fr: 'Français' },
     countries: countryCodes,
-    fileUpload: { upload, remove, downloadUrl },
+    fileUpload: { upload, remove, downloadUrl, download },
     geo: { tiles: 'https://tile.example.org/{z}/{x}/{y}.png', center: [-73.6, 45.5], zoom: 10 },
   }"
 />
@@ -96,7 +96,7 @@ The built-in renderers read these entries:
 | --- | --- | --- |
 | `languages` | [localized string](#/controls/localized-string) | Languages of the localized strings, `['en', 'fr']` or `{ en: 'English', fr: 'Français' }`. Looked up after `options.languages` and before the `languages` prop of `QJsonForm`; defaults to `['en']`. |
 | `countries` | [countries](#/controls/countries) | The `[{ code, name }]` list of the country select, or a `{ locale: [...] }` map keyed by language (the current locale is used). Looked up after `options.countries` and before a `jsonforms-countries` provide; the `countryCodes` export holds the ISO 3166-1 alpha-3 codes. |
-| `fileUpload` | [file upload](#/controls/file-upload) | Programmatic upload hooks: `upload(file, context)` returning the file item to store (or the path for a string control), `remove(item, context)` called after a file is removed from the data, and `downloadUrl(item, context)` giving the link of a stored file. `context` holds the `path`, `schema`, `uischema` and `options` of the control. Without `upload`, the declarative `uploadUrl` flow of the control options applies. |
+| `fileUpload` | [file upload](#/controls/file-upload) | Programmatic upload hooks: `upload(file, context, onProgress)` returning the file item to store (or the path for a string control) and reporting its progress (0 to 100), `remove(item, context)` called after a file is removed from the data, `downloadUrl(item, context)` giving the link of a stored file, and `download(item, context)`, an async handler called when the file name is clicked instead of a link (to fetch the file with the application authentication). `context` holds the `path`, `schema`, `uischema` and `options` of the control. Without `upload`, the declarative `uploadUrl` flow of the control options applies. |
 | `geo` | [geo](#/controls/geo) | Defaults of the map controls: `tiles` (a `{z}/{x}/{y}` URL template or `{ url, attributions }`), `center` (`[lon, lat]`), `zoom`, `height`, `precision` (decimals of the coordinates) and `grayscale`. Each one is overridden by the option of the same name on the control. |
 
 Any other entry is ignored by the built-in renderers but reaches the [custom controls](#/start/custom-controls)
