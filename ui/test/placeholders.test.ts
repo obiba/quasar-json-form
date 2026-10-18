@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect } from 'vitest'
-import { fillPlaceholders, placeholderError, escapeMarkdown, formatValue } from '../src/utils/placeholders'
-import { renderMarkdownInline } from '../src/utils/markdown'
+import { fillPlaceholders, renderPlaceholders, placeholderError, formatValue } from '../src/utils/placeholders'
+import { renderMarkdown, renderMarkdownInline } from '../src/utils/markdown'
 import { mountForm, flush } from './utils'
 
 describe('placeholders', () => {
@@ -20,13 +20,26 @@ describe('placeholders', () => {
   })
 
   it('escapes the values so that they cannot inject markup', () => {
-    const html = renderMarkdownInline(escapeMarkdown('<img src=x onerror=alert(1)> **bold** [link](javascript:alert(1))'))
+    const inline = (text: string, value: string) => renderPlaceholders(text, renderMarkdownInline, () => value)
+    const html = inline('{{v}}', '<img src=x onerror=alert(1)> **bold** [link](javascript:alert(1))')
     expect(html).not.toContain('<img')
     expect(html).not.toContain('<strong>')
     expect(html).not.toContain('<a ')
     expect(html).toContain('[link](javascript:alert(1))')
     expect(html).toContain('&lt;img')
     expect(html).toContain('**bold**')
+    // the block structure does not depend on the data
+    expect(renderPlaceholders('{{v}}', renderMarkdown, () => 'x\n===\n\n    code')).toBe('<p>x\n===\n\n    code</p>\n')
+    // in a code span, an attribute, a link
+    expect(inline('`{{v}}`', 'a.b-1 <c>')).toBe('<code>a.b-1 &lt;c&gt;</code>')
+    expect(inline('<span title="{{v}}">x</span>', 'x" class="evil')).toBe('<span title="x&quot; class=&quot;evil">x</span>')
+    expect(inline('[x](https://a.org/?q={{v}})', 'a b&c')).toBe('<a href="https://a.org/?q=a%20b%26c">x</a>')
+    // the markdown of the text, with the values
+    expect(inline('*{{a}}* and {{b}}', 'x')).toBe('<em>x</em> and x')
+  })
+
+  it('replaces the placeholders of a plain text by the raw values', () => {
+    expect(fillPlaceholders('Tab {{v}}', () => '<b>&')).toBe('Tab <b>&')
   })
 
   it('reports the invalid expressions', () => {
@@ -92,5 +105,22 @@ describe('placeholders in the form texts', () => {
     await flush()
     expect(wrapper.find('.q-label-renderer').text()).toBe('Salut Ada')
     wrapper.unmount()
+  })
+
+  it('replaces the placeholders of the category and step labels', async () => {
+    const elements = [{ type: 'Control', scope: '#/properties/name' }]
+    const categories = mountForm({
+      schema, modelValue: { name: 'Ada' },
+      uischema: { type: 'Categorization', elements: [{ type: 'Category', label: 'About {{name}}', elements }] },
+    })
+    const stepper = mountForm({
+      schema, modelValue: { name: 'Ada' },
+      uischema: { type: 'StepperLayout', labels: ['Step {{name}}'], elements: [{ type: 'VerticalLayout', elements }] },
+    })
+    await flush()
+    expect(categories.text()).toContain('About Ada')
+    expect(stepper.text()).toContain('Step Ada')
+    categories.unmount()
+    stepper.unmount()
   })
 })

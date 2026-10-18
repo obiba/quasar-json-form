@@ -17,7 +17,7 @@ export default defineComponent({
     const control = controlResult.control
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled } = useControlProperties(control)
+    const { isVisible, isEnabled, formText } = useControlProperties(control)
 
     const elements = computed(() => (props.uischema.elements && Array.isArray(props.uischema.elements) ? props.uischema.elements : []))
     const labels = computed(() => {
@@ -39,7 +39,7 @@ export default defineComponent({
     const steps = () => labels.value.map((name: string, index: number) =>
       h(QStep, {
         name: index,
-        title: t(name),
+        title: formText(name),
         icon: icons.value ? icons.value[index] : undefined,
       }, () => [
         h(QDispatchRenderer, {

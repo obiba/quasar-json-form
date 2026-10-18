@@ -168,8 +168,8 @@ not applied.
 The texts of a form can show the data: a `{{ expression }}` placeholder in the `title`,
 `description` or `hint` of a control (on the schema property or the `Control` element), in the
 `label` / `title`, `description` or `hint` of a `Group` / `Category`, in the `label` or
-`description` of a `Section`, or in the `text` of a `Label`, is replaced by the value of the
-expression:
+`description` of a `Section`, in the `text` of a `Label`, or in the `labels` of a `TabsLayout` /
+`StepperLayout`, is replaced by the value of the expression:
 
 ```json
 { "type": "Label", "text": "Thank you **{{participant.firstName}}**, your score is {{scores.total}}." }
@@ -179,13 +179,16 @@ expression:
   `visible` / `compute` rules.
 - The placeholders are replaced after the translation with `t()`, so the translations can carry
   them too.
-- The value is escaped (markdown and HTML), so the data cannot inject markup; `undefined` and
-  `null` show nothing, the values of an array are separated by commas.
+- The value is inserted after the markdown rendering, HTML-escaped (URL-encoded in a link), so the
+  data cannot inject markup; `undefined` and `null` show nothing, the values of an array are
+  separated by commas.
 - The text is updated as the data changes; an expression that fails to evaluate shows nothing.
 - The form builder reports the placeholders whose expression does not compile.
 
-`fillPlaceholders(text, evaluate)` and `placeholderError(text)` are exported, for the texts an
-application displays outside of the form (a table of contents, an error summary).
+`fillPlaceholders(text, evaluate)` (plain text), `renderPlaceholders(text, render, evaluate)`
+(the HTML of a markdown text, `render` being `renderMarkdown` or `renderMarkdownInline`) and
+`placeholderError(text)` are exported, for the texts an application displays outside of the form
+(a table of contents, an error summary).
 
 ## Renderer messages
 

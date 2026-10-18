@@ -15,7 +15,7 @@ export default defineComponent({
     const control = controlResult.control
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled, rootClass, formText } = useControlProperties(control)
+    const { isVisible, isEnabled, rootClass, formMarkdown } = useControlProperties(control)
 
 
     return () => {
@@ -29,8 +29,7 @@ export default defineComponent({
       const groupTitle = (control.value as any).title || (control.value.uischema as any).title
         || (typeof (control.value.uischema as any).label === 'string' ? (control.value.uischema as any).label : undefined)
       if (groupTitle) {
-        let title = formText(String(groupTitle))
-        title = renderMarkdown(title)
+        const title = formMarkdown(String(groupTitle), renderMarkdown)
         children.push(h('div', {
           class: 'q-form-title' + ((control.value.uischema as any).titleClass ? ` ${(control.value.uischema as any).titleClass}` : ''),
           innerHTML: title,
@@ -38,8 +37,7 @@ export default defineComponent({
       }
 
       if ((control.value.uischema as any).description) {
-        let description = formText(String((control.value.uischema as any).description))
-        description = renderMarkdown(description)
+        const description = formMarkdown(String((control.value.uischema as any).description), renderMarkdown)
         children.push(h('div', {
           class: 'q-form-description' + ((control.value.uischema as any).descriptionClass ? ` ${(control.value.uischema as any).descriptionClass}` : ''),
           innerHTML: description,
@@ -60,8 +58,7 @@ export default defineComponent({
       })
 
       if ((control.value as any).hint || (control.value.uischema as any).hint) {
-        let hint = formText(String((control.value as any).hint || (control.value.uischema as any).hint))
-        hint = renderMarkdown(hint)
+        const hint = formMarkdown(String((control.value as any).hint || (control.value.uischema as any).hint), renderMarkdown)
         children.push(h('div', {
           class: 'q-form-hint' + ((control.value.uischema as any).hintClass ? ` ${(control.value.uischema as any).hintClass}` : ''),
           innerHTML: hint,

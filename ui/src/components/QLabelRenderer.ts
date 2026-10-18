@@ -14,7 +14,7 @@ export default defineComponent({
     const control = controlResult.control
 
     // Use the generic control rules composable
-    const { isVisible, rootClass, formText } =
+    const { isVisible, rootClass, formMarkdown } =
       useControlProperties(control)
 
 
@@ -29,7 +29,7 @@ export default defineComponent({
       // placeholders are replaced by their value.
       const uischema = control.value.uischema as any
       const text = uischema.label || uischema.text
-      const label = text ? renderMarkdown(formText(String(text))) : ''
+      const label = text ? formMarkdown(String(text), renderMarkdown) : ''
 
       return h('div', {
         class: ['q-label-renderer', uischema.labelClass, rootClass.value],

@@ -31,25 +31,37 @@ export function formatValue(value: any): string {
   return String(value)
 }
 
-/**
- * A value as literal markdown text: the HTML special characters become
- * entities and the markdown punctuation is backslash-escaped, so that the
- * data cannot inject markup.
- */
-export function escapeMarkdown(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/[\\`*_{}[\]()#+\-.!|~"']/g, '\\$&')
-}
-
-/**
- * The text with its placeholders replaced by the escaped value of their
- * expression (`evaluate` gives undefined when it fails, an empty string is
- * displayed then). A text without placeholders is returned as is.
- */
+/** The text with its placeholders replaced by the text of their value, for a plain text (not markdown). */
 export function fillPlaceholders(text: string, evaluate: (expression: string) => any): string {
   if (!text.includes('{{')) return text
-  return text.replace(PLACEHOLDER, (_match, expression: string) => escapeMarkdown(formatValue(evaluate(expression.trim()))))
+  return text.replace(PLACEHOLDER, (_match, expression: string) => formatValue(evaluate(expression.trim())))
+}
+
+const HTML_ENTITIES: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }
+
+function escapeHtml(text: string): string {
+  return text.replace(/[&<>"']/g, (c) => HTML_ENTITIES[c]!)
+}
+
+// A placeholder stands as `\uE000<index>\uE001` (private use characters,
+// left as is by markdown-it and DOMPurify) while the text is rendered, or
+// percent-encoded when markdown-it normalized it in a link URL
+const TOKEN = /\uE000(\d+)\uE001|%EE%80%80(\d+)%EE%80%81/g
+
+/**
+ * The HTML of a markdown text (`render` is `renderMarkdown` or
+ * `renderMarkdownInline`) with its placeholders replaced by the value of
+ * their expression. The text is rendered with the placeholders as tokens and
+ * the values replace the tokens in the HTML, HTML-escaped (URL-encoded in a
+ * link), so that the data cannot inject markup, and the rendering of the text
+ * does not depend on the data (it stays cached).
+ */
+export function renderPlaceholders(text: string, render: (text: string) => string, evaluate: (expression: string) => any): string {
+  if (!text.includes('{{')) return render(text)
+  const expressions: string[] = []
+  const html = render(text.replace(PLACEHOLDER, (_match, expression: string) => `\uE000${expressions.push(expression.trim()) - 1}\uE001`))
+  return html.replace(TOKEN, (_match, index: string | undefined, encodedIndex: string | undefined) => {
+    const value = formatValue(evaluate(expressions[Number(index ?? encodedIndex)]!))
+    return index !== undefined ? escapeHtml(value) : escapeHtml(encodeURIComponent(value))
+  })
 }

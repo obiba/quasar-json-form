@@ -2,7 +2,6 @@ import { h, computed, ref, defineComponent } from 'vue'
 import { rendererProps } from '@jsonforms/vue'
 import QDispatchRenderer from './QDispatchRenderer'
 import { QTabs, QTab, QTabPanels, QTabPanel, QSeparator } from 'quasar'
-import { useFormI18n } from '../composables/useFormI18n'
 import { useControlProperties } from '../composables/useControlProperties'
 import { useLayoutControl } from '../composables/useControl'
 
@@ -10,14 +9,12 @@ export default defineComponent({
   name: 'QTabsLayout',
   props: rendererProps(),
   setup(props: any) {
-    const { t } = useFormI18n()
-
     const controlResult = useLayoutControl(props)
 
     const control = controlResult.control
 
     // Use the generic control rules composable
-    const { isVisible, isEnabled } = useControlProperties(control)
+    const { isVisible, isEnabled, formText } = useControlProperties(control)
 
     const withCategories = computed(() => props.uischema.type === 'Categorization')
 
@@ -56,7 +53,7 @@ export default defineComponent({
         }, () => labels.value.map((name: string, index: number) =>
           h(QTab, {
             name: String(index),
-            label: t(name),
+            label: formText(name),
             class: labelClass.value,
           })
         )),

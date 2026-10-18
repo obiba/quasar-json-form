@@ -14,7 +14,7 @@ export default defineComponent({
     const control = controlResult.control
 
     // Use the generic control rules composable
-    const { isVisible, rootClass, formText } = useControlProperties(control)
+    const { isVisible, rootClass, formMarkdown } = useControlProperties(control)
 
 
     return () => {
@@ -30,14 +30,14 @@ export default defineComponent({
       if (label) {
         children.push(h('div', {
           class: ['q-form-label', uischema.labelClass],
-          innerHTML: renderMarkdownInline(formText(String(label))),
+          innerHTML: formMarkdown(String(label), renderMarkdownInline),
         }))
       }
 
       if (uischema.description) {
         children.push(h('div', {
           class: ['q-form-description text-markdown', uischema.descriptionClass],
-          innerHTML: renderMarkdown(formText(String(uischema.description))),
+          innerHTML: formMarkdown(String(uischema.description), renderMarkdown),
         }))
       }
 
