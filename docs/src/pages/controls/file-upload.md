@@ -31,7 +31,7 @@ const download = async (item) => {
   const url = URL.createObjectURL(await response.blob())
   const a = Object.assign(document.createElement('a'), { href: url, download: item.fileName })
   a.click()
-  URL.revokeObjectURL(url)
+  setTimeout(() => URL.revokeObjectURL(url))
 }
 ```
 
