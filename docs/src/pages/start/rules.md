@@ -36,7 +36,7 @@ and sections.
 ## Placeholders
 
 A `{{ expression }}` in a text of the form shows the value of the expression: the `title`,
-`description` and `hint` of a control (on the schema property or the `Control` element), the
+`description`, `label` and `hint` of a control (on the schema property or the `Control` element), the
 `label`, `description` and `hint` of a group or a category, the `label` and `description` of a
 section, the `text` of a label and the `labels` of the tabs and stepper layouts. The placeholders are replaced after the translation, so the translations can
 carry them too. The value is escaped (it cannot inject markup), `undefined` and `null` show

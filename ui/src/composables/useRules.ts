@@ -175,15 +175,23 @@ export class RuleEngine {
     Object.values(node).forEach((child) => this.check(child))
   }
 
+  // the failures already logged: the expressions are evaluated again on every render
+  // ponytail: grows with the distinct failures, bounded by the expressions of the forms
+  private loggedFailures = new Set<string>()
+
   /**
    * The value of an expression on a context. An expression that does not
-   * compile or fails to evaluate logs the error and gives `fallback`.
+   * compile or fails to evaluate logs the error (once) and gives `fallback`.
    */
   evaluate(expression: string, context: Record<string, any>, fallback: any = false): any {
     try {
       return this.compile(expression)(context, this.customFunctions)
     } catch (error) {
-      console.error('Error evaluating expression:', expression, error)
+      const key = `${expression}\n${error}`
+      if (!this.loggedFailures.has(key)) {
+        this.loggedFailures.add(key)
+        console.error('Error evaluating expression:', expression, error)
+      }
       return fallback
     }
   }

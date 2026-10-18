@@ -6,7 +6,7 @@ import { ruleEngine } from '../composables/useRules'
  * descriptions, hints, labels): the expression is evaluated with the rule
  * engine on the form data, and its value replaces the placeholder.
  */
-const PLACEHOLDER = /\{\{([^{}]*)\}\}/g
+const PLACEHOLDER = /\{\{([\s\S]*?)\}\}/g
 
 /** The expressions of the placeholders of a text. */
 export function placeholders(text: string): string[] {

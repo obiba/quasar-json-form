@@ -63,12 +63,12 @@ export default defineComponent({
 
     const {
       isVisible, isEnabled, isReadonly, title, inputLabel, rootClass, hasError, errorMessage, options, config,
-      renderHeader, renderHint,
+      renderHeader, renderHint, formText,
     } = useControlProperties(control)
 
-    const { t, translate } = useFormI18n()
+    const { translate } = useFormI18n()
 
-    const name = computed<string | undefined>(() => inputLabel.value ?? (title.value ? t(title.value) : undefined))
+    const name = computed<string | undefined>(() => inputLabel.value ?? (title.value ? formText(title.value) : undefined))
 
     const isEditable = computed(() => isEnabled.value && !isReadonly.value)
 

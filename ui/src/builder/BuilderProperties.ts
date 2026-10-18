@@ -134,7 +134,8 @@ export default defineComponent({
     const textInput = (slot: TextSlot, label: string, multiline = false): VNode => {
       const n = node.value!
       const value = getText(props.model, n, slot, props.locale) ?? ''
-      const error = placeholderError(value)
+      // the option titles and the validation messages are not interpolated
+      const error = /^(options|validation)\./.test(slot.name) ? undefined : placeholderError(value)
       return h(QInput, {
         modelValue: value,
         label,

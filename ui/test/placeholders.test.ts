@@ -40,6 +40,7 @@ describe('placeholders', () => {
 
   it('replaces the placeholders of a plain text by the raw values', () => {
     expect(fillPlaceholders('Tab {{v}}', () => '<b>&')).toBe('Tab <b>&')
+    expect(fillPlaceholders('{{ x ? "{a}" : "b" }}!', (e) => e)).toBe('x ? "{a}" : "b"!')
   })
 
   it('reports the invalid expressions', () => {
@@ -48,6 +49,8 @@ describe('placeholders', () => {
     expect(placeholderError('Hello {{name ==}}')).toMatch(/^\{\{name ==\}\}: /)
     expect(placeholderError('Hello {{unknownFn(name)}}')).toMatch(/unknown function/)
     expect(placeholderError('Hello {{ }}')).toMatch(/empty expression/)
+    expect(placeholderError('{{ isEmpty(name) ? "{none}" : name }}')).toBeUndefined()
+    expect(placeholderError('{{ isEmpty(name) ? "{none}" : name ==}}')).toBeDefined()
   })
 })
 
@@ -56,6 +59,7 @@ describe('placeholders in the form texts', () => {
     type: 'object',
     properties: {
       name: { type: 'string', title: 'Name' },
+      nick: { type: 'string' },
       age: { type: 'integer', title: 'Age of {{name}}', description: 'In {{ year + 1 }}', hint: 'Hint for {{name}}' },
       year: { type: 'integer' },
     },
@@ -66,7 +70,7 @@ describe('placeholders in the form texts', () => {
       { type: 'Section', label: 'Section {{name}}', description: 'Section text {{name}}' },
       {
         type: 'Group', label: 'Group {{name}}', description: 'Group text {{name}}', hint: 'Group hint {{name}}',
-        elements: [{ type: 'Control', scope: '#/properties/age' }],
+        elements: [{ type: 'Control', scope: '#/properties/age' }, { type: 'Control', scope: '#/properties/nick', label: 'Nick of {{name}}' }],
       },
       { type: 'Label', text: 'Hello **{{name}}**' },
     ],
@@ -76,7 +80,7 @@ describe('placeholders in the form texts', () => {
     const wrapper = mountForm({ schema, uischema, modelValue: { name: 'Ada', year: 2025 } })
     await flush()
     const text = wrapper.text()
-    for (const expected of ['Section Ada', 'Section text Ada', 'Group Ada', 'Group text Ada', 'Group hint Ada', 'Age of Ada', 'In 2026', 'Hint for Ada']) {
+    for (const expected of ['Section Ada', 'Section text Ada', 'Group Ada', 'Group text Ada', 'Group hint Ada', 'Age of Ada', 'Nick of Ada', 'In 2026', 'Hint for Ada']) {
       expect(text).toContain(expected)
     }
     expect(wrapper.find('.q-label-renderer strong').text()).toBe('Ada')

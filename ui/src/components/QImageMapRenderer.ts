@@ -5,7 +5,6 @@ import { rendererProps } from '@jsonforms/vue'
 import { useControl } from '../composables/useControl'
 import { QIcon, QSelect } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
-import { useFormI18n } from '../composables/useFormI18n'
 import { omitOptions, RENDERER_OPTION_KEYS } from '../utils/options'
 import { isSupportedImage } from './QImagesRenderer'
 
@@ -87,13 +86,11 @@ export default defineComponent({
 
     const {
       isVisible, isEnabled, isReadonly, inputLabel, title, rootClass, hasError, errorMessage, options, selectOptions,
-      maxValue, clearInvalidSelection, renderHeader, renderHint, hintSlot,
+      maxValue, clearInvalidSelection, renderHeader, renderHint, hintSlot, formText,
     } = useControlProperties(control)
 
-    const { t } = useFormI18n()
-
     /** accessible name of the image and the overlay: the label, else the title */
-    const name = computed<string | undefined>(() => inputLabel.value ?? (title.value ? t(title.value) : undefined))
+    const name = computed<string | undefined>(() => inputLabel.value ?? (title.value ? formText(title.value) : undefined))
 
     const isMultiple = computed(() => control.value.schema.type === 'array')
 

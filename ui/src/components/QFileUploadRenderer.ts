@@ -68,7 +68,7 @@ export default defineComponent({
 
     const {
       isVisible, isEnabled, isReadonly, rootClass, options, config, label,
-      minValue, maxValue, hasError, errorMessage, validationMessage, renderHeader, renderHint,
+      minValue, maxValue, hasError, errorMessage, validationMessage, renderHeader, renderHint, formText,
     } = useControlProperties(control)
 
     const fileInputRef = ref<HTMLInputElement | null>(null)
@@ -399,7 +399,7 @@ export default defineComponent({
         if (canAdd.value) {
           children.push(h('div', { class: 'q-mt-sm' }, [
             h(QBtn, {
-              label: label.value ? t(label.value) : translate('files.upload'),
+              label: label.value ? formText(label.value) : translate('files.upload'),
               color: 'primary',
               icon: 'cloud_upload',
               size: 'sm',

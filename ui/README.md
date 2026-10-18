@@ -166,7 +166,7 @@ not applied.
 ## Placeholders
 
 The texts of a form can show the data: a `{{ expression }}` placeholder in the `title`,
-`description` or `hint` of a control (on the schema property or the `Control` element), in the
+`description`, `label` or `hint` of a control (on the schema property or the `Control` element), in the
 `label` / `title`, `description` or `hint` of a `Group` / `Category`, in the `label` or
 `description` of a `Section`, in the `text` of a `Label`, or in the `labels` of a `TabsLayout` /
 `StepperLayout`, is replaced by the value of the expression:

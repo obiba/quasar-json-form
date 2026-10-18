@@ -356,7 +356,7 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
   // Translated label for input-like components, with the required marker when no title carries it
   const inputLabel = computed(() => {
     if (!label.value) return undefined
-    return t(label.value) + (title.value ? '' : requiredMark.value)
+    return formText(label.value) + (title.value ? '' : requiredMark.value)
   })
 
   const renderTitle = (): VNode | null => {
