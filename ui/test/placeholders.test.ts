@@ -17,6 +17,7 @@ describe('placeholders', () => {
     expect(formatValue(['a', 1])).toBe('a, 1')
     expect(formatValue(0)).toBe('0')
     expect(formatValue(false)).toBe('false')
+    expect(formatValue(new Date(0))).toBe('1970-01-01T00:00:00.000Z')
   })
 
   it('escapes the values so that they cannot inject markup', () => {
@@ -35,6 +36,10 @@ describe('placeholders', () => {
     expect(inline('<span title="{{v}}">x</span>', 'x" class="evil')).toBe('<span title="x&quot; class=&quot;evil">x</span>')
     expect(inline('[x]({{v}})', 'https://a.org/?q=a b')).toBe('<a href="https://a.org/?q=a%20b">x</a>')
     expect(inline('<a href="{{v}}">x</a>', 'javascript:alert(1)')).toBe('<a>x</a>')
+    expect(inline('[x](https://{{v}}/a)', 'example.org')).toBe('<a href="https://example.org/a">x</a>')
+    expect(inline('www.{{v}}.com', 'evil')).toBe('<a href="http://www.evil.com">www.evil.com</a>')
+    expect(inline('[x]({{v}})', 'https://a.org/a%20b')).toBe('<a href="https://a.org/a%20b">x</a>')
+    expect(inline('[x](/s?q={{v}})', 'a\uD800')).toBe('<a href="/s?q=a%EF%BF%BD">x</a>')
     expect(inline('[x]({{v}})', 'javascript:alert(1)')).not.toContain('javascript')
     // the markdown of the text, with the values
     expect(inline('*{{a}}* and {{b}}', 'x')).toBe('<em>x</em> and x')

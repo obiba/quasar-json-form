@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import DOMPurify from 'dompurify'
 import { ruleEngine } from '../composables/useRules'
+import { encodeUrl, sanitizeHtml } from './markdown'
 
 /**
  * `{{ expression }}` placeholders of the texts of a form (titles,
@@ -28,6 +28,7 @@ export function placeholderError(text: string | undefined): string | undefined {
 export function formatValue(value: any): string {
   if (value === undefined || value === null) return ''
   if (Array.isArray(value)) return value.map(formatValue).join(', ')
+  if (value instanceof Date) return isNaN(value.getTime()) ? '' : value.toISOString()
   if (typeof value === 'object') return JSON.stringify(value)
   return String(value)
 }
@@ -54,7 +55,7 @@ const TOKEN = /\uE000(\d+)\uE001|%EE%80%80(\d+)%EE%80%81/g
  * `renderMarkdownInline`) with its placeholders replaced by the value of
  * their expression. The text is rendered with the placeholders as tokens (the
  * rendering does not depend on the data, it stays cached) and the values
- * replace the tokens in the HTML, HTML-escaped (URI-encoded in a link), so
+ * replace the tokens in the HTML, HTML-escaped (percent-encoded in a link), so
  * that the data cannot inject markup; the result is sanitized again, as a
  * value can make a dangerous URL of an attribute (`javascript:`).
  */
@@ -62,8 +63,8 @@ export function renderPlaceholders(text: string, render: (text: string) => strin
   if (!text.includes('{{')) return render(text)
   const expressions: string[] = []
   const html = render(text.replace(PLACEHOLDER, (_match, expression: string) => `\uE000${expressions.push(expression.trim()) - 1}\uE001`))
-  return DOMPurify.sanitize(html.replace(TOKEN, (_match, index: string | undefined, encodedIndex: string | undefined) => {
+  return sanitizeHtml(html.replace(TOKEN, (_match, index: string | undefined, encodedIndex: string | undefined) => {
     const value = formatValue(evaluate(expressions[Number(index ?? encodedIndex)]!))
-    return escapeHtml(index !== undefined ? value : encodeURI(value))
+    return escapeHtml(index !== undefined ? value : encodeUrl(value))
   }))
 }
