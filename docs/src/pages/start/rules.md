@@ -33,6 +33,18 @@ and sections.
 
 <DocExample name="rules/min-max" title="max on a list" />
 
+## Placeholders
+
+A `{{ expression }}` in a text of the form shows the value of the expression: the `title`,
+`description` and `hint` of a control (on the schema property or the `Control` element), the
+`label`, `description` and `hint` of a group, the `label` and `description` of a section, and the
+`text` of a label. The placeholders are replaced after the translation, so the translations can
+carry them too. The value is escaped (it cannot inject markup), `undefined` and `null` show
+nothing and the values of an array are separated by commas; the text is updated as the data
+changes. The form builder reports the placeholders whose expression is invalid.
+
+<DocExample name="rules/placeholders" title="placeholders" source />
+
 ## Expressions
 
 Rules are a subset of JavaScript, evaluated by

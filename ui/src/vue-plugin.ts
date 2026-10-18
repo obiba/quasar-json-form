@@ -41,6 +41,7 @@ import type { CountryCode } from './data/countries'
 import { createJsonFormsI18n, createTranslator, errorTranslator, interpolate, lookupTranslation } from './utils/i18n'
 import type { FormTranslations, Messages } from './utils/i18n'
 import { renderMarkdown, renderMarkdownInline } from './utils/markdown'
+import { fillPlaceholders, placeholderError, placeholders, escapeMarkdown, formatValue } from './utils/placeholders'
 import { countWords, parseWordLimit } from './utils/words'
 import { ruleEngine, RuleEngine } from './composables/useRules'
 import { createFormErrorRegistry, toInstancePath, useReportedErrors } from './composables/useFormErrors'
@@ -147,6 +148,11 @@ export {
   lookupTranslation,
   renderMarkdown,
   renderMarkdownInline,
+  fillPlaceholders,
+  placeholderError,
+  placeholders,
+  escapeMarkdown,
+  formatValue,
   countWords,
   parseWordLimit,
   ruleEngine,

@@ -163,6 +163,30 @@ not applied.
 `{ "type": "Label", "text": "..." }` renders markdown with raw HTML allowed (`<h3>`, alert
 `<div>`s...), sanitized with DOMPurify; the text is first resolved as a vue-i18n key.
 
+## Placeholders
+
+The texts of a form can show the data: a `{{ expression }}` placeholder in the `title`,
+`description` or `hint` of a control (on the schema property or the `Control` element), in the
+`label` / `title`, `description` or `hint` of a `Group` / `Category`, in the `label` or
+`description` of a `Section`, or in the `text` of a `Label`, is replaced by the value of the
+expression:
+
+```json
+{ "type": "Label", "text": "Thank you **{{participant.firstName}}**, your score is {{scores.total}}." }
+```
+
+- The expression is a rule expression, with the same variables (the form data) and functions as the
+  `visible` / `compute` rules.
+- The placeholders are replaced after the translation with `t()`, so the translations can carry
+  them too.
+- The value is escaped (markdown and HTML), so the data cannot inject markup; `undefined` and
+  `null` show nothing, the values of an array are separated by commas.
+- The text is updated as the data changes; an expression that fails to evaluate shows nothing.
+- The form builder reports the placeholders whose expression does not compile.
+
+`fillPlaceholders(text, evaluate)` and `placeholderError(text)` are exported, for the texts an
+application displays outside of the form (a table of contents, an error summary).
+
 ## Renderer messages
 
 A renderer-level check reads its message from `options.validationMessage.<name>` on the control when

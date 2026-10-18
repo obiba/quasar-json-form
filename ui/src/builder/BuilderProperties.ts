@@ -15,6 +15,7 @@ import { renameProperty, ruleReferences } from './operations'
 import { textSlots, getText, setText, keyPrefix } from './texts'
 import type { TextSlot } from './texts'
 import { matchItem, optionsSchema, rawOptions, keywordsSchema, choicesOf, expressionError, fieldNames } from './items'
+import { placeholderError } from '../utils/placeholders'
 import type { BuilderCatalog } from './items'
 
 /** size limit of a local image embedded in the form, in bytes */
@@ -132,9 +133,13 @@ export default defineComponent({
 
     const textInput = (slot: TextSlot, label: string, multiline = false): VNode => {
       const n = node.value!
+      const value = getText(props.model, n, slot, props.locale) ?? ''
+      const error = placeholderError(value)
       return h(QInput, {
-        modelValue: getText(props.model, n, slot, props.locale) ?? '',
+        modelValue: value,
         label,
+        error: !!error,
+        errorMessage: error ? `${tr('invalidExpression')}: ${error}` : undefined,
         dense: true,
         outlined: true,
         autogrow: multiline,

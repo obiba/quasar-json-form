@@ -7,6 +7,7 @@ import { useReportedErrors } from './useFormErrors'
 import { DATA_KEY, READONLY_KEY, LANGUAGES_KEY } from './keys'
 import { omitOptions } from '../utils/options'
 import { renderMarkdown, renderMarkdownInline } from '../utils/markdown'
+import { fillPlaceholders } from '../utils/placeholders'
 
 export interface SelectOption {
   label: string
@@ -121,6 +122,12 @@ export interface ControlPropertiesReturn {
   label: ComputedRef<string | undefined>
   /** the `hint`, displayed under the input */
   hint: ComputedRef<string | undefined>
+  /**
+   * A text of the form (title, description, hint...) translated with `t()`,
+   * with its `{{ expression }}` placeholders replaced by their value on the
+   * form data (escaped markdown), to be rendered as markdown.
+   */
+  formText: (text: string) => string
   /** the title (inline markdown, with the required mark) as a `div.q-form-title`, or null */
   renderTitle: () => VNode | null
   /** the description (markdown) as a `div.q-form-description`, or null */
@@ -149,6 +156,8 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
   const injectedLanguages = inject<unknown>(LANGUAGES_KEY, undefined)
 
   const { evaluateRule } = useRules(injectedFormData)
+
+  const formText = (text: string): string => fillPlaceholders(t(text), (expression) => evaluateRule(expression, undefined))
 
   // Extract rule options from UI schema
   const ruleOptions = computed(() => {
@@ -345,7 +354,7 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
     if (!title.value) return null
     return h('div', {
       class: ['q-form-title', control.value.uischema.titleClass],
-      innerHTML: renderMarkdownInline(t(title.value)) + requiredMark.value,
+      innerHTML: renderMarkdownInline(formText(title.value)) + requiredMark.value,
     })
   }
 
@@ -353,7 +362,7 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
     if (!description.value) return null
     return h('div', {
       class: ['q-form-description text-markdown', control.value.uischema.descriptionClass],
-      innerHTML: renderMarkdown(t(description.value)).trim(),
+      innerHTML: renderMarkdown(formText(description.value)).trim(),
     })
   }
 
@@ -365,7 +374,7 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
     if (!hint.value) return null
     return h('div', {
       class: ['q-form-hint text-markdown', control.value.uischema.hintClass],
-      innerHTML: renderMarkdown(t(hint.value)).trim(),
+      innerHTML: renderMarkdown(formText(hint.value)).trim(),
     })
   }
 
@@ -508,6 +517,7 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
     description,
     label,
     hint,
+    formText,
     renderTitle,
     renderDescription,
     renderHeader,
