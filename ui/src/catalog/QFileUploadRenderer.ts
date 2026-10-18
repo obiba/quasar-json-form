@@ -104,7 +104,7 @@ export default {
     },
   },
   data: {
-    desc: 'Path controls store the path (`pathKey` of the response). List controls store file items `{ id, fileName, size, ... }`: everything returned by the server is kept, `fileName` and `size` are filled from the selected file when missing, and `justUploaded: true` marks the files uploaded in this session. Programmatic flow: `config.fileUpload` of `QJsonForm` with `upload(file, context)` returning the item (or the path), `remove(item, context)` and `downloadUrl(item, context)`. The errors are reported with the `files` keyword.',
+    desc: 'Path controls store the path (`pathKey` of the response). List controls store file items `{ id, fileName, size, ... }`: everything returned by the server is kept, `fileName` and `size` are filled from the selected file when missing, and `justUploaded: true` marks the files uploaded in this session. Programmatic flow: `config.fileUpload` of `QJsonForm` with `upload(file, context, onProgress)` returning the item (or the path) and reporting its progress (0 to 100), `remove(item, context)`, `downloadUrl(item, context)` and `download(item, context)`, an async handler called when the file name is clicked, instead of a link (to fetch the file with the application authentication). The errors are reported with the `files` keyword.',
     example: '{\n  "picture": "/tmp/photo.png",\n  "attachments": [{ "id": "a1", "fileName": "protocol.pdf", "size": 245760 }],\n  "protocol": { "obibaFiles": [{ "id": "b2", "fileName": "ethics.pdf" }] }\n}',
   },
   items: [

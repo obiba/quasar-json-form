@@ -19,6 +19,24 @@ it, and `label` (on the control element or the schema property) sets the button 
 
 <DocExample name="file-upload/hooks" title="Hooks: object, array and path controls" source />
 
+The `upload` hook gets an `onProgress` callback (0 to 100) as third argument, for a determinate
+progress bar. When the files are protected, a `download(item, context)` hook replaces the link: a
+link cannot carry an `Authorization` header, and a token in the URL leaks in the server logs and
+the browser history. The hook fetches the file with the application authentication and saves it:
+
+```js
+const download = async (item) => {
+  const response = await fetch(`/ws/files/${item.id}`, { headers: { Authorization: `Bearer ${token}` } })
+  if (!response.ok) throw new Error(`status ${response.status}`)
+  const url = URL.createObjectURL(await response.blob())
+  const a = Object.assign(document.createElement('a'), { href: url, download: item.fileName })
+  a.click()
+  URL.revokeObjectURL(url)
+}
+```
+
+A failed download is reported under the list.
+
 ## Declarative flow
 
 Without an `upload` hook, the file is `POST`ed to `uploadUrl` as multipart form data (`fileField`,

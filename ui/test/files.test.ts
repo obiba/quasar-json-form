@@ -102,6 +102,67 @@ describe('file upload', () => {
     wrapper.unmount()
   })
 
+  it('passes a progress callback to the upload hook', async () => {
+    let report: ((progress: number) => void) | undefined
+    let done: ((item: any) => void) | undefined
+    const upload = vi.fn((_file: File, _context: any, onProgress: (progress: number) => void) => {
+      report = onProgress
+      return new Promise((resolve) => { done = resolve })
+    })
+    const wrapper = mountForm({ schema, config: { fileUpload: { upload } }, modelValue: { docs: { obibaFiles: [] } } })
+    await flush()
+    const input = wrapper.find('input[type="file"]')
+    Object.defineProperty(input.element, 'files', { value: [new File(['hello'], 'a.txt')], configurable: true })
+    await input.trigger('change')
+    await flush()
+    const bar = () => wrapper.findComponent({ name: 'QLinearProgress' })
+    expect(bar().props('indeterminate')).toBe(true)
+    report!(40)
+    await flush()
+    expect(bar().props('indeterminate')).toBe(false)
+    expect(bar().props('value')).toBe(0.4)
+    done!({ id: 'x' })
+    await selectFiles(wrapper, [])
+    expect(lastData(wrapper).docs.obibaFiles).toEqual([{ id: 'x', fileName: 'a.txt', size: 5, justUploaded: true }])
+    wrapper.unmount()
+  })
+
+  it('downloads through the config hook instead of a link', async () => {
+    const download = vi.fn(async () => {})
+    const downloadUrl = vi.fn(() => '/ws/files/1')
+    const wrapper = mountForm({
+      schema,
+      readonly: true,
+      config: { fileUpload: { download, downloadUrl } },
+      modelValue: { docs: { obibaFiles: [{ id: '1', fileName: 'a.pdf' }] } },
+    })
+    await flush()
+    const link = wrapper.find('.q-file-item a')
+    expect(link.attributes('href')).toBe('#')
+    expect(link.attributes('target')).toBeUndefined()
+    await link.trigger('click')
+    await flush()
+    expect(download).toHaveBeenCalledWith({ id: '1', fileName: 'a.pdf' }, expect.objectContaining({ path: 'docs' }))
+    expect(downloadUrl).not.toHaveBeenCalled()
+    wrapper.unmount()
+  })
+
+  it('reports a failed download', async () => {
+    const download = vi.fn(async () => { throw new Error('forbidden') })
+    const wrapper = mountForm({
+      schema,
+      readonly: true,
+      config: { fileUpload: { download } },
+      modelValue: { docs: { obibaFiles: [{ id: '1', fileName: 'a.pdf' }] } },
+    })
+    await flush()
+    await wrapper.find('.q-file-item a').trigger('click')
+    await flush()
+    await flush()
+    expect(wrapper.find('.text-negative').text()).toBe('Download failed: forbidden')
+    wrapper.unmount()
+  })
+
   it('uploads with XHR, reads the Location header and fetches the metadata', async () => {
     const requests: any[] = []
     class FakeXhr {

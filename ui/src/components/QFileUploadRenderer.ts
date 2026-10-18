@@ -34,12 +34,20 @@ export interface FileUploadContext {
  * (`uploadUrl`, `metadataUrl`, `pathKey`... options) is used.
  */
 export interface FileUploadHooks {
-  /** uploads the file and returns the file item to store (or the path, for string controls) */
-  upload?: (file: File, context: FileUploadContext) => Promise<FileItem | string>
+  /**
+   * uploads the file and returns the file item to store (or the path, for string controls);
+   * `onProgress` (0 to 100) makes the progress bar determinate
+   */
+  upload?: (file: File, context: FileUploadContext, onProgress: (progress: number) => void) => Promise<FileItem | string>
   /** called after a file is removed from the form data */
   remove?: (item: FileItem, context: FileUploadContext) => Promise<void> | void
   /** download link of a stored file */
   downloadUrl?: (item: FileItem, context: FileUploadContext) => string | undefined
+  /**
+   * downloads a stored file when its name is clicked, instead of a link: the application fetches
+   * the content with its own authentication (a link cannot carry an `Authorization` header)
+   */
+  download?: (item: FileItem, context: FileUploadContext) => Promise<void> | void
 }
 
 interface PendingUpload {
@@ -273,10 +281,11 @@ export default defineComponent({
         if (maxItems.value !== undefined && isMultiple.value && current.length >= maxItems.value) break
         const entry: PendingUpload = reactive({ name: file.name, progress: 0 })
         pending.value = [...pending.value, entry]
+        const onProgress = (progress: number) => { entry.progress = progress }
         try {
           const result = hooks.value.upload
-            ? await hooks.value.upload(file, context())
-            : await xhrUpload(file, (progress) => { entry.progress = progress })
+            ? await hooks.value.upload(file, context(), onProgress)
+            : await xhrUpload(file, onProgress)
           const item = toItem(result, file)
           if (isMultiple.value) {
             current.push(item)
@@ -308,6 +317,16 @@ export default defineComponent({
         }
       } catch (error) {
         console.error('File removal failed:', error)
+      }
+    }
+
+    const downloadFile = async (event: Event, item: FileItem) => {
+      event.preventDefault()
+      uploadError.value = null
+      try {
+        await hooks.value.download!(item, context())
+      } catch (error: any) {
+        uploadError.value = translate('files.downloadFailed', { message: error?.message || String(error) })
       }
     }
 
@@ -345,13 +364,15 @@ export default defineComponent({
       const children: (VNode | null)[] = [...renderHeader()]
 
       const items = files.value.map((item, index) => {
-        const url = downloadUrl(item)
+        const url = hooks.value.download ? undefined : downloadUrl(item)
         const name = fileName(item)
         const size = formatFileSize(item.size)
         return h(QItem, { key: item.id || item.path || index, dense: true, class: 'q-file-item' }, () => [
           h(QItemSection, { avatar: true }, () => h(QIcon, { name: 'insert_drive_file', color: 'grey-7' })),
           h(QItemSection, {}, () => [
-            url
+            hooks.value.download
+              ? h('a', { href: '#', class: 'q-file-item__name', title: translate('files.download'), onClick: (event: Event) => downloadFile(event, item) }, name)
+              : url
               ? h('a', { href: url, target: '_blank', rel: 'noopener', class: 'q-file-item__name', title: translate('files.download') }, name)
               : h('span', { class: 'q-file-item__name', title: name }, name),
             size ? h('div', { class: 'text-caption text-grey-7' }, size) : null,
@@ -411,9 +432,10 @@ export default defineComponent({
           ]))
         }
 
-        if (uploadError.value) {
-          children.push(h('div', { class: 'text-negative text-caption q-mt-sm' }, uploadError.value))
-        }
+      }
+
+      if (uploadError.value) {
+        children.push(h('div', { class: 'text-negative text-caption q-mt-sm' }, uploadError.value))
       }
 
       const errors = [errorMessage.value, ...fileErrors.value].filter((e) => e && e.length > 0)
