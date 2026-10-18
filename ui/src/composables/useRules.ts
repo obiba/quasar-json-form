@@ -30,7 +30,8 @@ export class RuleEngine {
   customFunctions: Record<string, (...args: any[]) => any>
 
   /** Compiled and checked expressions, reset when a function is added (or when too many). */
-  private compiled = new Map<string, Evaluator>()
+  // the evaluator of an expression, or its error: the texts evaluate their placeholders on every render
+  private compiled = new Map<string, Evaluator | Error>()
 
   constructor() {
     // null prototype: a registered name never reaches Object.prototype
@@ -149,11 +150,16 @@ export class RuleEngine {
   private compile(expression: string): Evaluator {
     let evaluator = this.compiled.get(expression)
     if (!evaluator) {
-      evaluator = compile(expression, COMPILE_OPTIONS)
-      this.check(evaluator.ast)
+      try {
+        evaluator = compile(expression, COMPILE_OPTIONS)
+        this.check(evaluator.ast)
+      } catch (error) {
+        evaluator = error instanceof Error ? error : new Error(String(error))
+      }
       if (this.compiled.size >= 1000) this.compiled.clear()
       this.compiled.set(expression, evaluator)
     }
+    if (evaluator instanceof Error) throw evaluator
     return evaluator
   }
 
@@ -176,7 +182,6 @@ export class RuleEngine {
   }
 
   // the failures already logged: the expressions are evaluated again on every render
-  // ponytail: grows with the distinct failures, bounded by the expressions of the forms
   private loggedFailures = new Set<string>()
 
   /**
@@ -189,6 +194,8 @@ export class RuleEngine {
     } catch (error) {
       const key = `${expression}\n${error}`
       if (!this.loggedFailures.has(key)) {
+        // cleared when full, as the compiled expressions, so a recurring failure is logged again
+        if (this.loggedFailures.size >= 1000) this.loggedFailures.clear()
         this.loggedFailures.add(key)
         console.error('Error evaluating expression:', expression, error)
       }

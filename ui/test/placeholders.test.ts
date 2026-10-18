@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { fillPlaceholders, renderPlaceholders, placeholderError, formatValue } from '../src/utils/placeholders'
 import { renderMarkdown, renderMarkdownInline } from '../src/utils/markdown'
 import { mountForm, flush } from './utils'
@@ -33,7 +33,9 @@ describe('placeholders', () => {
     // in a code span, an attribute, a link
     expect(inline('`{{v}}`', 'a.b-1 <c>')).toBe('<code>a.b-1 &lt;c&gt;</code>')
     expect(inline('<span title="{{v}}">x</span>', 'x" class="evil')).toBe('<span title="x&quot; class=&quot;evil">x</span>')
-    expect(inline('[x](https://a.org/?q={{v}})', 'a b&c')).toBe('<a href="https://a.org/?q=a%20b%26c">x</a>')
+    expect(inline('[x]({{v}})', 'https://a.org/?q=a b')).toBe('<a href="https://a.org/?q=a%20b">x</a>')
+    expect(inline('<a href="{{v}}">x</a>', 'javascript:alert(1)')).toBe('<a>x</a>')
+    expect(inline('[x]({{v}})', 'javascript:alert(1)')).not.toContain('javascript')
     // the markdown of the text, with the values
     expect(inline('*{{a}}* and {{b}}', 'x')).toBe('<em>x</em> and x')
   })
@@ -85,6 +87,18 @@ describe('placeholders in the form texts', () => {
     }
     expect(wrapper.find('.q-label-renderer strong').text()).toBe('Ada')
     wrapper.unmount()
+  })
+
+  it('shows nothing for an expression that fails', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    const wrapper = mountForm({
+      schema, modelValue: {},
+      uischema: { type: 'VerticalLayout', elements: [{ type: 'Label', text: 'Score: {{ nope(x) }}' }] },
+    })
+    await flush()
+    expect(wrapper.find('.q-label-renderer').text()).toBe('Score:')
+    wrapper.unmount()
+    vi.restoreAllMocks()
   })
 
   it('follows the data, and escapes it', async () => {

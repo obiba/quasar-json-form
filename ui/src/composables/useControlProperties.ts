@@ -163,7 +163,8 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
 
   const { evaluateRule } = useRules(injectedFormData)
 
-  const evaluatePlaceholder = (expression: string) => evaluateRule(expression, undefined)
+  // null: undefined would select the `false` default fallback
+  const evaluatePlaceholder = (expression: string) => evaluateRule(expression, null)
   const formText = (text: string): string => fillPlaceholders(t(text), evaluatePlaceholder)
   const formMarkdown = (text: string, render: (text: string) => string): string =>
     renderPlaceholders(t(text), render, evaluatePlaceholder)
