@@ -18,15 +18,15 @@ export default {
   element: {
     label: {
       type: 'String',
-      desc: 'Title of the group (the JSON Forms convention); `title` is accepted too. Translated with `t()` and rendered as markdown.',
+      desc: 'Title of the group (the JSON Forms convention); `title` is accepted too. Translated with `t()` and rendered as markdown, with `{{ expression }}` placeholders.',
     },
     description: {
       type: 'String',
-      desc: 'Text under the title, markdown.',
+      desc: 'Text under the title, markdown, with `{{ expression }}` placeholders.',
     },
     hint: {
       type: 'String',
-      desc: 'Text after the elements, markdown, smaller and grey.',
+      desc: 'Text after the elements, markdown, smaller and grey, with `{{ expression }}` placeholders.',
     },
     elements: {
       type: 'Array',

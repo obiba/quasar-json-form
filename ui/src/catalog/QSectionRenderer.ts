@@ -13,11 +13,11 @@ export default {
   element: {
     label: {
       type: 'String',
-      desc: 'The heading (`q-form-label`), translated with `t()` and rendered as inline markdown; `title` is accepted too.',
+      desc: 'The heading (`q-form-label`), translated with `t()` and rendered as inline markdown, with `{{ expression }}` placeholders; `title` is accepted too.',
     },
     description: {
       type: 'String',
-      desc: 'Text under the heading, markdown.',
+      desc: 'Text under the heading, markdown, with `{{ expression }}` placeholders.',
     },
     labelClass: {
       type: 'String',

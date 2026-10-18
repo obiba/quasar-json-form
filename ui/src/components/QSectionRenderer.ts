@@ -2,7 +2,6 @@ import { h, defineComponent } from 'vue'
 import { rendererProps } from '@jsonforms/vue'
 import { useControlProperties } from '../composables/useControlProperties'
 import { useLayoutControl } from '../composables/useControl'
-import { useFormI18n } from '../composables/useFormI18n'
 import { renderMarkdown, renderMarkdownInline } from '../utils/markdown'
 
 
@@ -10,14 +9,12 @@ export default defineComponent({
   name: 'QSectionRenderer',
   props: rendererProps(),
   setup(props: any) {
-    const { t } = useFormI18n()
-    
     const controlResult = useLayoutControl(props)
 
     const control = controlResult.control
 
     // Use the generic control rules composable
-    const { isVisible, rootClass } = useControlProperties(control)
+    const { isVisible, rootClass, formMarkdown } = useControlProperties(control)
 
 
     return () => {
@@ -33,14 +30,14 @@ export default defineComponent({
       if (label) {
         children.push(h('div', {
           class: ['q-form-label', uischema.labelClass],
-          innerHTML: renderMarkdownInline(t(String(label))),
+          innerHTML: formMarkdown(String(label), renderMarkdownInline),
         }))
       }
 
       if (uischema.description) {
         children.push(h('div', {
           class: ['q-form-description text-markdown', uischema.descriptionClass],
-          innerHTML: renderMarkdown(t(String(uischema.description))),
+          innerHTML: formMarkdown(String(uischema.description), renderMarkdown),
         }))
       }
 

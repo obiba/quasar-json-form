@@ -1,0 +1,149 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { describe, it, expect, vi } from 'vitest'
+import { fillPlaceholders, renderPlaceholders, placeholderError, formatValue } from '../src/utils/placeholders'
+import { renderMarkdown, renderMarkdownInline } from '../src/utils/markdown'
+import { mountForm, flush } from './utils'
+
+describe('placeholders', () => {
+  it('replaces the placeholders by the value of their expression', () => {
+    const data: Record<string, any> = { a: 'x', n: 2 }
+    expect(fillPlaceholders('{{a}} and {{ n + 1 }}', (e) => (e === 'a' ? data.a : data.n + 1))).toBe('x and 3')
+    expect(fillPlaceholders('no placeholder', () => { throw new Error('not called') })).toBe('no placeholder')
+  })
+
+  it('formats the values', () => {
+    expect(formatValue(undefined)).toBe('')
+    expect(formatValue(null)).toBe('')
+    expect(formatValue(['a', 1])).toBe('a, 1')
+    expect(formatValue(0)).toBe('0')
+    expect(formatValue(false)).toBe('false')
+    expect(formatValue(new Date(0))).toBe('1970-01-01T00:00:00.000Z')
+  })
+
+  it('escapes the values so that they cannot inject markup', () => {
+    const inline = (text: string, value: string) => renderPlaceholders(text, renderMarkdownInline, () => value)
+    const html = inline('{{v}}', '<img src=x onerror=alert(1)> **bold** [link](javascript:alert(1))')
+    expect(html).not.toContain('<img')
+    expect(html).not.toContain('<strong>')
+    expect(html).not.toContain('<a ')
+    expect(html).toContain('[link](javascript:alert(1))')
+    expect(html).toContain('&lt;img')
+    expect(html).toContain('**bold**')
+    // the block structure does not depend on the data
+    expect(renderPlaceholders('{{v}}', renderMarkdown, () => 'x\n===\n\n    code')).toBe('<p>x\n===\n\n    code</p>\n')
+    // in a code span, an attribute, a link
+    expect(inline('`{{v}}`', 'a.b-1 <c>')).toBe('<code>a.b-1 &lt;c&gt;</code>')
+    expect(inline('<span title="{{v}}">x</span>', 'x" class="evil')).toBe('<span title="x&quot; class=&quot;evil">x</span>')
+    expect(inline('[x]({{v}})', 'https://a.org/?q=a b')).toBe('<a href="https://a.org/?q=a%20b">x</a>')
+    expect(inline('<a href="{{v}}">x</a>', 'javascript:alert(1)')).toBe('<a>x</a>')
+    expect(inline('[x](https://{{v}}/a)', 'example.org')).toBe('<a href="https://example.org/a">x</a>')
+    expect(inline('www.{{v}}.com', 'evil')).toBe('<a href="http://www.evil.com">www.evil.com</a>')
+    expect(inline('[x]({{v}})', 'https://a.org/a%20b')).toBe('<a href="https://a.org/a%20b">x</a>')
+    expect(inline('[x](/s?q={{v}})', 'a\uD800')).toBe('<a href="/s?q=a%EF%BF%BD">x</a>')
+    expect(inline('[x]({{v}})', 'javascript:alert(1)')).not.toContain('javascript')
+    // the markdown of the text, with the values
+    expect(inline('*{{a}}* and {{b}}', 'x')).toBe('<em>x</em> and x')
+  })
+
+  it('replaces the placeholders of a plain text by the raw values', () => {
+    expect(fillPlaceholders('Tab {{v}}', () => '<b>&')).toBe('Tab <b>&')
+    expect(fillPlaceholders('{{ x ? "{a}" : "b" }}!', (e) => e)).toBe('x ? "{a}" : "b"!')
+  })
+
+  it('reports the invalid expressions', () => {
+    expect(placeholderError('Hello {{name}}')).toBeUndefined()
+    expect(placeholderError('no placeholder')).toBeUndefined()
+    expect(placeholderError('Hello {{name ==}}')).toMatch(/^\{\{name ==\}\}: /)
+    expect(placeholderError('Hello {{unknownFn(name)}}')).toMatch(/unknown function/)
+    expect(placeholderError('Hello {{ }}')).toMatch(/empty expression/)
+    expect(placeholderError('{{ isEmpty(name) ? "{none}" : name }}')).toBeUndefined()
+    expect(placeholderError('{{ isEmpty(name) ? "{none}" : name ==}}')).toBeDefined()
+  })
+})
+
+describe('placeholders in the form texts', () => {
+  const schema = {
+    type: 'object',
+    properties: {
+      name: { type: 'string', title: 'Name' },
+      nick: { type: 'string' },
+      age: { type: 'integer', title: 'Age of {{name}}', description: 'In {{ year + 1 }}', hint: 'Hint for {{name}}' },
+      year: { type: 'integer' },
+    },
+  }
+  const uischema = {
+    type: 'VerticalLayout',
+    elements: [
+      { type: 'Section', label: 'Section {{name}}', description: 'Section text {{name}}' },
+      {
+        type: 'Group', label: 'Group {{name}}', description: 'Group text {{name}}', hint: 'Group hint {{name}}',
+        elements: [{ type: 'Control', scope: '#/properties/age' }, { type: 'Control', scope: '#/properties/nick', label: 'Nick of {{name}}' }],
+      },
+      { type: 'Label', text: 'Hello **{{name}}**' },
+    ],
+  }
+
+  it('renders the values in the titles, descriptions, hints and labels', async () => {
+    const wrapper = mountForm({ schema, uischema, modelValue: { name: 'Ada', year: 2025 } })
+    await flush()
+    const text = wrapper.text()
+    for (const expected of ['Section Ada', 'Section text Ada', 'Group Ada', 'Group text Ada', 'Group hint Ada', 'Age of Ada', 'Nick of Ada', 'In 2026', 'Hint for Ada']) {
+      expect(text).toContain(expected)
+    }
+    expect(wrapper.find('.q-label-renderer strong').text()).toBe('Ada')
+    wrapper.unmount()
+  })
+
+  it('shows nothing for an expression that fails', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    const wrapper = mountForm({
+      schema, modelValue: {},
+      uischema: { type: 'VerticalLayout', elements: [{ type: 'Label', text: 'Score: {{ nope(x) }}' }] },
+    })
+    await flush()
+    expect(wrapper.find('.q-label-renderer').text()).toBe('Score:')
+    wrapper.unmount()
+    vi.restoreAllMocks()
+  })
+
+  it('follows the data, and escapes it', async () => {
+    const wrapper = mountForm({ schema, uischema, modelValue: { name: 'Ada' } })
+    await flush()
+    await wrapper.setProps({ modelValue: { name: '<b>Bob</b>' } })
+    await flush()
+    expect(wrapper.find('.q-label-renderer').html()).not.toContain('<b>')
+    expect(wrapper.find('.q-label-renderer').text()).toContain('Hello <b>Bob</b>')
+    await wrapper.setProps({ modelValue: {} })
+    await flush()
+    expect(wrapper.find('.q-label-renderer').text()).not.toContain('Bob')
+    wrapper.unmount()
+  })
+
+  it('replaces the placeholders of the translations', async () => {
+    const translations = { en: { greeting: 'Hi {{name}}' }, fr: { greeting: 'Salut {{name}}' } }
+    const wrapper = mountForm({
+      schema, translations, locale: 'fr', modelValue: { name: 'Ada' },
+      uischema: { type: 'VerticalLayout', elements: [{ type: 'Label', text: 'greeting' }] },
+    })
+    await flush()
+    expect(wrapper.find('.q-label-renderer').text()).toBe('Salut Ada')
+    wrapper.unmount()
+  })
+
+  it('replaces the placeholders of the category and step labels', async () => {
+    const elements = [{ type: 'Control', scope: '#/properties/name' }]
+    const categories = mountForm({
+      schema, modelValue: { name: 'Ada' },
+      uischema: { type: 'Categorization', elements: [{ type: 'Category', label: 'About {{name}}', elements }] },
+    })
+    const stepper = mountForm({
+      schema, modelValue: { name: 'Ada' },
+      uischema: { type: 'StepperLayout', labels: ['Step {{name}}'], elements: [{ type: 'VerticalLayout', elements }] },
+    })
+    await flush()
+    expect(categories.text()).toContain('About Ada')
+    expect(stepper.text()).toContain('Step Ada')
+    categories.unmount()
+    stepper.unmount()
+  })
+})

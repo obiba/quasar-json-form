@@ -6,11 +6,11 @@ export const controlApi = {
   element: {
     title: {
       type: 'String',
-      desc: 'Question displayed above the control (also `title` on the schema property), translated with `t()` and rendered as inline markdown, with the `*` of a required control. `label: false` hides it.',
+      desc: 'Question displayed above the control (also `title` on the schema property), translated with `t()` and rendered as inline markdown, with the `*` of a required control. `label: false` hides it. Its `{{ expression }}` placeholders show the value of the expression on the form data (see [rules](#/start/rules)).',
     },
     description: {
       type: 'String',
-      desc: 'Text under the title (also `description` on the schema property), translated with `t()` and rendered as markdown.',
+      desc: 'Text under the title (also `description` on the schema property), translated with `t()` and rendered as markdown. Its `{{ expression }}` placeholders show the value of the expression on the form data (see [rules](#/start/rules)).',
     },
     label: {
       type: 'String | false',
@@ -18,7 +18,7 @@ export const controlApi = {
     },
     hint: {
       type: 'String',
-      desc: 'Help text under the input (also `hint` on the schema property), translated with `t()` and rendered as markdown; the error messages replace it.',
+      desc: 'Help text under the input (also `hint` on the schema property), translated with `t()` and rendered as markdown; the error messages replace it. Its `{{ expression }}` placeholders show the value of the expression on the form data (see [rules](#/start/rules)).',
     },
     titleClass: {
       type: 'String',

@@ -9,6 +9,14 @@ const md = new MarkdownIt({
   typographer: true  // Enable smartquotes and other typographic replacements
 })
 
+// A link with a placeholder token (see placeholders.ts) is only encoded, not
+// normalized: the punycode of its host would lose the token
+const normalizeLink = md.normalizeLink.bind(md)
+md.normalizeLink = (url) => (url.includes('\uE000') ? md.utils.lib.mdurl.encode(url) : normalizeLink(url))
+
+/** A URL (or a part of it) percent-encoded as markdown-it does: the existing `%XX` escapes are kept. */
+export const encodeUrl: (url: string) => string = md.utils.lib.mdurl.encode
+
 // The sanitized HTML by source text: the renderers render their labels and
 // descriptions again on every data change of the form
 // ponytail: cleared when full, an LRU if forms ever have more distinct texts than this
@@ -30,3 +38,6 @@ function cached(render: (text: string) => string): (text: string) => string {
 export const renderMarkdown = cached((text) => md.render(text))
 
 export const renderMarkdownInline = cached((text) => md.renderInline(text))
+
+/** The sanitized HTML, cached */
+export const sanitizeHtml = cached((html) => html)

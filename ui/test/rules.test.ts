@@ -179,6 +179,13 @@ describe('RuleEngine API', () => {
     expect(error).toHaveBeenCalledWith('Error evaluating expression:', 'a ==', expect.anything())
   })
 
+  it('logs a failure once', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+    ruleEngine.evaluate('once ==', {})
+    ruleEngine.evaluate('once ==', {})
+    expect(error.mock.calls.filter((call) => call[1] === 'once ==')).toHaveLength(1)
+  })
+
   it('gives the fallback when an expression fails', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {})
     expect(ruleEngine.evaluate('a ==', { a: 1 }, true)).toBe(true)

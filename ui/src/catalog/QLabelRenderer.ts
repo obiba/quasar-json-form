@@ -13,7 +13,7 @@ export default {
   element: {
     text: {
       type: 'String',
-      desc: 'The content (JSON Forms convention); `label` is accepted too.',
+      desc: 'The content (JSON Forms convention), with `{{ expression }}` placeholders; `label` is accepted too.',
     },
     labelClass: {
       type: 'String',

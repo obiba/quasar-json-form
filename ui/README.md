@@ -163,6 +163,37 @@ not applied.
 `{ "type": "Label", "text": "..." }` renders markdown with raw HTML allowed (`<h3>`, alert
 `<div>`s...), sanitized with DOMPurify; the text is first resolved as a vue-i18n key.
 
+## Placeholders
+
+The texts of a form can show the data: a `{{ expression }}` placeholder in the `title`,
+`description`, `label` or `hint` of a control (on the schema property or the `Control` element), in the
+`label` / `title`, `description` or `hint` of a `Group` / `Category`, in the `label` or
+`description` of a `Section`, in the `text` of a `Label`, or in the `labels` of a `TabsLayout` /
+`StepperLayout`, is replaced by the value of the expression:
+
+```json
+{ "type": "Label", "text": "Thank you **{{participant.firstName}}**, your score is {{scores.total}}." }
+```
+
+- The expression is a rule expression, with the same variables (the form data) and functions as the
+  `visible` / `compute` rules.
+- The placeholders are replaced after the translation with `t()`, so the form translations can
+  carry them too (not the application vue-i18n messages, whose syntax reserves `{`, `|` and `@`).
+- The value is inserted after the markdown rendering, HTML-escaped (percent-encoded in a link) and the
+  result sanitized, so the data cannot inject markup or a `javascript:` URL; `undefined` and
+  `null` show nothing, the values of an array are separated by commas.
+- The text is updated as the data changes; an expression that fails to evaluate shows nothing.
+- The form builder reports the placeholders whose expression does not compile.
+- Any `{{ ... }}` of a text is a placeholder, there is no escape for a literal `{{`; the
+  expression ends at the first `}}`, so it cannot contain `}}` (a nested object literal, a string).
+- The other texts (option titles, validation messages, matrix item names, list buttons...) do not
+  replace placeholders.
+
+`fillPlaceholders(text, evaluate)` (plain text), `renderPlaceholders(text, render, evaluate)`
+(the HTML of a markdown text, `render` being `renderMarkdown` or `renderMarkdownInline`) and
+`placeholderError(text)` are exported, for the texts an application displays outside of the form
+(a table of contents, an error summary).
+
 ## Renderer messages
 
 A renderer-level check reads its message from `options.validationMessage.<name>` on the control when

@@ -7,6 +7,7 @@ import { useReportedErrors } from './useFormErrors'
 import { DATA_KEY, READONLY_KEY, LANGUAGES_KEY } from './keys'
 import { omitOptions } from '../utils/options'
 import { renderMarkdown, renderMarkdownInline } from '../utils/markdown'
+import { fillPlaceholders, renderPlaceholders } from '../utils/placeholders'
 
 export interface SelectOption {
   label: string
@@ -121,6 +122,18 @@ export interface ControlPropertiesReturn {
   label: ComputedRef<string | undefined>
   /** the `hint`, displayed under the input */
   hint: ComputedRef<string | undefined>
+  /**
+   * A text of the form (tab label...) translated with `t()`, with its
+   * `{{ expression }}` placeholders replaced by their value on the form data,
+   * as plain text.
+   */
+  formText: (text: string) => string
+  /**
+   * The HTML of a markdown text of the form (title, description, hint...)
+   * translated with `t()`, `render` being `renderMarkdown` or
+   * `renderMarkdownInline`, with its placeholders replaced by their escaped value.
+   */
+  formMarkdown: (text: string, render: (text: string) => string) => string
   /** the title (inline markdown, with the required mark) as a `div.q-form-title`, or null */
   renderTitle: () => VNode | null
   /** the description (markdown) as a `div.q-form-description`, or null */
@@ -149,6 +162,12 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
   const injectedLanguages = inject<unknown>(LANGUAGES_KEY, undefined)
 
   const { evaluateRule } = useRules(injectedFormData)
+
+  // null: undefined would select the `false` default fallback
+  const evaluatePlaceholder = (expression: string) => evaluateRule(expression, null)
+  const formText = (text: string): string => fillPlaceholders(t(text), evaluatePlaceholder)
+  const formMarkdown = (text: string, render: (text: string) => string): string =>
+    renderPlaceholders(t(text), render, evaluatePlaceholder)
 
   // Extract rule options from UI schema
   const ruleOptions = computed(() => {
@@ -338,14 +357,14 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
   // Translated label for input-like components, with the required marker when no title carries it
   const inputLabel = computed(() => {
     if (!label.value) return undefined
-    return t(label.value) + (title.value ? '' : requiredMark.value)
+    return formText(label.value) + (title.value ? '' : requiredMark.value)
   })
 
   const renderTitle = (): VNode | null => {
     if (!title.value) return null
     return h('div', {
       class: ['q-form-title', control.value.uischema.titleClass],
-      innerHTML: renderMarkdownInline(t(title.value)) + requiredMark.value,
+      innerHTML: formMarkdown(title.value, renderMarkdownInline) + requiredMark.value,
     })
   }
 
@@ -353,7 +372,7 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
     if (!description.value) return null
     return h('div', {
       class: ['q-form-description text-markdown', control.value.uischema.descriptionClass],
-      innerHTML: renderMarkdown(t(description.value)).trim(),
+      innerHTML: formMarkdown(description.value, renderMarkdown).trim(),
     })
   }
 
@@ -365,7 +384,7 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
     if (!hint.value) return null
     return h('div', {
       class: ['q-form-hint text-markdown', control.value.uischema.hintClass],
-      innerHTML: renderMarkdown(t(hint.value)).trim(),
+      innerHTML: formMarkdown(hint.value, renderMarkdown).trim(),
     })
   }
 
@@ -508,6 +527,8 @@ export function useControlProperties(control: Ref<any>): ControlPropertiesReturn
     description,
     label,
     hint,
+    formText,
+    formMarkdown,
     renderTitle,
     renderDescription,
     renderHeader,
