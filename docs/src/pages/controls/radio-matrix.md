@@ -10,6 +10,7 @@ Rows come from `items` (`[{ key, name }]`) and columns from `values` (`[{ key, c
 `{ key: caption }`), in the control options or directly on the schema property as in the
 angular-schema-form add-on. Labels are translated and rendered as inline markdown. The data is
 `{ [item.key]: value.key }`; a required matrix must have every row answered.
+Set `options.dense: true` for a compact table.
 
 <DocExample name="radio-matrix/basic" title="Radio matrix" source />
 

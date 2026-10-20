@@ -162,7 +162,7 @@ export default defineComponent({
 
       children.push(h(QMarkupTable, {
         flat: true,
-        dense: true,
+        dense: options.value.dense === true,
         wrapCells: true,
         class: 'q-radio-matrix',
       }, () => [header, h('tbody', {}, rows)]))

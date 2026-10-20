@@ -25,6 +25,11 @@ export default {
       default: 'false',
       desc: 'One checkbox per item instead of radio columns; the data is `{ [item.key]: boolean }`.',
     },
+    dense: {
+      type: 'Boolean',
+      default: 'false',
+      desc: 'Dense table rows.',
+    },
   },
   validation: {
     allItemsSelected: {
