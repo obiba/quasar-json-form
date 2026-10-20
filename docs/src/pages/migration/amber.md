@@ -57,6 +57,8 @@ rule inside a group (AJV does not validate the properties of a group not answere
 | `$('GROUP.ITEM')`, `formData.GROUP.ITEM` | `GROUP.ITEM` |
 | `val` | the path of the item itself |
 | `Date.parse(d)`, `Date.now()` | `parseDate(d)`, `now()` |
+| `new Date().getFullYear()`, `getMonth()`, `getDate()`, `getDay()` | `currentYear()`, `(currentMonth() - 1)`, `currentDay()`, `currentWeekday()` |
+| `new Date().getHours()`, `getMinutes()`, `getSeconds()`, `getTime()` | `currentHour()`, `currentMinute()`, `currentSecond()`, `now()` |
 | `list.includes(v)`, `list.indexOf(v) > -1` | `contains(list, v)` |
 | `list.length` | `length(list)` |
 | `(data) => data.A + data.B` | `A + B` |

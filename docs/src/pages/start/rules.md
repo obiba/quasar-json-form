@@ -73,6 +73,11 @@ Assignments and the `this` keyword are rejected, and the data is never mutated b
 | `matches(s, pattern)` | regular expression test (pattern of at most 100 characters) |
 | `wordCount(s)` | number of whitespace-separated words |
 | `now()` | current time in milliseconds, as `Date.now()` |
+| `currentYear()`, `currentMonth()`, `currentDay()` | current local year, month (1 to 12) and day of the month |
+| `today()` | current local date as an ISO string (`YYYY-MM-DD`): `visit <= today()`, `parseDate(visit) <= parseDate(today())` |
+| `currentWeekday()` | current day of the week, from 0 (Sunday) to 6 |
+| `currentHour()`, `currentMinute()`, `currentSecond()` | current local time parts |
+| `parseInt(s, radix)`, `parseFloat(s)` | number parsed from a string, as in JavaScript |
 | `parseDate(s)` | milliseconds of a date string, as `Date.parse()` (`NaN` when invalid): `parseDate(birth) < now()` |
 | `map(v, mapping, undef)` | recodes `v` (each value of an array): with an object, its entry for `v` or the `'*'` one; with `[stop1, v1, ..., stopN, vN]`, `v1` below `stop1`..., `vN` from `stopN`; `undef` when `v` is undefined; else `v` |
 

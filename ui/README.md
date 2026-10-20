@@ -404,8 +404,8 @@ const { schema, uischema, translations, diagnostics } = convert(amberSchema)
 
 The root UI schema has one element per top-level item (`uischema.elements[page]` for a paged
 form). The item expressions (`condition`, `required`, `disabled`, `validation`, `compute`) are
-rewritten into rules: `$('A.B')` → `A.B`, `val` → the item path, `Date.parse()` / `Date.now()` →
-`parseDate()` / `now()`, `includes` / `indexOf` → `contains()`. What cannot be converted is
+rewritten into rules: `$('A.B')` → `A.B`, `val` → the item path, `Date.parse()` / `Date.now()` /
+`new Date().getFullYear()`... → `parseDate()` / `now()` / `currentYear()`..., `includes` / `indexOf` → `contains()`. What cannot be converted is
 reported in `diagnostics` and skipped. The Amber demo form is the acceptance fixture
 (`test/fixtures/amber`), and the builder imports Amber schemas (`fromAmber`).
 

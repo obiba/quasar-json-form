@@ -92,6 +92,23 @@ describe('RuleEngine built-in functions', () => {
     expect(Number.isNaN(evaluate('parseDate(d)', { d: 'nope' }))).toBe(true)
   })
 
+  it('the current date parts, parseInt and parseFloat', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 9, 20, 16, 30, 45))
+    expect(evaluate('[currentYear(), currentMonth(), currentDay(), currentWeekday(), currentHour(), currentMinute(), currentSecond()]', {}))
+      .toEqual([2026, 10, 20, 2, 16, 30, 45])
+    vi.setSystemTime(new Date(2026, 0, 5, 23, 59))
+    expect(evaluate('today()', {})).toBe('2026-01-05')
+    expect(evaluate('d <= today()', { d: '2026-01-05' })).toBe(true)
+    expect(evaluate('d <= today()', { d: '2026-01-06' })).toBe(false)
+    vi.useRealTimers()
+    const year = new Date().getFullYear()
+    expect(evaluate('y && parseInt(y) <= currentYear()', { y: String(year) })).toBe(true)
+    expect(evaluate('y && parseInt(y) <= currentYear()', { y: String(year + 1) })).toBe(false)
+    expect(evaluate('parseInt(h, 16)', { h: 'ff' })).toBe(255)
+    expect(evaluate('parseFloat(f)', { f: '1.5' })).toBe(1.5)
+  })
+
   it('map with an object mapping, a thresholds array, arrays and undefined', () => {
     expect(evaluate("map(v, { '1': 'yes', '0': 'no' })", { v: 1 })).toBe('yes')
     expect(evaluate("map(v, { '1': 'yes', '*': 'other' })", { v: 3 })).toBe('other')
