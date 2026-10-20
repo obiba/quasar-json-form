@@ -43,6 +43,11 @@ describe('amber expressions', () => {
     expect(rewriteExpression("$('A.B') === '1'")).toBe("A.B === '1'")
     expect(rewriteExpression('$("A") > 2 && formData.B.C < 3')).toBe('A > 2 && B.C < 3')
     expect(rewriteExpression('Date.parse(val) > Date.now()', 'G.D')).toBe('parseDate(G.D) > now()')
+    expect(rewriteExpression('val && parseInt(val) <= new Date().getFullYear()', 'G.Y'))
+      .toBe('G.Y && parseInt(G.Y) <= currentYear()')
+    expect(rewriteExpression('val == new Date().getMonth() + 1 && new Date().getTime() > 0', 'G.M'))
+      .toBe('G.M == (currentMonth() - 1) + 1 && now() > 0')
+    expect(() => rewriteExpression('new Date().getMilliseconds() > 0')).toThrow()
     // not a reference: a string literal, a property named val
     expect(rewriteExpression("x.val == 'val'", 'G.D')).toBe("x.val == 'val'")
   })

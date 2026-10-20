@@ -44,10 +44,23 @@ export function isAmberSchema(value: unknown): boolean {
 
 const CHOICE_TYPES = ['radiogroup', 'checkboxgroup', 'select', 'autocomplete', 'image-select']
 
+/** The rule of each part of `new Date()`: `getMonth()` is 0-based, `currentMonth()` is not */
+const DATE_GETTERS: Record<string, string> = {
+  getFullYear: 'currentYear()',
+  getMonth: '(currentMonth() - 1)',
+  getDate: 'currentDay()',
+  getDay: 'currentWeekday()',
+  getHours: 'currentHour()',
+  getMinutes: 'currentMinute()',
+  getSeconds: 'currentSecond()',
+  getTime: 'now()',
+}
+
 /**
  * Rewrites an Amber expression (JavaScript) into a rule: `$('A.B')` and
  * `formData.A.B` become `A.B`, `val` the path of the item itself,
  * `Date.parse()` / `Date.now()` the `parseDate()` / `now()` functions,
+ * `new Date().getFullYear()` (and the other parts) `currentYear()`...,
  * `list.includes(v)` and the `indexOf` tests `contains(list, v)`, `x.length`
  * `length(x)`; a single-expression arrow function `(data) => data.A` is
  * reduced to its body. Throws an Error when the result is not a valid rule.
@@ -62,6 +75,7 @@ export function rewriteExpression(expression: string, self?: string): string {
     .replace(/(?<![\w$.])formData\./g, '')
     .replace(/(?<![\w$.])Date\.parse\(/g, 'parseDate(')
     .replace(/(?<![\w$.])Date\.now\(\s*\)/g, 'now()')
+    .replace(/(?<![\w$.])new\s+Date\(\s*\)\.(get\w+)\(\s*\)/g, (match, getter: string) => DATE_GETTERS[getter] ?? match)
   if (self) rule = rule.replace(/(?<![\w$.'"])val(?![\w$'"])/g, self)
   const path = '([A-Za-z_$][\\w$]*(?:\\.[A-Za-z_$][\\w$]*)*)'
   rule = rule

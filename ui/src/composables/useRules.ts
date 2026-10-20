@@ -137,6 +137,26 @@ export class RuleEngine {
     // parseDate(value): milliseconds since the epoch of a date string, as `Date.parse()` (NaN when invalid)
     this.addFunction('parseDate', (value: any) => (typeof value === 'string' ? Date.parse(value) : NaN))
 
+    // the parts of the current local date and time: currentMonth() from 1 to 12,
+    // currentWeekday() from 0 (Sunday) to 6, as `new Date().getDay()`
+    this.addFunction('currentYear', () => new Date().getFullYear())
+    this.addFunction('currentMonth', () => new Date().getMonth() + 1)
+    this.addFunction('currentDay', () => new Date().getDate())
+    this.addFunction('currentWeekday', () => new Date().getDay())
+    this.addFunction('currentHour', () => new Date().getHours())
+    this.addFunction('currentMinute', () => new Date().getMinutes())
+    this.addFunction('currentSecond', () => new Date().getSeconds())
+
+    // today(): the current local date as an ISO string (`YYYY-MM-DD`), comparable with the stored dates
+    this.addFunction('today', () => {
+      const d = new Date()
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    })
+
+    // parseInt(value, radix), parseFloat(value): as the JavaScript functions
+    this.addFunction('parseInt', (value: any, radix?: number) => Number.parseInt(value, radix))
+    this.addFunction('parseFloat', (value: any) => Number.parseFloat(value))
+
     // map(value, mapping, undefValue): recodes a value (each value of an array)
     this.addFunction('map', mapValue)
   }
