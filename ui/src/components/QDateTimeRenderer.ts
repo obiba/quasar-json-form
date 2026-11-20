@@ -6,6 +6,7 @@ import type { QPopupProxy as QPopupProxyInstance } from 'quasar'
 import { useControlProperties } from '../composables/useControlProperties'
 import { useFormI18n } from '../composables/useFormI18n'
 import { omitOptions } from '../utils/options'
+import { openPopupOnClick } from '../utils/popup'
 
 export default defineComponent({
   name: 'QDateTimeRenderer',
@@ -44,6 +45,9 @@ export default defineComponent({
       controlResult.handleChange(control.value.path, value || undefined)
     }
 
+    // a click in the field opens the date picker, the time picker stays on its icon
+    const openDatePopup = openPopupOnClick(datePopupRef)
+
     const closeDatePopup = () => {
       datePopupRef.value?.hide()
     }
@@ -67,6 +71,7 @@ export default defineComponent({
         required: control.value.required,
         disable: !isEnabled.value && !isReadonly.value,
         readonly: isReadonly.value,
+        ...(isReadonly.value || !isEnabled.value ? {} : { onClick: openDatePopup }),
       }, {
         ...hintSlot.value,
         ...(isReadonly.value ? {} : {
