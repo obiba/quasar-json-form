@@ -19,6 +19,13 @@ const openPopup = async (wrapper: any, index = 0) => {
   await flush()
 }
 
+const clickField = async (wrapper: any, selector = 'input') => {
+  await wrapper.find(selector).trigger('click')
+  await flush()
+  await new Promise((resolve) => setTimeout(resolve, 0))
+  await flush()
+}
+
 const closeMenus = () => {
   document.body.querySelectorAll('.q-menu, .q-dialog').forEach((el) => el.remove())
 }
@@ -250,6 +257,50 @@ describe('date picker popup', () => {
     expect(lastData(wrapper).d).toBe('2020-02-20')
     await date.find('.q-btn').trigger('click')
     await flush()
+    wrapper.unmount()
+    closeMenus()
+  })
+
+  it('opens the picker on a click in the field, not on the clear button or read-only', async () => {
+    const schema = { type: 'object', properties: { d: { type: 'string', format: 'date', title: 'D' } } }
+    let wrapper = mountForm({
+      schema,
+      uischema: { type: 'Control', scope: '#/properties/d', options: { clearable: true } },
+      modelValue: { d: '2020-02-15' },
+    })
+    await flush()
+    await clickField(wrapper, '.q-field__append .q-field__focusable-action')
+    expect(wrapper.findComponent(QDate).exists()).toBe(false)
+    await clickField(wrapper)
+    expect(wrapper.findComponent(QDate).exists()).toBe(true)
+    wrapper.unmount()
+    closeMenus()
+
+    wrapper = mountForm({ schema, modelValue: { d: '2020-02-15' }, readonly: true })
+    await flush()
+    await clickField(wrapper)
+    expect(wrapper.findComponent(QDate).exists()).toBe(false)
+    wrapper.unmount()
+    closeMenus()
+  })
+
+  it('opens the time picker and the date-time date picker on a click in the field', async () => {
+    const schema = {
+      type: 'object',
+      properties: { t: { type: 'string', format: 'time' }, dt: { type: 'string', format: 'date-time' } },
+    }
+    let wrapper = mountForm({ schema, uischema: { type: 'Control', scope: '#/properties/t' }, modelValue: { t: '10:30' } })
+    await flush()
+    await clickField(wrapper)
+    expect(wrapper.findComponent(QTime).exists()).toBe(true)
+    wrapper.unmount()
+    closeMenus()
+
+    wrapper = mountForm({ schema, uischema: { type: 'Control', scope: '#/properties/dt' }, modelValue: { dt: '2020-01-15 10:30' } })
+    await flush()
+    await clickField(wrapper)
+    expect(wrapper.findComponent(QDate).exists()).toBe(true)
+    expect(wrapper.findComponent(QTime).exists()).toBe(false)
     wrapper.unmount()
     closeMenus()
   })

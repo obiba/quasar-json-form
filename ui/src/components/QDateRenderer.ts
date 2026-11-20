@@ -9,6 +9,7 @@ import { useFormI18n } from '../composables/useFormI18n'
 import { useReportedErrors } from '../composables/useFormErrors'
 import { DATA_KEY } from '../composables/keys'
 import { getByPath, omitOptions, RENDERER_OPTION_KEYS } from '../utils/options'
+import { openPopupOnClick } from '../utils/popup'
 
 /** angular-strap style masks (`yyyy-MM-dd`) to Quasar masks (`YYYY-MM-DD`) */
 export function normalizeDateMask(mask: unknown): string | undefined {
@@ -194,6 +195,8 @@ export default defineComponent({
       },
     )
 
+    const openPopup = openPopupOnClick(popupRef)
+
     const closePopup = () => {
       popupRef.value?.hide()
     }
@@ -231,6 +234,7 @@ export default defineComponent({
         required: control.value.required,
         disable: disabled,
         readonly: isReadonly.value,
+        ...(isReadonly.value || disabled ? {} : { onClick: openPopup }),
       }, {
         ...hintSlot.value,
         ...(isReadonly.value || disabled ? {} : {
